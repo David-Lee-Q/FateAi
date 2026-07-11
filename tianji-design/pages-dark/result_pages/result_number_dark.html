@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字能量解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-number: #06b6d4;
+            --color-destiny: #8b5cf6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .number-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-number), var(--color-destiny));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 
+                0 0 40px rgba(6, 182, 212, 0.4),
+                0 0 80px rgba(139, 92, 246, 0.2);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .digit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 0.5rem;
+        }
+        .digit-box {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .digit-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(6, 182, 212, 0.3);
+        }
+        .vibration-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--color-number), var(--color-destiny));
+        }
+        .calculation-step {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 20px var(--color-number);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">数字能量</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-cyan-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 数字能量头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-cyan-900/40 via-slate-900/50 to-violet-900/40 rounded-2xl p-6 border border-cyan-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center">
+                    <i class="fas fa-calculator text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white glow-text">数字能量解读</h1>
+                    <p class="text-cyan-300">生命灵数 · 命运数字</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm border border-cyan-500/40">
+                    <i class="fas fa-star mr-1"></i>生命灵数：7
+                </span>
+                <span class="px-3 py-1 bg-violet-500/20 text-violet-300 rounded-full text-sm border border-violet-500/40">
+                    <i class="fas fa-heart mr-1"></i>生日数字：1993-06-15
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-vibrate mr-1"></i>振动频率：高
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 核心数字展示 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-8 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-hashtag text-cyan-400"></i>
+                生命灵数
+            </h2>
+
+            <div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+                <!-- 核心数字圆 -->
+                <div class="flex-shrink-0 flex flex-col items-center">
+                    <div class="number-circle mb-3">7</div>
+                    <span class="text-cyan-400 font-semibold">生命灵数</span>
+                </div>
+                
+                <!-- 数字含义 -->
+                <div class="flex-1 space-y-4">
+                    <div class="bg-cyan-500/10 rounded-xl p-4 border border-cyan-500/30">
+                        <h3 class="text-cyan-400 font-semibold mb-2">数字7的特质</h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            7代表内在智慧、精神追求和深度思考。这是最具灵性的数字之一，拥有它的人往往对宇宙奥秘有天生的感知力。
+                        </p>
+                    </div>
+                    <div class="bg-violet-500/10 rounded-xl p-4 border border-violet-500/30">
+                        <h3 class="text-violet-400 font-semibold mb-2">天赋优势</h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            直觉敏锐、分析力强、善于独处、追求真理、对神秘事物有浓厚兴趣。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 计算过程 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-calculator text-violet-400"></i>
+                计算过程
+            </h2>
+
+            <div class="space-y-4">
+                <!-- 原始数字 -->
+                <div class="calculation-step rounded-xl p-4">
+                    <p class="text-gray-400 text-sm mb-2">1. 出生日期数字</p>
+                    <div class="digit-grid mb-2">
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">1</span><br><span class="text-xs text-gray-500">年</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">9</span><br><span class="text-xs text-gray-500">年</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">9</span><br><span class="text-xs text-gray-500">年</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">3</span><br><span class="text-xs text-gray-500">年</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">0</span><br><span class="text-xs text-gray-500">月</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">6</span><br><span class="text-xs text-gray-500">月</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">1</span><br><span class="text-xs text-gray-500">日</span></div>
+                        <div class="digit-box"><span class="text-xl font-bold text-cyan-400">5</span><br><span class="text-xs text-gray-500">日</span></div>
+                    </div>
+                </div>
+
+                <!-- 第一步计算 -->
+                <div class="calculation-step rounded-xl p-4">
+                    <p class="text-gray-400 text-sm mb-2">2. 第一步：所有数字相加</p>
+                    <p class="text-white font-mono">1 + 9 + 9 + 3 + 0 + 6 + 1 + 5 = <span class="text-cyan-400 font-bold">34</span></p>
+                </div>
+
+                <!-- 第二步计算 -->
+                <div class="calculation-step rounded-xl p-4">
+                    <p class="text-gray-400 text-sm mb-2">3. 第二步：继续相加至单位数</p>
+                    <p class="text-white font-mono">3 + 4 = <span class="text-cyan-400 font-bold">7</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 多维数字解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-pie text-cyan-400"></i>
+                多维数字解读
+            </h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/50 rounded-xl p-4 border border-cyan-500/30">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold">7</span>
+                        <span class="text-gray-400 text-sm">生命灵数</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-2">代表人生核心课题与成长方向</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white text-sm">精神追求</span>
+                        <span class="text-cyan-400 text-sm">核心</span>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 border border-violet-500/30">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center text-violet-400 font-bold">5</span>
+                        <span class="text-gray-400 text-sm">性格数字</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-2">代表外在表现与行为模式</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white text-sm">自由变革</span>
+                        <span class="text-violet-400 text-sm">外在</span>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 border border-emerald-500/30">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">3</span>
+                        <span class="text-gray-400 text-sm">灵魂数字</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-2">代表内心深处的渴望</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white text-sm">创造表达</span>
+                        <span class="text-emerald-400 text-sm">内在</span>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 border border-amber-500/30">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold">8</span>
+                        <span class="text-gray-400 text-sm">使命数字</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-2">代表此生需要完成的课题</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white text-sm">成功丰盛</span>
+                        <span class="text-amber-400 text-sm">使命</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 年度数字 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-cyan-900/30 to-slate-900/50 rounded-2xl p-6 border border-cyan-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-cyan-400"></i>
+                2025年度数字
+            </h2>
+            
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center">
+                    <span class="text-white text-2xl font-bold">9</span>
+                </div>
+                <div>
+                    <p class="text-cyan-400 font-semibold">9号年</p>
+                    <p class="text-gray-400 text-sm">完成、释放与新的开始</p>
+                </div>
+            </div>
+            
+            <p class="text-gray-300 text-sm leading-relaxed">
+                9是完结与重生的数字。这一年你将告别旧模式、清理不再服务你的事物，为新周期腾出空间。
+                对于7号人来说，这是一个特别的灵性成长年份，适合深度反思与内在探索。
+            </p>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-cyan-900/30 to-slate-900/60 rounded-2xl p-6 border border-cyan-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于数字学的个性化分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    你的生命数字是7——这是宇宙中最具灵性的数字之一。你天生拥有一双看透表象的眼睛，对生命本质有着不懈的追寻。
+                    <br><br>
+                    <span class="text-cyan-400 font-medium">核心特质：</span>你是一个思想者，喜欢独处与深度思考。喧嚣的世界有时会让你感到疲惫，你需要定期的独处时间来充电。在亲密关系中，你可能显得有些神秘，但这恰恰是你吸引人的地方。
+                    <br><br>
+                    <span class="text-violet-400 font-medium">人生课题：</span>学会在独处与社交之间找到平衡。过于封闭可能让你错失人间温暖；过于追求精神世界可能让你脱离现实基础。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">行动指引：</span>继续追随你的直觉，但记得将智慧落地于生活。冥想、阅读、写作都将成为你的灵魂滋养。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

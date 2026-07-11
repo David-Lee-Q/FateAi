@@ -1,0 +1,43 @@
+/**
+ * 天机 AI 运势查询工具 - 服务入口
+ * 基于 Express 的 REST API 服务
+ */
+
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import fortuneRouter from './routes/fortune';
+import configRouter from './routes/config';
+
+dotenv.config();
+
+const app = express();
+
+// 中间件配置
+app.use(cors());
+// 手相算命需上传 Base64 图片，默认 100kb 限制不足，设置为 50MB
+app.use(express.json({ limit: '50mb' }));
+
+// 健康检查接口
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', name: '天机 AI 运势查询工具', version: '1.0.0' });
+});
+
+// 注册占卜路由
+app.use('/api/fortune', fortuneRouter);
+
+// 注册 AI 配置管理路由
+app.use('/api/config', configRouter);
+
+// 启动服务
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`天机服务已启动: http://localhost:${PORT}`);
+  console.log(`接口文档:`);
+  console.log(`  POST /api/fortune/query   - 提交占卜查询`);
+  console.log(`  GET  /api/fortune/result/:id - 获取查询结果`);
+  console.log(`  GET  /api/fortune/history   - 获取历史记录`);
+  console.log(`  GET  /api/health             - 健康检查`);
+  console.log(`  GET  /api/config/ai          - 获取AI配置`);
+  console.log(`  PUT  /api/config/ai          - 保存AI配置`);
+});

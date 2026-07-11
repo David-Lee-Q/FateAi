@@ -1,0 +1,989 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姓名测算 — 天机</title>
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #f8fafc;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #f1f5f9;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #1a1e2e;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #8b6914;
+
+  /* State colors */
+  --state-success: #059669;
+  --state-warning: #d97706;
+  --state-error: #dc2626;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ---- 姓名测算主题：命理古韵风格 ---- */
+
+      /* 八卦装饰纹样 */
+      .bagua-spinner {
+        animation: bagua-rotate 60s linear infinite;
+      }
+      @keyframes bagua-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      /* 三才圆圈容器 */
+      .sancai-circle {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+      }
+      @media (min-width: 640px) {
+        .sancai-circle {
+          width: 170px;
+          height: 170px;
+        }
+      }
+
+      /* 吉凶色标 */
+      .luck-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 500;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .luck-badge.luck-ji {
+        background: rgba(26, 138, 92, 0.12);
+        color: #2ecc71;
+      }
+      .luck-badge.luck-zhongji {
+        background: rgba(26, 138, 92, 0.1);
+        color: var(--state-success);
+      }
+      .luck-badge.luck-xiong {
+        background: rgba(196, 58, 58, 0.12);
+        color: #e74c3c;
+      }
+      .luck-badge.luck-gi {
+        background: rgba(200, 122, 26, 0.12);
+        color: var(--state-warning);
+      }
+      .luck-badge.luck-daji {
+        background: rgba(200, 168, 78, 0.15);
+        color: var(--color-gold);
+      }
+
+      /* 结果卡片 */
+      .result-card {
+        background: var(--color-bg-elevated);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+      }
+
+      /* AI分析渐变边框卡片 */
+      .ai-analysis-card {
+        position: relative;
+        background: linear-gradient(135deg, rgba(0, 75, 170, 0.03) 0%, rgba(200, 168, 78, 0.05) 100%);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+      }
+      .ai-analysis-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius-xl);
+        padding: 1px;
+        background: linear-gradient(135deg, var(--color-primary-lighter), var(--color-gold));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      /* 推荐卡片 */
+      .recommend-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-6) var(--space-4);
+        background: var(--color-bg-elevated);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border-light);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        text-align: center;
+      }
+      .recommend-card:hover {
+        border-color: var(--color-primary-lighter);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+
+      /* 五格表格 */
+      .wuge-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: var(--text-sm);
+      }
+      .wuge-table thead th {
+        text-align: left;
+        padding: 12px 16px;
+        font-weight: 500;
+        white-space: nowrap;
+        color: var(--color-text-secondary);
+        background: var(--color-bg-inset);
+      }
+      .wuge-table thead th:first-child {
+        border-radius: var(--radius-lg) 0 0 0;
+      }
+      .wuge-table thead th:last-child {
+        border-radius: 0 var(--radius-lg) 0 0;
+      }
+      .wuge-table tbody td {
+        padding: 12px 16px;
+        border-top: 1px solid var(--color-border-light);
+        color: var(--color-text);
+      }
+      .wuge-table tbody tr:last-child td:first-child {
+        border-radius: 0 0 0 var(--radius-lg);
+      }
+      .wuge-table tbody tr:last-child td:last-child {
+        border-radius: 0 0 var(--radius-lg) 0;
+      }
+
+      /* 字义分析卡片 */
+      .char-card {
+        flex: 1;
+        min-width: 160px;
+        padding: var(--space-5);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border-light);
+        background: var(--color-bg-elevated);
+        text-align: center;
+        transition: all var(--transition-base);
+      }
+      .char-card:hover {
+        border-color: var(--color-primary-lighter);
+        box-shadow: var(--shadow-sm);
+      }
+      .char-card .char-big {
+        font-family: 'Noto Serif SC', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--color-primary-light);
+        line-height: 1.2;
+      }
+      @media (min-width: 640px) {
+        .char-card .char-big {
+          font-size: 3rem;
+        }
+      }
+      .char-card .char-stroke {
+        font-size: var(--text-xs);
+        color: var(--color-text-tertiary);
+        margin-top: 4px;
+      }
+      .char-card .char-meaning {
+        font-size: var(--text-sm);
+        color: var(--color-text-secondary);
+        margin-top: var(--space-2);
+        line-height: var(--leading-relaxed);
+      }
+      .char-card .char-wuxing {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: var(--space-2);
+        padding: 3px 10px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 500;
+      }
+
+      /* 五行色 */
+      .wuxing-jin { background: rgba(200, 168, 78, 0.15); color: var(--color-gold); }
+      .wuxing-mu { background: rgba(26, 138, 92, 0.12); color: #2ecc71; }
+      .wuxing-shui { background: rgba(0, 75, 170, 0.12); color: var(--color-primary-lighter); }
+      .wuxing-huo { background: rgba(196, 58, 58, 0.12); color: #e74c3c; }
+      .wuxing-tu { background: rgba(180, 140, 100, 0.15); color: #b08060; }
+
+      /* 表单元素 */
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-inset);
+        border: 1.5px solid var(--color-border);
+        color: var(--color-text);
+        font-size: var(--text-base);
+        font-family: var(--font-body);
+        outline: none;
+        transition: all var(--transition-fast);
+      }
+      .form-input:focus {
+        border-color: var(--color-primary-lighter);
+        box-shadow: 0 0 0 3px rgba(0, 75, 170, 0.1);
+      }
+      .form-input::placeholder {
+        color: var(--color-text-tertiary);
+      }
+      .form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b92a8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 40px;
+      }
+      .form-label {
+        display: block;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        margin-bottom: var(--space-2);
+      }
+
+      /* 生肖配对标签 */
+      .zodiac-tag-good {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        background: rgba(26, 138, 92, 0.08);
+        color: var(--state-success);
+        border: 1px solid rgba(26, 138, 92, 0.2);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .zodiac-tag-bad {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        background: rgba(196, 58, 58, 0.06);
+        color: #c43a3a;
+        border: 1px solid rgba(196, 58, 58, 0.15);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* 星光粒子 */
+      .name-particles {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .name-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(200, 168, 78, 0.5);
+        animation: name-particle-float 8s ease-in-out infinite;
+      }
+      @keyframes name-particle-float {
+        0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+        50% { opacity: 1; transform: translateY(-30px) scale(1); }
+      }
+
+      /* 星星闪烁 */
+      @keyframes star-twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+      .star-twinkle {
+        animation: star-twinkle 3s ease-in-out infinite;
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body);">
+
+    <!-- 导航栏（与首页一致，民俗趣味高亮） -->
+    <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========== 页面标题区：深蓝+金色古韵 ========== -->
+        <section class="relative overflow-hidden" style="background: linear-gradient(180deg, #001a40 0%, #002860 40%, #003580 100%);">
+            <!-- 星光粒子背景 -->
+            <div class="name-particles">
+                <div class="name-particle" style="left: 6%; top: 12%; animation-delay: 0s;"></div>
+                <div class="name-particle" style="left: 15%; top: 30%; animation-delay: 1.5s;"></div>
+                <div class="name-particle" style="left: 28%; top: 8%; animation-delay: 3s;"></div>
+                <div class="name-particle" style="left: 42%; top: 22%; animation-delay: 0.8s;"></div>
+                <div class="name-particle" style="left: 55%; top: 45%; animation-delay: 2s;"></div>
+                <div class="name-particle" style="left: 65%; top: 10%; animation-delay: 4s;"></div>
+                <div class="name-particle" style="left: 76%; top: 35%; animation-delay: 1.2s;"></div>
+                <div class="name-particle" style="left: 86%; top: 18%; animation-delay: 2.5s;"></div>
+                <div class="name-particle" style="left: 93%; top: 50%; animation-delay: 3.5s;"></div>
+                <div class="name-particle" style="left: 10%; top: 58%; animation-delay: 5s;"></div>
+            </div>
+
+            <!-- 星星装饰 SVG -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full" viewBox="0 0 1280 320" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="90" cy="35" r="1.5" fill="#e8d48b" class="star-twinkle" style="animation-delay: 0s;"/>
+                    <circle cx="220" cy="75" r="1" fill="#e8d48b" class="star-twinkle" style="animation-delay: 0.5s;"/>
+                    <circle cx="380" cy="28" r="1.2" fill="#c8a84e" class="star-twinkle" style="animation-delay: 1s;"/>
+                    <circle cx="510" cy="85" r="0.8" fill="#e8d48b" class="star-twinkle" style="animation-delay: 1.5s;"/>
+                    <circle cx="640" cy="45" r="1.5" fill="#c8a84e" class="star-twinkle" style="animation-delay: 0.3s;"/>
+                    <circle cx="770" cy="95" r="1" fill="#e8d48b" class="star-twinkle" style="animation-delay: 2s;"/>
+                    <circle cx="910" cy="30" r="1.3" fill="#c8a84e" class="star-twinkle" style="animation-delay: 0.8s;"/>
+                    <circle cx="1060" cy="65" r="0.8" fill="#e8d48b" class="star-twinkle" style="animation-delay: 1.2s;"/>
+                    <circle cx="1190" cy="40" r="1.5" fill="#c8a84e" class="star-twinkle" style="animation-delay: 1.8s;"/>
+                    <circle cx="160" cy="140" r="1" fill="#e8d48b" class="star-twinkle" style="animation-delay: 2.5s;"/>
+                    <circle cx="440" cy="170" r="0.8" fill="#c8a84e" class="star-twinkle" style="animation-delay: 0.7s;"/>
+                    <circle cx="700" cy="155" r="1.2" fill="#e8d48b" class="star-twinkle" style="animation-delay: 1.3s;"/>
+                    <circle cx="960" cy="190" r="1" fill="#c8a84e" class="star-twinkle" style="animation-delay: 0.4s;"/>
+                    <circle cx="1120" cy="165" r="0.8" fill="#e8d48b" class="star-twinkle" style="animation-delay: 2.2s;"/>
+                </svg>
+            </div>
+
+            <!-- 八卦装饰 SVG -->
+            <div class="absolute top-6 right-6 sm:top-10 sm:right-16 lg:right-24 opacity-10 bagua-spinner">
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                    <circle cx="60" cy="60" r="56" stroke="#c8a84e" stroke-width="1"/>
+                    <!-- 太极 -->
+                    <path d="M60 4 A56 56 0 0 1 60 116 A28 28 0 0 1 60 60 A28 28 0 0 0 60 4Z" fill="#c8a84e" opacity="0.6"/>
+                    <circle cx="60" cy="32" r="6" fill="#002860"/>
+                    <circle cx="60" cy="88" r="6" fill="#c8a84e" opacity="0.6"/>
+                    <!-- 八卦短线 -->
+                    <line x1="60" y1="0" x2="60" y2="8" stroke="#c8a84e" stroke-width="0.5"/>
+                    <line x1="60" y1="112" x2="60" y2="120" stroke="#c8a84e" stroke-width="0.5"/>
+                    <line x1="0" y1="60" x2="8" y2="60" stroke="#c8a84e" stroke-width="0.5"/>
+                    <line x1="112" y1="60" x2="120" y2="60" stroke="#c8a84e" stroke-width="0.5"/>
+                </svg>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20" style="max-width: var(--max-width);">
+                <!-- 面包屑 -->
+                <nav class="flex items-center gap-2 text-sm mb-6" style="color: var(--color-text-tertiary);">
+                    <a href="#" class="transition-colors hover:text-white">首页</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <a href="#" class="transition-colors hover:text-white">民俗趣味</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="color: var(--color-gold-light);">姓名测算</span>
+                </nav>
+
+                <!-- 标题 -->
+                <div class="flex items-start gap-6 sm:gap-8">
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mb-4" style="color: #f0f0f0; font-family: 'Noto Serif SC', serif; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                            姓名测算
+                        </h1>
+                        <p class="text-base sm:text-lg max-w-2xl" style="color: rgba(232, 212, 139, 0.8); line-height: var(--leading-relaxed);">
+                            三才五格数理分析，揭示姓名吉凶密码
+                        </p>
+                    </div>
+                    <!-- 毛笔/卷轴图标 -->
+                    <div class="hidden sm:flex flex-shrink-0 items-center justify-center" style="width: 64px; height: 64px;">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <!-- 卷轴 -->
+                            <rect x="12" y="8" width="40" height="48" rx="4" stroke="var(--color-gold)" stroke-width="1.2" fill="rgba(200,168,78,0.06)"/>
+                            <rect x="8" y="12" width="8" height="40" rx="2" stroke="var(--color-gold)" stroke-width="0.8" fill="rgba(200,168,78,0.1)"/>
+                            <rect x="48" y="12" width="8" height="40" rx="2" stroke="var(--color-gold)" stroke-width="0.8" fill="rgba(200,168,78,0.1)"/>
+                            <!-- 文字线条 -->
+                            <line x1="22" y1="22" x2="42" y2="22" stroke="var(--color-gold)" stroke-width="1" opacity="0.5"/>
+                            <line x1="22" y1="30" x2="42" y2="30" stroke="var(--color-gold)" stroke-width="1" opacity="0.5"/>
+                            <line x1="22" y1="38" x2="36" y2="38" stroke="var(--color-gold)" stroke-width="1" opacity="0.5"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 输入表单区 ========== -->
+        <section style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <div class="result-card p-5 sm:p-8">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-6" style="color: var(--color-text); font-family: 'Noto Serif SC', serif;">
+                        <i data-lucide="feather" class="w-5 h-5 inline-block mr-2 align-text-bottom" style="color: var(--color-gold);"></i>
+                        输入姓名信息
+                    </h2>
+
+                    <div class="grid grid-cols-1 gap-5">
+                        <!-- 姓名（占整行，用户自由输入） -->
+                        <div>
+                            <label class="form-label" for="name-input">姓名汉字</label>
+                            <input
+                                id="name-input"
+                                type="text"
+                                class="form-input"
+                                placeholder="请输入要测算的姓名，如：李明辉"
+                                maxlength="4"
+                            />
+                            <p class="text-xs mt-1.5" style="color: var(--color-text-tertiary);">支持 1-4 个汉字，建议使用本名</p>
+                        </div>
+
+                        <!-- 性别 + 出生日期（同行） -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="form-label" for="gender-select">性别</label>
+                                <select id="gender-select" class="form-input form-select">
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" for="birth-date">出生日期（可选）</label>
+                                <input
+                                    id="birth-date"
+                                    type="date"
+                                    class="form-input"
+                                />
+                                <p class="text-xs mt-1.5" style="color: var(--color-text-tertiary);">填写后可结合八字分析</p>
+                            </div>
+                        </div>
+
+                        <!-- 笔画标准 -->
+                        <div>
+                            <label class="form-label" for="stroke-standard">笔画标准</label>
+                            <select id="stroke-standard" class="form-input form-select">
+                                <option value="kangxi" selected>康熙字典笔画（推荐）</option>
+                                <option value="simplified">简体笔画</option>
+                                <option value="traditional">繁体笔画</option>
+                            </select>
+                            <p class="text-xs mt-1.5" style="color: var(--color-text-tertiary);">传统姓名学以康熙字典笔画为准，分析结果更精确</p>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="flex justify-end mt-6">
+                        <button
+                            data-dom-id="nametest-submit"
+                            class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-base font-medium transition-all"
+                            style="background: var(--color-primary); color: var(--color-text-inverse); box-shadow: 0 4px 12px rgba(0,75,170,0.25);"
+                            onmouseover="this.style.background='var(--color-primary-light)'; this.style.boxShadow='0 6px 20px rgba(0,75,170,0.35)'"
+                            onmouseout="this.style.background='var(--color-primary)'; this.style.boxShadow='0 4px 12px rgba(0,75,170,0.25)'"
+                        >
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            开始测算
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 三才分析结果 ========== -->
+        <section style="background: var(--color-bg-elevated);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <h2 class="text-lg sm:text-xl font-semibold mb-6" style="color: var(--color-text); font-family: 'Noto Serif SC', serif;">
+                    测算结果：李明辉
+                </h2>
+
+                <!-- 三才分析：天格 / 人格 / 地格 三个圆圈 -->
+                <div class="result-card p-5 sm:p-8 mb-6">
+                    <h3 class="text-base font-semibold mb-6" style="color: var(--color-text);">
+                        <i data-lucide="circle-dot" class="w-4 h-4 inline-block mr-2 align-text-bottom" style="color: var(--color-gold);"></i>
+                        三才分析
+                    </h3>
+
+                    <div class="flex items-center justify-center gap-6 sm:gap-10 lg:gap-16 flex-wrap">
+                        <!-- 天格 -->
+                        <div class="sancai-circle" style="background: linear-gradient(135deg, rgba(0,75,170,0.08), rgba(0,75,170,0.18)); border: 2px solid var(--color-primary-lighter);">
+                            <span class="text-xs font-medium" style="color: var(--color-primary-lighter);">天格</span>
+                            <span class="text-2xl sm:text-3xl font-bold mt-1" style="color: var(--color-primary-light); font-family: 'Noto Serif SC', serif;">8</span>
+                            <span class="luck-badge luck-ji mt-2">吉</span>
+                        </div>
+                        <!-- 连接线 -->
+                        <svg width="32" height="8" viewBox="0 0 32 8" class="hidden sm:block flex-shrink-0"><line x1="0" y1="4" x2="32" y2="4" stroke="var(--color-gold)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/></svg>
+                        <!-- 人格 -->
+                        <div class="sancai-circle" style="background: linear-gradient(135deg, rgba(200,168,78,0.08), rgba(200,168,78,0.18)); border: 2px solid var(--color-gold);">
+                            <span class="text-xs font-medium" style="color: var(--color-gold);">人格</span>
+                            <span class="text-2xl sm:text-3xl font-bold mt-1" style="color: var(--color-gold); font-family: 'Noto Serif SC', serif;">15</span>
+                            <span class="luck-badge luck-daji mt-2">大吉</span>
+                        </div>
+                        <!-- 连接线 -->
+                        <svg width="32" height="8" viewBox="0 0 32 8" class="hidden sm:block flex-shrink-0"><line x1="0" y1="4" x2="32" y2="4" stroke="var(--color-gold)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/></svg>
+                        <!-- 地格 -->
+                        <div class="sancai-circle" style="background: linear-gradient(135deg, rgba(26,138,92,0.08), rgba(26,138,92,0.18)); border: 2px solid #2ecc71;">
+                            <span class="text-xs font-medium" style="color: #2ecc71;">地格</span>
+                            <span class="text-2xl sm:text-3xl font-bold mt-1" style="color: var(--state-success); font-family: 'Noto Serif SC', serif;">14</span>
+                            <span class="luck-badge luck-ji mt-2">吉</span>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-center mt-6" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                        三才配置为「金一金一火」，天格地格相生，人格大吉。性格刚毅果敢，天生具有领导才能，事业运势亨通。
+                    </p>
+                </div>
+
+                <!-- ========== 五格分析表格 ========== -->
+                <div class="result-card mb-6 overflow-hidden">
+                    <div class="p-5 sm:p-8 pb-0 sm:pb-0">
+                        <h3 class="text-base font-semibold mb-6" style="color: var(--color-text);">
+                            <i data-lucide="table-2" class="w-4 h-4 inline-block mr-2 align-text-bottom" style="color: var(--color-gold);"></i>
+                            五格分析
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="wuge-table" style="min-width: 480px;">
+                            <thead>
+                                <tr>
+                                    <th>格名</th>
+                                    <th>计算方式</th>
+                                    <th>笔画数</th>
+                                    <th>数理</th>
+                                    <th>吉凶</th>
+                                    <th class="min-w-[160px]">含义</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-medium whitespace-nowrap" style="color: var(--color-primary-light);">天格</td>
+                                    <td class="whitespace-nowrap" style="color: var(--color-text-secondary);">姓+1</td>
+                                    <td class="whitespace-nowrap font-medium">8</td>
+                                    <td class="whitespace-nowrap">坚刚</td>
+                                    <td class="whitespace-nowrap"><span class="luck-badge luck-ji">吉</span></td>
+                                    <td style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">意志坚强，有突破万难的气概，能克服困难，成就大志。</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium whitespace-nowrap" style="color: var(--color-gold);">人格</td>
+                                    <td class="whitespace-nowrap" style="color: var(--color-text-secondary);">姓+名首字</td>
+                                    <td class="whitespace-nowrap font-medium">15</td>
+                                    <td class="whitespace-nowrap">福寿</td>
+                                    <td class="whitespace-nowrap"><span class="luck-badge luck-daji">大吉</span></td>
+                                    <td style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">福寿圆满，富贵荣誉，涵养雅量，德高望重。</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium whitespace-nowrap" style="color: #2ecc71;">地格</td>
+                                    <td class="whitespace-nowrap" style="color: var(--color-text-secondary);">名末字+1</td>
+                                    <td class="whitespace-nowrap font-medium">14</td>
+                                    <td class="whitespace-nowrap">破兆</td>
+                                    <td class="whitespace-nowrap"><span class="luck-badge luck-ji">吉</span></td>
+                                    <td style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">忍耐克己，进取勇猛，但须防意外之灾。</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium whitespace-nowrap" style="color: var(--color-primary-lighter);">外格</td>
+                                    <td class="whitespace-nowrap" style="color: var(--color-text-secondary);">总格-人格+1</td>
+                                    <td class="whitespace-nowrap font-medium">7</td>
+                                    <td class="whitespace-nowrap">刚毅</td>
+                                    <td class="whitespace-nowrap"><span class="luck-badge luck-ji">吉</span></td>
+                                    <td style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">精力旺盛，头脑明敏，排除万难，为人尊仰。</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium whitespace-nowrap" style="color: var(--color-gold-dark);">总格</td>
+                                    <td class="whitespace-nowrap" style="color: var(--color-text-secondary);">姓名总笔画</td>
+                                    <td class="whitespace-nowrap font-medium">21</td>
+                                    <td class="whitespace-nowrap">明月</td>
+                                    <td class="whitespace-nowrap"><span class="luck-badge luck-daji">大吉</span></td>
+                                    <td style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">光风霁月，万物确立，大业成就，智勇得志。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ========== 字义分析 ========== -->
+                <div class="result-card p-5 sm:p-8 mb-6">
+                    <h3 class="text-base font-semibold mb-6" style="color: var(--color-text);">
+                        <i data-lucide="book-open" class="w-4 h-4 inline-block mr-2 align-text-bottom" style="color: var(--color-gold);"></i>
+                        字义分析
+                    </h3>
+
+                    <div class="flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar pb-2">
+                        <!-- 李 -->
+                        <div class="char-card">
+                            <div class="char-big">李</div>
+                            <div class="char-stroke">康熙笔画：7</div>
+                            <div class="char-meaning line-clamp-3">桃李满天下，象征品德高尚、子孙昌盛，是中国最古老的姓氏之一。</div>
+                            <span class="char-wuxing wuxing-jin">
+                                <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4" fill="currentColor" opacity="0.3"/><circle cx="6" cy="6" r="2" fill="currentColor"/></svg>
+                                五行属金
+                            </span>
+                        </div>
+                        <!-- 明 -->
+                        <div class="char-card">
+                            <div class="char-big">明</div>
+                            <div class="char-stroke">康熙笔画：8</div>
+                            <div class="char-meaning line-clamp-3">光明、明亮、明智，寓意智慧过人、前途光明、洞察力强。</div>
+                            <span class="char-wuxing wuxing-huo">
+                                <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4" fill="currentColor" opacity="0.3"/><circle cx="6" cy="6" r="2" fill="currentColor"/></svg>
+                                五行属火
+                            </span>
+                        </div>
+                        <!-- 辉 -->
+                        <div class="char-card">
+                            <div class="char-big">辉</div>
+                            <div class="char-stroke">康熙笔画：15</div>
+                            <div class="char-meaning line-clamp-3">辉煌、光辉、荣耀，寓意成就斐然、光芒万丈、受人敬仰。</div>
+                            <span class="char-wuxing wuxing-huo">
+                                <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4" fill="currentColor" opacity="0.3"/><circle cx="6" cy="6" r="2" fill="currentColor"/></svg>
+                                五行属火
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== 生肖配对分析 ========== -->
+                <div class="result-card p-5 sm:p-8 mb-6">
+                    <h3 class="text-base font-semibold mb-2" style="color: var(--color-text);">
+                        <i data-lucide="shield-check" class="w-4 h-4 inline-block mr-2 align-text-bottom" style="color: var(--color-gold);"></i>
+                        生肖配对分析
+                    </h3>
+                    <p class="text-sm mb-5" style="color: var(--color-text-tertiary);">基于出生年月推算生肖（示例：属龙）</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <!-- 宜用字 -->
+                        <div class="p-4 sm:p-5 rounded-xl" style="background: rgba(26,138,92,0.04); border: 1px solid rgba(26,138,92,0.12);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i data-lucide="check-circle" class="w-4 h-4" style="color: var(--state-success);"></i>
+                                <span class="text-sm font-medium" style="color: var(--state-success);">宜用字</span>
+                            </div>
+                            <p class="text-xs mb-3" style="color: var(--color-text-tertiary);">属龙宜用水、金、日、月、星、云等偏旁，助运生辉</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="zodiac-tag-good">水</span>
+                                <span class="zodiac-tag-good">金</span>
+                                <span class="zodiac-tag-good">日</span>
+                                <span class="zodiac-tag-good">月</span>
+                                <span class="zodiac-tag-good">星</span>
+                                <span class="zodiac-tag-good">辰</span>
+                                <span class="zodiac-tag-good">霖</span>
+                                <span class="zodiac-tag-good">鑫</span>
+                            </div>
+                        </div>
+                        <!-- 忌用字 -->
+                        <div class="p-4 sm:p-5 rounded-xl" style="background: rgba(196,58,58,0.03); border: 1px solid rgba(196,58,58,0.1);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i data-lucide="x-circle" class="w-4 h-4" style="color: #c43a3a;"></i>
+                                <span class="text-sm font-medium" style="color: #c43a3a;">忌用字</span>
+                            </div>
+                            <p class="text-xs mb-3" style="color: var(--color-text-tertiary);">属龙忌用土、犬、山、石等偏旁，恐有冲克</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="zodiac-tag-bad">土</span>
+                                <span class="zodiac-tag-bad">犬</span>
+                                <span class="zodiac-tag-bad">山</span>
+                                <span class="zodiac-tag-bad">石</span>
+                                <span class="zodiac-tag-bad">戌</span>
+                                <span class="zodiac-tag-bad">磊</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== AI 取名建议 ========== -->
+        <section style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <div class="ai-analysis-card p-5 sm:p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-gold) 100%);">
+                            <i data-lucide="brain" class="w-4 h-4" style="color: white;"></i>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-semibold" style="color: var(--color-text);">AI 取名建议</h3>
+                    </div>
+
+                    <p class="text-sm leading-relaxed mb-5" style="color: var(--color-text-secondary);">
+                        综合三才五格、五行生克、生肖喜忌分析，以下为 AI 推荐的替代用字组合，均经过数理吉凶验证，可优化姓名整体运势：
+                    </p>
+
+                    <!-- 推荐名字列表 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- 推荐方案 1 -->
+                        <div class="p-4 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-lg font-bold" style="color: var(--color-primary-light); font-family: 'Noto Serif SC', serif;">李明泽</span>
+                                <span class="luck-badge luck-daji">大吉</span>
+                            </div>
+                            <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">泽为水旁，滋润龙气。三才配置金一火一水，水火既济。</p>
+                        </div>
+                        <!-- 推荐方案 2 -->
+                        <div class="p-4 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-lg font-bold" style="color: var(--color-primary-light); font-family: 'Noto Serif SC', serif;">李明鑫</span>
+                                <span class="luck-badge luck-daji">大吉</span>
+                            </div>
+                            <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">三金组合，五行补全。总格 24 数理丰厚，财禄双收。</p>
+                        </div>
+                        <!-- 推荐方案 3 -->
+                        <div class="p-4 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-lg font-bold" style="color: var(--color-primary-light); font-family: 'Noto Serif SC', serif;">李明辰</span>
+                                <span class="luck-badge luck-ji">吉</span>
+                            </div>
+                            <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">辰属龙本位，增强自身气场。外格 9 智能优越。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 导出报告 + 操作按钮 -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <button class="inline-flex items-center justify-center gap-2 flex-1 sm:flex-none px-8 py-3 rounded-xl text-base font-medium transition-all" style="background: var(--color-primary); color: var(--color-text-inverse); box-shadow: 0 4px 12px rgba(0,75,170,0.2);" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        导出报告
+                    </button>
+                    <button class="inline-flex items-center justify-center gap-2 flex-1 sm:flex-none px-6 py-3 rounded-xl text-sm font-medium transition-all" style="background: var(--color-bg-inset); color: var(--color-text-secondary); border: 1.5px solid var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary-lighter)'; this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-secondary)'">
+                        <i data-lucide="bookmark" class="w-4 h-4"></i>
+                        收藏结果
+                    </button>
+                    <button class="inline-flex items-center justify-center gap-2 flex-1 sm:flex-none px-6 py-3 rounded-xl text-sm font-medium transition-all" style="background: var(--color-bg-inset); color: var(--color-text-secondary); border: 1.5px solid var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary-lighter)'; this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-secondary)'">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        分享
+                    </button>
+                    <!-- 追问输入 -->
+                    <div class="flex-1 relative min-w-0">
+                        <input
+                            type="text"
+                            class="w-full rounded-xl pl-4 pr-4 py-3 text-sm outline-none transition-shadow"
+                            style="background: var(--color-bg-elevated); border: 1.5px solid var(--color-border); color: var(--color-text);"
+                            placeholder="追问 AI：换一个姓氏再分析..."
+                            onfocus="this.style.borderColor='var(--color-primary-lighter)'; this.style.boxShadow='0 0 0 3px rgba(0,75,170,0.1)'"
+                            onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none'"
+                        />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 相关推荐 ========== -->
+        <section style="background: var(--color-bg-elevated);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <h2 class="text-lg sm:text-xl font-semibold mb-6 text-center" style="color: var(--color-text); font-family: 'Noto Serif SC', serif;">
+                    推荐工具
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <!-- 周公解梦 -->
+                    <a href="#" class="recommend-card">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary-bg-strong), rgba(200,168,78,0.1));">
+                            <i data-lucide="moon" class="w-7 h-7" style="color: var(--color-primary);"></i>
+                        </div>
+                        <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">周公解梦</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">AI 智能梦境解读，揭示吉凶预兆</p>
+                    </a>
+                    <!-- 生肖运势 -->
+                    <a href="#" class="recommend-card">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary-bg-strong), rgba(200,168,78,0.1));">
+                            <i data-lucide="star" class="w-7 h-7" style="color: var(--color-primary);"></i>
+                        </div>
+                        <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">生肖运势</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">查看今日生肖运势与宜忌</p>
+                    </a>
+                    <!-- 签诗抽签 -->
+                    <a href="#" class="recommend-card">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary-bg-strong), rgba(200,168,78,0.1));">
+                            <i data-lucide="scroll-text" class="w-7 h-7" style="color: var(--color-primary);"></i>
+                        </div>
+                        <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">签诗抽签</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">随机抽取灵签，获取签诗指引</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer style="background: #001a40; border-top: 1px solid rgba(200,168,78,0.1);">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center" style="max-width: var(--max-width);">
+            <p class="text-sm" style="color: rgba(255,255,255,0.4);">
+                天机 AI 运势查询 — 仅供参考，切勿迷信
+            </p>
+        </div>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+
+
+

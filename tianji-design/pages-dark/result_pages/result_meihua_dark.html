@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梅花易数解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-meihua: #ec4899;
+            --color-wuxing: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .hexagram-box {
+            width: 60px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .yao-line {
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--color-meihua), var(--color-wuxing));
+        }
+        .yao-line.broken {
+            background: linear-gradient(90deg, var(--color-bg-card), var(--color-bg-card));
+            border: 1px solid var(--color-meihua);
+            opacity: 0.7;
+        }
+        .gua-card {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .wuxing-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        .ti-yong-bar {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--color-meihua), var(--color-wuxing));
+        }
+        .glow-text {
+            text-shadow: 0 0 20px var(--color-meihua);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">梅花易数</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-pink-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 梅花易数头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-pink-900/40 via-slate-900/50 to-emerald-900/40 rounded-2xl p-6 border border-pink-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white glow-text">梅花易数</h1>
+                    <p class="text-pink-300">观梅占 · 体用生克</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-pink-500/20 text-pink-300 rounded-full text-sm border border-pink-500/40">
+                    <i class="fas fa-fire mr-1"></i>体卦：离火
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-water mr-1"></i>用卦：坎水
+                </span>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-clock mr-1"></i>火水未济
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 卦象展示 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-diagram-project text-pink-400"></i>
+                卦象结构
+            </h2>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-center">
+                <!-- 卦象SVG可视化 -->
+                <div class="flex-shrink-0">
+                    <div class="flex gap-6">
+                        <!-- 本卦：火水未济 -->
+                        <div class="text-center">
+                            <p class="text-pink-400 text-sm mb-2">本卦</p>
+                            <div class="bg-slate-900/50 rounded-xl p-4 border border-pink-500/30">
+                                <div class="hexagram-box mx-auto">
+                                    <!-- 初六 -->
+                                    <div class="yao-line"></div>
+                                    <!-- 九二 -->
+                                    <div class="yao-line broken"></div>
+                                    <!-- 六三 -->
+                                    <div class="yao-line broken"></div>
+                                    <!-- 九四 -->
+                                    <div class="yao-line"></div>
+                                    <!-- 六五 -->
+                                    <div class="yao-line broken"></div>
+                                    <!-- 上九 -->
+                                    <div class="yao-line"></div>
+                                </div>
+                                <p class="text-white font-semibold mt-2">火水未济</p>
+                                <p class="text-gray-400 text-xs">上离下坎</p>
+                            </div>
+                        </div>
+
+                        <!-- 互卦：火水未济的互卦仍是火水未济 -->
+                        <div class="text-center">
+                            <p class="text-emerald-400 text-sm mb-2">互卦</p>
+                            <div class="bg-slate-900/50 rounded-xl p-4 border border-emerald-500/30">
+                                <div class="hexagram-box mx-auto">
+                                    <div class="yao-line"></div>
+                                    <div class="yao-line broken"></div>
+                                    <div class="yao-line broken"></div>
+                                    <div class="yao-line"></div>
+                                    <div class="yao-line broken"></div>
+                                    <div class="yao-line"></div>
+                                </div>
+                                <p class="text-white font-semibold mt-2">火水未济</p>
+                                <p class="text-gray-400 text-xs">内互</p>
+                            </div>
+                        </div>
+
+                        <!-- 变卦：水火既济 -->
+                        <div class="text-center">
+                            <p class="text-amber-400 text-sm mb-2">变卦</p>
+                            <div class="bg-slate-900/50 rounded-xl p-4 border border-amber-500/30">
+                                <div class="hexagram-box mx-auto">
+                                    <div class="yao-line broken"></div>
+                                    <div class="yao-line"></div>
+                                    <div class="yao-line"></div>
+                                    <div class="yao-line broken"></div>
+                                    <div class="yao-line"></div>
+                                    <div class="yao-line broken"></div>
+                                </div>
+                                <p class="text-white font-semibold mt-2">水火既济</p>
+                                <p class="text-gray-400 text-xs">上坎下离</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 卦辞 -->
+                <div class="flex-1 gua-card rounded-xl p-5">
+                    <h3 class="text-pink-400 font-semibold mb-3">火水未济卦辞</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed mb-3">
+                        亨，小狐汔济，濡其尾，无攸利。
+                    </p>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        象曰：火在水上，未济。君子以慎辨物居方。
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-pink-500/20">
+                        <h4 class="text-pink-400 text-sm font-medium mb-2">卦象含义</h4>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            未济表示事情尚未完成，仍在发展过程中。小狐狸过河时沾湿了尾巴，警示做事要有始有终，不可半途而废。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 体用分析 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-balance-scale text-pink-400"></i>
+                体用生克分析
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- 体卦 -->
+                <div class="gua-card rounded-xl p-5">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                            <i class="fas fa-fire text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-pink-400 font-bold text-lg">体卦：离火</h3>
+                            <p class="text-gray-400 text-sm">代表求测者自身</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        离火代表光明、热情、智慧与表达。你目前处于积极活跃的状态，有较强的创造力和表达能力。
+                    </p>
+                </div>
+
+                <!-- 用卦 -->
+                <div class="gua-card rounded-xl p-5">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center">
+                            <i class="fas fa-water text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-emerald-400 font-bold text-lg">用卦：坎水</h3>
+                            <p class="text-gray-400 text-sm">代表所测之事</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        坎水代表险难、流动、智慧与隐伏。所测之事充满变数，需要谨慎行事，以智慧化解困境。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 生克关系 -->
+            <div class="bg-slate-900/50 rounded-xl p-5 mb-6">
+                <h3 class="text-pink-400 font-semibold mb-4">五行生克关系</h3>
+                
+                <div class="flex items-center justify-center gap-6 mb-4">
+                    <!-- 体卦：火 -->
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center mb-2">
+                            <span class="text-white font-bold">火</span>
+                        </div>
+                        <p class="text-pink-400 text-sm">体卦</p>
+                    </div>
+                    
+                    <!-- 克关系 -->
+                    <div class="flex flex-col items-center">
+                        <i class="fas fa-arrow-right text-pink-400 text-2xl"></i>
+                        <span class="text-gray-400 text-xs mt-1">水克火</span>
+                    </div>
+                    
+                    <!-- 用卦：水 -->
+                    <div class="text-center">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center mb-2">
+                            <span class="text-white font-bold">水</span>
+                        </div>
+                        <p class="text-emerald-400 text-sm">用卦</p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-500/10 rounded-lg p-4 border border-amber-500/30">
+                    <p class="text-amber-400 text-sm">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>分析结论：</strong>用克体（水克火），主事态对求测者不利，需谨慎应对。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 体用力量对比 -->
+            <div class="bg-slate-900/50 rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-pink-400 text-sm">体卦力量</span>
+                    <span class="text-pink-400 text-sm">40%</span>
+                </div>
+                <div class="w-full h-3 bg-slate-700 rounded-full overflow-hidden mb-3">
+                    <div class="h-full bg-gradient-to-r from-pink-500 to-rose-600 rounded-full" style="width: 40%"></div>
+                </div>
+                
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-emerald-400 text-sm">用卦力量</span>
+                    <span class="text-emerald-400 text-sm">60%</span>
+                </div>
+                <div class="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-emerald-500 to-cyan-600 rounded-full" style="width: 60%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 六亲配象 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-pink-900/30 to-slate-900/50 rounded-2xl p-6 border border-pink-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-users text-pink-400"></i>
+                六亲配象
+            </h2>
+
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <div class="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-home text-pink-400"></i>
+                    </div>
+                    <p class="text-pink-400 text-sm font-medium">父母</p>
+                    <p class="text-gray-500 text-xs">文书契约</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-hand-holding-usd text-amber-400"></i>
+                    </div>
+                    <p class="text-amber-400 text-sm font-medium">兄弟</p>
+                    <p class="text-gray-500 text-xs">竞争阻碍</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-coins text-emerald-400"></i>
+                    </div>
+                    <p class="text-emerald-400 text-sm font-medium">妻财</p>
+                    <p class="text-gray-500 text-xs">金钱物质</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-fire text-rose-400"></i>
+                    </div>
+                    <p class="text-rose-400 text-sm font-medium">子孙</p>
+                    <p class="text-gray-500 text-xs">福禄喜悦</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <div class="w-10 h-10 rounded-full bg-violet-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-user text-violet-400"></i>
+                    </div>
+                    <p class="text-violet-400 text-sm font-medium">官鬼</p>
+                    <p class="text-gray-500 text-xs">压力小人</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <div class="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-male text-sky-400"></i>
+                    </div>
+                    <p class="text-sky-400 text-sm font-medium">兄弟</p>
+                    <p class="text-gray-500 text-xs">自身力量</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-pink-900/30 to-slate-900/60 rounded-2xl p-6 border border-pink-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于梅花易数法则的综合分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    火水未济卦，体为离火，用为坎水，用克体之象，寓示所测之事对你形成一定压力。
+                    <br><br>
+                    <span class="text-pink-400 font-medium">核心判断：</span>此事目前处于未完成状态，进展中存在阻力。从本卦变既济，需要耐心等待时机，不可急于求成。
+                    <br><br>
+                    <span class="text-pink-400 font-medium">体用分析：</span>体卦离火代表你目前的状态——内心明亮、思路清晰，有足够的智慧应对。用卦坎水代表所测之事——暗流涌动，变数较多。水克火的格局提醒你需要格外谨慎，避免正面冲突。
+                    <br><br>
+                    <span class="text-emerald-400 font-medium">趋避建议：</span>「小狐汔济，濡其尾」——小狐狸过河时尚未完全成功，你也需要谨慎前行，不可半途而废。保持低调，多听少做，以柔克刚，等待时机成熟再做决定。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-pink-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

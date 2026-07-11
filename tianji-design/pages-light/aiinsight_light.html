@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 洞察 — 天机</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #f8fafc;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #f1f5f9;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #1a1e2e;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #8b6914;
+
+  /* State colors */
+  --state-success: #059669;
+  --state-warning: #d97706;
+  --state-error: #dc2626;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Dark Mode Overrides ---- */
+.dark {
+  --color-bg: #f8fafc;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #0d1220;
+  --color-text: #1a1e2e;
+  --color-text-secondary: #a0aac0;
+  --color-text-tertiary: #6b7590;
+  --color-border: #1e2740;
+  --color-border-light: #161e35;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 按钮基础样式 */
+    .btn-gold {
+      background: var(--color-gold);
+      color: var(--color-primary-darker);
+      font-weight: 600;
+      border-radius: var(--radius-lg);
+      padding: 14px 32px;
+      font-size: var(--text-base);
+      transition: all var(--transition-base);
+      border: none;
+      cursor: pointer;
+    }
+    .btn-gold:hover {
+      background: var(--color-gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(200, 168, 78, 0.3);
+    }
+    .btn-outline-white {
+      background: transparent;
+      color: var(--color-text-inverse);
+      font-weight: 500;
+      border-radius: var(--radius-lg);
+      padding: 14px 32px;
+      font-size: var(--text-base);
+      transition: all var(--transition-base);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+    }
+    .btn-outline-white:hover {
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+    .ai-card {
+      background: linear-gradient(135deg, rgba(0, 75, 170, 0.1), rgba(200, 168, 78, 0.05));
+      border: 1px solid rgba(0, 75, 170, 0.15);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius-xl);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(0,75,170,0.3), rgba(200,168,78,0.2), rgba(0,75,170,0.1));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .ai-card:hover {
+      border-color: rgba(200, 168, 78, 0.35);
+      box-shadow: 0 12px 40px rgba(0, 75, 170, 0.18);
+      transform: translateY(-4px);
+    }
+    /* AI 功能入口卡片（增强版） */
+    .ai-entry-card {
+      background: linear-gradient(135deg, rgba(0, 75, 170, 0.12), rgba(200, 168, 78, 0.06));
+      border: 1px solid rgba(0, 75, 170, 0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: all var(--transition-slow);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+    }
+    .ai-entry-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius-xl);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(0,75,170,0.4), rgba(200,168,78,0.3), rgba(0,75,170,0.15));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .ai-entry-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200, 168, 78, 0.4), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-slow);
+    }
+    .ai-entry-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(200, 168, 78, 0.35);
+      box-shadow: 0 16px 48px rgba(0, 75, 170, 0.2), 0 0 60px rgba(200, 168, 78, 0.08);
+      background: linear-gradient(135deg, rgba(0, 75, 170, 0.15), rgba(200, 168, 78, 0.08));
+    }
+    .ai-entry-card:hover::after { opacity: 1; }
+    .ai-entry-card:hover .ai-entry-arrow {
+      transform: translateX(4px);
+      color: var(--color-gold-light);
+    }
+    .ai-entry-arrow {
+      transition: all var(--transition-fast);
+    }
+    .content-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+      color: var(--color-text-inverse);
+      text-wrap: balance;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+    .section-subtitle {
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ========== 星空粒子动画 ========== */
+      .starfield { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+      .starfield .layer-1, .starfield .layer-2, .starfield .layer-3 {
+        position: absolute; border-radius: 50%; background: #fff;
+      }
+      .starfield .layer-1 {
+        width: 2px; height: 2px;
+        box-shadow:
+          120px 40px 0 0 rgba(255,255,255,0.7), 250px 120px 0 0 rgba(255,255,255,0.5),
+          400px 30px 0 0 rgba(255,255,255,0.6), 550px 180px 0 0 rgba(255,255,255,0.4),
+          700px 80px 0 0 rgba(255,255,255,0.8), 850px 200px 0 0 rgba(255,255,255,0.5),
+          1000px 50px 0 0 rgba(255,255,255,0.6), 1150px 150px 0 0 rgba(255,255,255,0.7),
+          50px 250px 0 0 rgba(255,255,255,0.5), 300px 300px 0 0 rgba(255,255,255,0.4),
+          500px 260px 0 0 rgba(255,255,255,0.6), 750px 280px 0 0 rgba(255,255,255,0.8),
+          950px 310px 0 0 rgba(255,255,255,0.5), 1100px 280px 0 0 rgba(255,255,255,0.7),
+          180px 400px 0 0 rgba(255,255,255,0.4), 620px 420px 0 0 rgba(255,255,255,0.6),
+          1050px 380px 0 0 rgba(255,255,255,0.5);
+        animation: twinkle1 4s ease-in-out infinite alternate;
+      }
+      .starfield .layer-2 {
+        width: 1px; height: 1px;
+        box-shadow:
+          80px 100px 0 0 rgba(255,255,255,0.4), 200px 200px 0 0 rgba(255,255,255,0.3),
+          350px 80px 0 0 rgba(255,255,255,0.5), 480px 220px 0 0 rgba(255,255,255,0.3),
+          620px 140px 0 0 rgba(255,255,255,0.6), 780px 50px 0 0 rgba(255,255,255,0.4),
+          920px 180px 0 0 rgba(255,255,255,0.5), 1060px 90px 0 0 rgba(255,255,255,0.3),
+          150px 350px 0 0 rgba(255,255,255,0.4), 420px 380px 0 0 rgba(255,255,255,0.3),
+          680px 360px 0 0 rgba(255,255,255,0.5), 880px 340px 0 0 rgba(255,255,255,0.4),
+          280px 460px 0 0 rgba(255,255,255,0.3), 730px 440px 0 0 rgba(255,255,255,0.5);
+        animation: twinkle2 6s ease-in-out infinite alternate;
+      }
+      .starfield .layer-3 {
+        width: 3px; height: 3px;
+        box-shadow:
+          180px 60px 0 0 rgba(200,168,78,0.6), 450px 150px 0 0 rgba(200,168,78,0.4),
+          730px 100px 0 0 rgba(200,168,78,0.5), 1020px 220px 0 0 rgba(200,168,78,0.3),
+          330px 320px 0 0 rgba(200,168,78,0.4), 900px 400px 0 0 rgba(200,168,78,0.5);
+        animation: twinkle3 5s ease-in-out infinite alternate;
+      }
+      @keyframes twinkle1 { 0% { opacity: 0.4; } 100% { opacity: 1; } }
+      @keyframes twinkle2 { 0% { opacity: 0.6; } 100% { opacity: 0.3; } }
+      @keyframes twinkle3 { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+
+      /* ========== AI 脉冲光效 ========== */
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 16px rgba(74,144,217,0.4), 0 0 32px rgba(200,168,78,0.2); }
+        50% { box-shadow: 0 0 24px rgba(74,144,217,0.6), 0 0 48px rgba(200,168,78,0.3); }
+      }
+
+      /* ========== 导航栏玻璃效果 ========== */
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ========== 导航链接 ========== */
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+
+      /* ========== Footer ========== */
+      .footer-link {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        transition: color var(--transition-fast);
+      }
+      .footer-link:hover { color: var(--color-gold-light); }
+
+      /* ========== 移动端菜单按钮 ========== */
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--color-text);
+        cursor: pointer;
+        padding: 8px;
+      }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .nav-links { display: none !important; }
+        .nav-actions { display: none !important; }
+      }
+
+      /* ========== 渐变边框徽章 ========== */
+      .gradient-badge {
+        position: relative;
+        background: rgba(0, 20, 50, 0.6);
+        border-radius: var(--radius-full);
+        padding: 2px;
+      }
+      .gradient-badge::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius-full);
+        padding: 1px;
+        background: linear-gradient(135deg, var(--color-primary-lighter), var(--color-gold), var(--color-primary));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+      .gradient-badge-inner {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 18px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        color: var(--color-gold-light);
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="background: #0a0e1a; color: var(--color-text);">
+    <main>
+
+      <!-- ==================== 1. 顶部导航栏（固定） ==================== -->
+      <header class="nav-glass fixed top-0 left-0 w-full z-50" style="height: var(--nav-height);">
+        <div class="content-container h-full flex items-center justify-between">
+          <!-- Logo -->
+          <a href="home.html" class="flex items-center gap-3 no-underline">
+            <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+          </a>
+          <!-- 导航链接（桌面端显示） -->
+          <nav class="nav-links hidden md:flex items-center gap-8">
+            <a href="home.html" class="nav-link">首页</a>
+            <a href="#" class="nav-link">东方命理</a>
+            <a href="#" class="nav-link">西方占卜</a>
+            <a href="folk.html" class="nav-link">民俗趣味</a>
+            <a href="aiinsight.html" class="nav-link" style="color: var(--color-text-inverse);">AI 洞察</a>
+            <a href="profile.html" class="nav-link">个人中心</a>
+          </nav>
+          <!-- 右侧操作 -->
+          <div class="nav-actions hidden md:flex items-center gap-4">
+            <button class="nav-link p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);">
+              <i data-lucide="search" style="width:20px;height:20px;"></i>
+            </button>
+            <a href="profile.html" class="w-8 h-8 rounded-full flex items-center justify-center no-underline" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;">
+              <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+            </a>
+          </div>
+          <!-- 移动端菜单按钮 -->
+          <button class="mobile-menu-btn">
+            <i data-lucide="menu" style="width:24px;height:24px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================== 2. 标题区 ==================== -->
+      <section class="relative overflow-hidden" style="background: linear-gradient(180deg, #002060 0%, #0a0a2e 100%); padding-top: calc(var(--nav-height) + var(--space-16)); padding-bottom: var(--space-16);">
+        <!-- 星空粒子背景 -->
+        <div class="starfield">
+          <div class="layer-1"></div>
+          <div class="layer-2"></div>
+          <div class="layer-3"></div>
+        </div>
+
+        <div class="content-container relative z-10 text-center">
+          <!-- 面包屑 -->
+          <nav class="flex items-center justify-center gap-2 text-sm mb-8" style="color: var(--color-text-tertiary);">
+            <a href="home.html" class="transition-colors hover:text-white no-underline" style="color: var(--color-text-tertiary);">首页</a>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="color: var(--color-gold-light);">AI 洞察</span>
+          </nav>
+
+          <!-- 金色渐变徽章 -->
+          <div class="gradient-badge inline-block mb-6">
+            <div class="gradient-badge-inner">
+              <i data-lucide="brain" style="width:16px;height:16px;color:var(--color-gold-light);"></i>
+              <span>智能分析</span>
+            </div>
+          </div>
+
+          <!-- 标题 -->
+          <h1 class="display-font font-bold text-center mb-6" style="font-size: clamp(2.5rem, 5vw, var(--text-5xl)); color: #ffffff; letter-spacing: 0.04em; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; line-height: var(--leading-tight);">
+            AI 洞察
+          </h1>
+
+          <!-- 副标题 -->
+          <p class="text-center max-w-2xl mx-auto" style="font-size: clamp(var(--text-base), 1.6vw, var(--text-lg)); color: var(--color-primary-lightest); line-height: var(--leading-relaxed);">
+            综合多个占卜体系，运用 AI 深度分析，生成跨维度的命运解读与行动指南
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================== 3. 功能入口网格（2x2） ==================== -->
+      <section style="background: #0a0a2e; padding: var(--space-16) 0 var(--space-24);">
+        <div class="content-container">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" style="max-width: 900px; margin: 0 auto;">
+
+            <!-- 卡片 1: 综合报告 -->
+            <a href="report.html" class="ai-entry-card">
+              <div class="flex items-center gap-4 mb-5 relative z-10">
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, rgba(0, 75, 170, 0.2), rgba(74, 144, 217, 0.1));">
+                  <i data-lucide="file-text" style="width:28px;height:28px;color:var(--color-primary-lighter);"></i>
+                </div>
+                <h3 class="text-lg font-semibold" style="color: var(--color-text);">综合报告</h3>
+              </div>
+              <p class="mb-5 relative z-10" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                融合多个占卜体系的结果，生成全面的综合运势分析报告
+              </p>
+              <div class="flex items-center gap-1 relative z-10" style="color: var(--color-gold); font-size: var(--text-sm); font-weight: 500;">
+                <span>查看报告</span>
+                <svg class="ai-entry-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m-4-4 4 4-4 4"/></svg>
+              </div>
+            </a>
+
+            <!-- 卡片 2: 趋势追踪 -->
+            <a href="trend.html" class="ai-entry-card">
+              <div class="flex items-center gap-4 mb-5 relative z-10">
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, rgba(200, 168, 78, 0.15), rgba(200, 168, 78, 0.05));">
+                  <i data-lucide="trending-up" style="width:28px;height:28px;color:var(--color-gold);"></i>
+                </div>
+                <h3 class="text-lg font-semibold" style="color: var(--color-text);">趋势追踪</h3>
+              </div>
+              <p class="mb-5 relative z-10" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                追踪你的运势变化趋势，提前预判未来走向与关键节点
+              </p>
+              <div class="flex items-center gap-1 relative z-10" style="color: var(--color-gold); font-size: var(--text-sm); font-weight: 500;">
+                <span>开始追踪</span>
+                <svg class="ai-entry-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m-4-4 4 4-4 4"/></svg>
+              </div>
+            </a>
+
+            <!-- 卡片 3: 多维对比 -->
+            <a href="compare.html" class="ai-entry-card">
+              <div class="flex items-center gap-4 mb-5 relative z-10">
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, rgba(0, 75, 170, 0.2), rgba(74, 144, 217, 0.1));">
+                  <i data-lucide="git-compare-arrows" style="width:28px;height:28px;color:var(--color-primary-lighter);"></i>
+                </div>
+                <h3 class="text-lg font-semibold" style="color: var(--color-text);">多维对比</h3>
+              </div>
+              <p class="mb-5 relative z-10" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                横向对比不同体系间的解读差异，全面理解命运信号
+              </p>
+              <div class="flex items-center gap-1 relative z-10" style="color: var(--color-gold); font-size: var(--text-sm); font-weight: 500;">
+                <span>开始对比</span>
+                <svg class="ai-entry-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m-4-4 4 4-4 4"/></svg>
+              </div>
+            </a>
+
+            <!-- 卡片 4: 运势结果 -->
+            <a href="result.html" class="ai-entry-card">
+              <div class="flex items-center gap-4 mb-5 relative z-10">
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, rgba(200, 168, 78, 0.15), rgba(200, 168, 78, 0.05));">
+                  <i data-lucide="bar-chart-3" style="width:28px;height:28px;color:var(--color-gold);"></i>
+                </div>
+                <h3 class="text-lg font-semibold" style="color: var(--color-text);">运势结果</h3>
+              </div>
+              <p class="mb-5 relative z-10" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                查看历史占卜结果与 AI 深度解读
+              </p>
+              <div class="flex items-center gap-1 relative z-10" style="color: var(--color-gold); font-size: var(--text-sm); font-weight: 500;">
+                <span>查看结果</span>
+                <svg class="ai-entry-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m-4-4 4 4-4 4"/></svg>
+              </div>
+            </a>
+
+            <!-- 个性化建议 -->
+            <a href="advice.html" className="ai-card flex flex-col relative z-10" style="text-decoration: none;">
+              <div class="flex items-center gap-4 mb-5">
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(0, 75, 170, 0.15);">
+                  <i data-lucide="sparkles" style="width:26px;height:26px;color:var(--color-gold);"></i>
+                </div>
+                <h3 class="font-semibold text-lg relative z-10" style="color: var(--color-text);">个性化建议</h3>
+              </div>
+              <p class="flex-1 mb-5 relative z-10" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                基于命理信息，生成可执行的行动建议与日程规划
+              </p>
+              <span class="card-link relative z-10" style="color: var(--color-gold);">
+                获取建议 <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i>
+              </span>
+            </a>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. AI 能力说明区 ==================== -->
+      <section style="background: linear-gradient(180deg, #0a0a2e 0%, #0d1220 100%); padding: var(--space-16) 0 var(--space-24);">
+        <div class="content-container">
+          <h2 class="section-title text-center mb-4">AI 核心能力</h2>
+          <p class="section-subtitle text-center mb-12" style="max-width: 520px; margin-left: auto; margin-right: auto;">
+            深度学习 + 传统智慧，打造下一代智能运势分析引擎
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- 深度理解 -->
+            <div class="ai-card">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 relative z-10" style="background: linear-gradient(135deg, rgba(0, 75, 170, 0.2), rgba(74, 144, 217, 0.08));">
+                <i data-lucide="brain" style="width:26px;height:26px;color:var(--color-primary-lighter);"></i>
+              </div>
+              <h4 class="text-base font-semibold mb-2 relative z-10" style="color: var(--color-text);">深度理解</h4>
+              <p class="text-sm relative z-10" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                AI 理解 17+ 种占卜体系的专业知识
+              </p>
+            </div>
+
+            <!-- 趋势预测 -->
+            <div class="ai-card">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 relative z-10" style="background: linear-gradient(135deg, rgba(200, 168, 78, 0.15), rgba(200, 168, 78, 0.05));">
+                <i data-lucide="trending-up" style="width:26px;height:26px;color:var(--color-gold);"></i>
+              </div>
+              <h4 class="text-base font-semibold mb-2 relative z-10" style="color: var(--color-text);">趋势预测</h4>
+              <p class="text-sm relative z-10" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                基于时间序列分析运势变化规律
+              </p>
+            </div>
+
+            <!-- 交叉验证 -->
+            <div class="ai-card">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 relative z-10" style="background: linear-gradient(135deg, rgba(0, 75, 170, 0.2), rgba(74, 144, 217, 0.08));">
+                <i data-lucide="git-compare-arrows" style="width:26px;height:26px;color:var(--color-primary-lighter);"></i>
+              </div>
+              <h4 class="text-base font-semibold mb-2 relative z-10" style="color: var(--color-text);">交叉验证</h4>
+              <p class="text-sm relative z-10" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                对比不同体系的结论，提升解读可靠性
+              </p>
+            </div>
+
+            <!-- 即时生成 -->
+            <div class="ai-card">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 relative z-10" style="background: linear-gradient(135deg, rgba(200, 168, 78, 0.15), rgba(200, 168, 78, 0.05));">
+                <i data-lucide="zap" style="width:26px;height:26px;color:var(--color-gold);"></i>
+              </div>
+              <h4 class="text-base font-semibold mb-2 relative z-10" style="color: var(--color-text);">即时生成</h4>
+              <p class="text-sm relative z-10" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                秒级生成个性化解读报告
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 页脚 ==================== -->
+      <footer style="background: #060a14; border-top: 1px solid rgba(255,255,255,0.06); padding: var(--space-12) 0 var(--space-8);">
+        <div class="content-container">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <!-- 品牌信息 + 免责声明 -->
+            <div class="max-w-md">
+              <span class="display-font text-base font-semibold" style="color: var(--color-gold);">天机</span>
+              <p class="mt-2" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                免责声明：本工具所有占卜结果仅供娱乐参考，不构成任何决策建议。命运掌握在自己手中。
+              </p>
+            </div>
+            <!-- 链接 -->
+            <div class="flex items-center gap-6">
+              <a href="#" class="footer-link no-underline">关于我们</a>
+              <a href="#" class="footer-link no-underline">使用条款</a>
+              <a href="#" class="footer-link no-underline">隐私政策</a>
+            </div>
+          </div>
+          <!-- 版权 -->
+          <div class="mt-8 pt-6 text-center" style="border-top: 1px solid rgba(255,255,255,0.04);">
+            <p style="color: var(--color-text-tertiary); font-size: var(--text-xs);">
+              &copy; 2026 天机 AI 运势查询工具. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+
+
+

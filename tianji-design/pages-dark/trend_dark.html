@@ -1,0 +1,801 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>趋势追踪 — 天机</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Dark Mode Overrides ---- */
+.dark {
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1220;
+  --color-text: #e8ecf4;
+  --color-text-secondary: #a0aac0;
+  --color-text-tertiary: #6b7590;
+  --color-border: #1e2740;
+  --color-border-light: #161e35;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 内容容器 */
+    .content-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+    }
+    /* Section 标题 */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+      color: var(--color-text-inverse);
+      text-wrap: balance;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+    .section-subtitle {
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ========== 导航栏玻璃效果 ========== */
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ========== 导航链接 ========== */
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+
+      /* ========== 移动端菜单按钮 ========== */
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--color-text);
+        cursor: pointer;
+        padding: 8px;
+      }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .nav-links { display: none !important; }
+        .nav-actions { display: none !important; }
+      }
+
+      /* ========== 面包屑 ========== */
+      .breadcrumb-link {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        transition: color var(--transition-fast);
+      }
+      .breadcrumb-link:hover { color: var(--color-gold-light); }
+      .breadcrumb-sep {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        margin: 0 6px;
+        opacity: 0.5;
+      }
+
+      /* ========== 维度 Tab ========== */
+      .dim-tab {
+        padding: 10px 22px;
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .dim-tab:hover {
+        background: rgba(200, 168, 78, 0.1);
+        border-color: rgba(200, 168, 78, 0.25);
+        color: var(--color-gold-light);
+      }
+      .dim-tab.active {
+        background: linear-gradient(135deg, rgba(0, 75, 170, 0.2), rgba(200, 168, 78, 0.15));
+        border-color: var(--color-gold);
+        color: var(--color-gold-light);
+        font-weight: 600;
+        box-shadow: 0 0 16px rgba(200, 168, 78, 0.12);
+      }
+
+      /* ========== 时间范围选择 ========== */
+      .range-btn {
+        padding: 8px 18px;
+        border-radius: var(--radius-md);
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .range-btn:hover {
+        border-color: rgba(0, 75, 170, 0.3);
+        color: var(--color-primary-lighter);
+      }
+      .range-btn.active {
+        background: var(--color-primary-bg-strong);
+        border-color: var(--color-primary-light);
+        color: var(--color-primary-lighter);
+        font-weight: 500;
+      }
+
+      /* ========== 趋势图容器 ========== */
+      .chart-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        position: relative;
+        overflow: hidden;
+      }
+      .chart-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+        opacity: 0.3;
+      }
+
+      /* ========== 趋势图 Tooltip ========== */
+      .chart-node { cursor: pointer; }
+      .chart-node .node-dot {
+        transition: r var(--transition-fast), opacity var(--transition-fast);
+      }
+      .chart-node:hover .node-dot {
+        r: 7;
+      }
+      .chart-node .tooltip-box {
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+        pointer-events: none;
+      }
+      .chart-node:hover .tooltip-box {
+        opacity: 1;
+      }
+
+      /* ========== 周期分析卡片 ========== */
+      .cycle-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        transition: all var(--transition-base);
+      }
+      .cycle-card:hover {
+        border-color: rgba(200, 168, 78, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 75, 170, 0.08);
+      }
+
+      /* ========== AI 解读区 ========== */
+      .ai-insight-card {
+        background: linear-gradient(135deg, rgba(0, 75, 170, 0.08), rgba(200, 168, 78, 0.04));
+        border: 1px solid rgba(200, 168, 78, 0.15);
+        border-radius: var(--radius-xl);
+        padding: var(--space-10);
+        position: relative;
+        overflow: hidden;
+      }
+      .ai-insight-card::before {
+        content: '';
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 180px; height: 180px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(200, 168, 78, 0.08), transparent 70%);
+        pointer-events: none;
+      }
+
+      /* ========== 图例 ========== */
+      .legend-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+      .legend-label {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        white-space: nowrap;
+      }
+
+      /* ========== Footer ========== */
+      .footer-link {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        transition: color var(--transition-fast);
+      }
+      .footer-link:hover { color: var(--color-gold-light); }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background: #0a0e1a; color: var(--color-text);">
+    <main>
+
+      <!-- ==================== 1. 顶部导航栏（固定） ==================== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header><!-- ==================== 2. 面包屑 + 标题区 ==================== -->
+      <section style="background: linear-gradient(180deg, #002060 0%, #0a0e1a 100%); padding: calc(var(--nav-height) + var(--space-12)) 0 var(--space-12);" data-dom-id="breadcrumb-title-section">
+        <div class="content-container">
+          <!-- 面包屑 -->
+          <nav class="flex items-center flex-wrap" style="margin-bottom: var(--space-6);" data-dom-id="breadcrumb">
+            <a href="#" class="breadcrumb-link no-underline" data-dom-id="breadcrumb-home">首页</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="#" class="breadcrumb-link no-underline" data-dom-id="breadcrumb-ai">AI 洞察</a>
+            <span class="breadcrumb-sep">/</span>
+            <span style="color: var(--color-gold-light); font-size: var(--text-sm);" data-dom-id="breadcrumb-current">趋势追踪</span>
+          </nav>
+          <!-- 标题 + 副标题 -->
+          <div style="max-width: 640px;">
+            <h1 class="display-font font-bold leading-tight" style="font-size: clamp(28px, 3.5vw, 48px); color: #ffffff; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; margin-bottom: var(--space-4);" data-dom-id="page-title">
+              趋势追踪
+            </h1>
+            <p class="section-subtitle" style="max-width: 560px;" data-dom-id="page-subtitle">
+              时间轴上的运势变化，发现命运的周期规律
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 3. 维度选择 + 时间范围 ==================== -->
+      <section style="background: #0a0e1a; padding: var(--space-8) 0 var(--space-6);" data-dom-id="filter-section">
+        <div class="content-container flex flex-col gap-6">
+          <!-- 维度选择 Tab -->
+          <div class="flex items-center gap-3 flex-nowrap overflow-x-auto no-scrollbar" data-dom-id="trend-dimension">
+            <button class="dim-tab active" data-dom-id="dim-overall">综合运势</button>
+            <button class="dim-tab" data-dom-id="dim-career">事业运</button>
+            <button class="dim-tab" data-dom-id="dim-love">感情运</button>
+            <button class="dim-tab" data-dom-id="dim-wealth">财运</button>
+            <button class="dim-tab" data-dom-id="dim-health">健康运</button>
+          </div>
+          <!-- 时间范围选择 -->
+          <div class="flex items-center gap-3 flex-nowrap overflow-x-auto no-scrollbar" data-dom-id="time-range">
+            <span style="color: var(--color-text-tertiary); font-size: var(--text-sm); white-space: nowrap; margin-right: var(--space-2);">
+              <i data-lucide="calendar" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i>时间范围
+            </span>
+            <button class="range-btn" data-dom-id="range-7d">近7天</button>
+            <button class="range-btn active" data-dom-id="range-30d">近30天</button>
+            <button class="range-btn" data-dom-id="range-12m">近12个月</button>
+            <button class="range-btn" data-dom-id="range-5y">近5年</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. 趋势图区 ==================== -->
+      <section style="background: #0a0e1a; padding: 0 0 var(--space-16);" data-dom-id="chart-section">
+        <div class="content-container">
+          <div class="chart-card" data-dom-id="chart-card">
+            <!-- 图例 + 标签 -->
+            <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: var(--space-6);">
+              <h3 class="display-font font-semibold" style="font-size: var(--text-xl); color: var(--color-text);" data-dom-id="chart-title">综合运势趋势</h3>
+              <div class="flex items-center gap-5 flex-wrap">
+                <span class="flex items-center gap-2"><span class="legend-dot" style="background: var(--state-success);"></span><span class="legend-label">运势高峰</span></span>
+                <span class="flex items-center gap-2"><span class="legend-dot" style="background: var(--state-error);"></span><span class="legend-label">运势低谷</span></span>
+                <span class="flex items-center gap-2"><span class="legend-dot" style="background: var(--color-gold);"></span><span class="legend-label">转折节点</span></span>
+                <span class="flex items-center gap-2"><span class="legend-dot" style="background: var(--color-text-tertiary); border: 1.5px dashed var(--color-text-tertiary); background: transparent;"></span><span class="legend-label">预测区间</span></span>
+              </div>
+            </div>
+
+            <!-- SVG 趋势图 -->
+            <div class="w-full" style="min-height: 320px;" data-dom-id="chart-area">
+              <svg viewBox="0 0 1100 380" xmlns="http://www.w3.org/2000/svg" class="w-full" style="height: auto; min-height: 320px;" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <!-- 蓝金色渐变用于曲线 -->
+                  <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#004baa" />
+                    <stop offset="50%" stop-color="#1a6fd4" />
+                    <stop offset="100%" stop-color="#c8a84e" />
+                  </linearGradient>
+                  <!-- 曲线下方填充渐变 -->
+                  <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(0,75,170,0.25)" />
+                    <stop offset="100%" stop-color="rgba(0,75,170,0)" />
+                  </linearGradient>
+                  <!-- 预测区填充 -->
+                  <linearGradient id="predictAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(200,168,78,0.1)" />
+                    <stop offset="100%" stop-color="rgba(200,168,78,0)" />
+                  </linearGradient>
+                </defs>
+
+                <!-- 网格线 -->
+                <g stroke="rgba(255,255,255,0.04)" stroke-width="1">
+                  <line x1="80" y1="40" x2="1060" y2="40" />
+                  <line x1="80" y1="112" x2="1060" y2="112" />
+                  <line x1="80" y1="184" x2="1060" y2="184" />
+                  <line x1="80" y1="256" x2="1060" y2="256" />
+                  <line x1="80" y1="328" x2="1060" y2="328" />
+                </g>
+
+                <!-- Y轴标签 -->
+                <g fill="var(--color-text-tertiary)" font-size="11" font-family="var(--font-body)" text-anchor="end">
+                  <text x="72" y="44">100</text>
+                  <text x="72" y="116">75</text>
+                  <text x="72" y="188">50</text>
+                  <text x="72" y="260">25</text>
+                  <text x="72" y="332">0</text>
+                </g>
+
+                <!-- X轴标签 -->
+                <g fill="var(--color-text-tertiary)" font-size="11" font-family="var(--font-body)" text-anchor="middle">
+                  <text x="80" y="356">6/10</text>
+                  <text x="176" y="356">6/14</text>
+                  <text x="272" y="356">6/18</text>
+                  <text x="368" y="356">6/22</text>
+                  <text x="464" y="356">6/26</text>
+                  <text x="560" y="356">6/30</text>
+                  <text x="656" y="356">7/4</text>
+                  <text x="752" y="356">7/8</text>
+                  <text x="848" y="356">7/10</text>
+                  <text x="944" y="356">7/12</text>
+                  <text x="1040" y="356">7/14</text>
+                </g>
+
+                <!-- 预测区分隔线 -->
+                <line x1="848" y1="40" x2="848" y2="328" stroke="var(--color-gold)" stroke-width="1" stroke-dasharray="4,4" opacity="0.3" />
+                <text x="855" y="56" fill="var(--color-gold)" font-size="10" font-family="var(--font-body)" opacity="0.6">预测</text>
+
+                <!-- 曲线下方填充区域（实际数据） -->
+                <path d="M80,218 C120,200 155,170 176,160 C210,148 240,175 272,190 C305,205 335,145 368,120 C400,96 430,108 464,130 C498,152 528,168 560,184 C592,200 622,155 656,135 C690,116 720,140 752,160 C785,180 815,148 848,128 L848,328 L80,328 Z"
+                  fill="url(#areaGrad)" />
+
+                <!-- 预测区填充 -->
+                <path d="M848,128 C880,108 912,90 944,78 C976,66 1008,72 1040,84 L1040,328 L848,328 Z"
+                  fill="url(#predictAreaGrad)" />
+
+                <!-- 实际数据曲线 -->
+                <path d="M80,218 C120,200 155,170 176,160 C210,148 240,175 272,190 C305,205 335,145 368,120 C400,96 430,108 464,130 C498,152 528,168 560,184 C592,200 622,155 656,135 C690,116 720,140 752,160 C785,180 815,148 848,128"
+                  fill="none" stroke="url(#curveGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+                <!-- 预测虚线曲线 -->
+                <path d="M848,128 C880,108 912,90 944,78 C976,66 1008,72 1040,84"
+                  fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-dasharray="6,4" opacity="0.6" />
+
+                <!-- 关键数据节点（可悬停查看详情） -->
+                <!-- 节点1: 低谷 6/14 分数45 -->
+                <g class="chart-node">
+                  <circle cx="272" cy="190" r="4.5" fill="var(--state-error)" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="228" y="196" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <text x="272" y="215" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">6/18</text>
+                    <text x="272" y="233" fill="var(--state-error)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">45 分</text>
+                    <text x="272" y="246" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">低谷期</text>
+                  </g>
+                </g>
+
+                <!-- 节点2: 高峰 6/22 分数78 -->
+                <g class="chart-node">
+                  <circle cx="368" cy="120" r="4.5" fill="var(--state-success)" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="324" y="72" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <text x="368" y="91" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">6/22</text>
+                    <text x="368" y="109" fill="var(--state-success)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">78 分</text>
+                    <text x="368" y="122" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">高峰期</text>
+                  </g>
+                </g>
+
+                <!-- 节点3: 转折 6/30 分数50 -->
+                <g class="chart-node">
+                  <circle cx="560" cy="184" r="4.5" fill="var(--color-gold)" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="516" y="136" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" stroke-width="1" />
+                    <text x="560" y="155" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">6/30</text>
+                    <text x="560" y="173" fill="var(--color-gold)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">50 分</text>
+                    <text x="560" y="186" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">转折点</text>
+                  </g>
+                </g>
+
+                <!-- 节点4: 高峰 7/4 分数67 -->
+                <g class="chart-node">
+                  <circle cx="656" cy="135" r="4.5" fill="var(--state-success)" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="612" y="87" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <text x="656" y="106" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">7/4</text>
+                    <text x="656" y="124" fill="var(--state-success)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">67 分</text>
+                    <text x="656" y="137" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">高峰期</text>
+                  </g>
+                </g>
+
+                <!-- 节点5: 低谷 7/8 分数58 -->
+                <g class="chart-node">
+                  <circle cx="752" cy="160" r="4.5" fill="var(--state-error)" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="708" y="168" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    <text x="752" y="187" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">7/8</text>
+                    <text x="752" y="205" fill="var(--state-error)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">58 分</text>
+                    <text x="752" y="218" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">低谷期</text>
+                  </g>
+                </g>
+
+                <!-- 节点6: 当前 7/10 分数70 -->
+                <g class="chart-node">
+                  <circle cx="848" cy="128" r="5.5" fill="var(--color-gold)" stroke="#fff" stroke-width="1.5" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="804" y="80" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.3)" stroke-width="1" />
+                    <text x="848" y="99" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">7/10（今天）</text>
+                    <text x="848" y="117" fill="var(--color-gold)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">70 分</text>
+                    <text x="848" y="130" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">当前值</text>
+                  </g>
+                </g>
+
+                <!-- 预测节点: 7/12 分数84 -->
+                <g class="chart-node">
+                  <circle cx="944" cy="78" r="4" fill="var(--color-gold)" opacity="0.5" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="900" y="30" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" stroke-width="1" />
+                    <text x="944" y="49" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">7/12（预测）</text>
+                    <text x="944" y="67" fill="var(--color-gold)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">84 分</text>
+                    <text x="944" y="80" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">预测高峰</text>
+                  </g>
+                </g>
+
+                <!-- 预测节点: 7/14 分数75 -->
+                <g class="chart-node">
+                  <circle cx="1040" cy="84" r="4" fill="var(--color-gold)" opacity="0.5" class="node-dot" />
+                  <g class="tooltip-box">
+                    <rect x="996" y="94" width="88" height="48" rx="8" fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" stroke-width="1" />
+                    <text x="1040" y="113" fill="var(--color-text-secondary)" font-size="10" font-family="var(--font-body)" text-anchor="middle">7/14（预测）</text>
+                    <text x="1040" y="131" fill="var(--color-gold)" font-size="13" font-weight="600" font-family="var(--font-body)" text-anchor="middle">75 分</text>
+                    <text x="1040" y="144" fill="var(--color-text-tertiary)" font-size="9" font-family="var(--font-body)" text-anchor="middle">预测回落</text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 周期分析区 ==================== -->
+      <section style="background: #0d1220; padding: var(--space-16) 0;" data-dom-id="cycle-section">
+        <div class="content-container">
+          <div class="flex items-center gap-3 mb-8" data-dom-id="cycle-header">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+              <i data-lucide="repeat" style="width:20px;height:20px;color:var(--color-gold);"></i>
+            </div>
+            <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+              周期分析
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-dom-id="cycle-cards">
+            <!-- 周期1: 短周期 -->
+            <div class="cycle-card" data-dom-id="cycle-short">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md text-xs font-medium" style="background: rgba(0, 75, 170, 0.15); color: var(--color-primary-lighter);">短周期</span>
+                <span style="color: var(--color-text-tertiary); font-size: var(--text-sm);">7-14 天</span>
+              </div>
+              <h4 class="font-semibold mb-2" style="color: var(--color-text); font-size: var(--text-base);">情绪波动周期</h4>
+              <p class="line-clamp-4" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                你的综合运势呈现约 7 天的短周期波动。每逢农历初一前后运势偏低，新月过后逐步回升，满月前后达到阶段峰值。当前正处于上升周期中段，预计 7 月 12 日前后达到短周期高点。
+              </p>
+            </div>
+
+            <!-- 周期2: 中周期 -->
+            <div class="cycle-card" data-dom-id="cycle-mid">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md text-xs font-medium" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold);">中周期</span>
+                <span style="color: var(--color-text-tertiary); font-size: var(--text-sm);">28-35 天</span>
+              </div>
+              <h4 class="font-semibold mb-2" style="color: var(--color-text); font-size: var(--text-base);">事业机遇周期</h4>
+              <p class="line-clamp-4" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                事业运存在约一个月的规律性循环。上一次事业运高峰出现在 6 月 22 日前后，对应职场中一个重要进展节点。下一个事业运窗口期预计在 7 月 20 日前后开启，届时适合推进新项目或提出关键方案。
+              </p>
+            </div>
+
+            <!-- 周期3: 长周期 -->
+            <div class="cycle-card" data-dom-id="cycle-long">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md text-xs font-medium" style="background: rgba(26, 138, 92, 0.12); color: var(--state-success);">长周期</span>
+                <span style="color: var(--color-text-tertiary); font-size: var(--text-sm);">约 6 个月</span>
+              </div>
+              <h4 class="font-semibold mb-2" style="color: var(--color-text); font-size: var(--text-base);">整体运势大周期</h4>
+              <p class="line-clamp-4" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                从长周期维度观察，你自 2026 年初进入一个整体运势上升通道。当前处于上升期的中后段，预计 8 月中旬至 9 月初将迎来本轮大周期的高峰阶段。建议把握接下来的黄金窗口期，在事业和感情方面主动出击。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 6. AI 解读区 ==================== -->
+      <section style="background: linear-gradient(180deg, #0d1220 0%, #0a0a2e 100%); padding: var(--space-16) 0 var(--space-20);" data-dom-id="ai-insight-section">
+        <div class="content-container">
+          <div class="flex items-center gap-3 mb-8" data-dom-id="insight-header">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+              <i data-lucide="sparkles" style="width:20px;height:20px;color:var(--color-gold);"></i>
+            </div>
+            <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+              AI 解读
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-dom-id="insight-cards">
+            <!-- 趋势变化原因分析 -->
+            <div class="ai-insight-card" data-dom-id="insight-reason">
+              <div class="flex items-center gap-2 mb-5">
+                <i data-lucide="bar-chart-3" style="width:18px;height:18px;color:var(--color-primary-lighter);"></i>
+                <h4 class="font-semibold" style="color: var(--color-text); font-size: var(--text-base);">趋势变化原因</h4>
+              </div>
+              <div class="flex flex-col gap-4">
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs font-semibold" style="background: rgba(0, 75, 170, 0.2); color: var(--color-primary-lighter);">1</span>
+                  <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                    <strong style="color: var(--color-text);">火星进入狮子座</strong>：6 月下旬火象能量增强，推动事业运在 6 月 22 日前后达到小高峰，你在此期间展现出的领导力获得认可。
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs font-semibold" style="background: rgba(200, 168, 78, 0.15); color: var(--color-gold);">2</span>
+                  <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                    <strong style="color: var(--color-text);">水星逆行影响</strong>：6 月底水逆期间沟通效率下降，导致综合运势短暂回落至 50 分附近。7 月初水逆结束后运势快速反弹。
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs font-semibold" style="background: rgba(26, 138, 92, 0.15); color: var(--state-success);">3</span>
+                  <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                    <strong style="color: var(--color-text);">木星三分相</strong>：7 月上旬木星与你的本命太阳形成三分相，带来扩展与幸运的能量，推动当前运势回升至 70 分以上。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 行动建议 -->
+            <div class="ai-insight-card" data-dom-id="insight-action">
+              <div class="flex items-center gap-2 mb-5">
+                <i data-lucide="lightbulb" style="width:18px;height:18px;color:var(--color-gold);"></i>
+                <h4 class="font-semibold" style="color: var(--color-text); font-size: var(--text-base);">行动建议</h4>
+              </div>
+              <div class="flex flex-col gap-4">
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs font-semibold" style="background: rgba(0, 75, 170, 0.2); color: var(--color-primary-lighter);">A</span>
+                  <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                    <strong style="color: var(--color-text);">把握本周黄金窗口</strong>：7 月 10-14 日运势持续走高，适合推进重要谈判、签约、面试等关键事务。建议将核心任务安排在此时间段。
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs font-semibold" style="background: rgba(200, 168, 78, 0.15); color: var(--color-gold);">B</span>
+                  <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                    <strong style="color: var(--color-text);">感情主动出击</strong>：感情运随木星三分相同步上升，单身者适合参加社交活动；有伴侣者适合安排深度对话或共同体验活动。
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md text-xs font-semibold" style="background: rgba(26, 138, 92, 0.15); color: var(--state-success);">C</span>
+                  <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                    <strong style="color: var(--color-text);">关注 7 月中旬转折</strong>：预测显示 7 月 14 日后运势将有所回落，提前做好规划，避免将所有重要事项堆叠在高峰之后。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 7. 页脚 ==================== -->
+      <footer style="background: #060a14; border-top: 1px solid rgba(255,255,255,0.06); padding: var(--space-12) 0 var(--space-8);" data-dom-id="footer">
+        <div class="content-container">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div class="max-w-md">
+              <span class="display-font text-base font-semibold" style="color: var(--color-gold);">天机</span>
+              <p class="mt-2" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                免责声明：本工具所有占卜结果仅供娱乐参考，不构成任何决策建议。命运掌握在自己手中。
+              </p>
+            </div>
+            <div class="flex items-center gap-6">
+              <a href="#" class="footer-link no-underline" data-dom-id="footer-about">关于我们</a>
+              <a href="#" class="footer-link no-underline" data-dom-id="footer-terms">使用条款</a>
+              <a href="#" class="footer-link no-underline" data-dom-id="footer-privacy">隐私政策</a>
+            </div>
+          </div>
+          <div class="mt-8 pt-6 text-center" style="border-top: 1px solid rgba(255,255,255,0.04);">
+            <p style="color: var(--color-text-tertiary); font-size: var(--text-xs);">
+              &copy; 2026 天机 AI 运势查询工具. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

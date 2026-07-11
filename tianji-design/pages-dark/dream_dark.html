@@ -1,0 +1,755 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周公解梦 — 天机</title>
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ---- 梦境主题：梦幻柔和风格 ---- */
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+      /* 月亮 CSS 装饰 */
+      .moon-decoration {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #e8e0f0 0%, #c8b8d8 100%);
+        box-shadow:
+          0 0 40px rgba(180, 160, 220, 0.4),
+          0 0 80px rgba(150, 130, 200, 0.2),
+          inset -12px -6px 20px rgba(100, 80, 140, 0.25);
+        position: relative;
+      }
+      .moon-decoration::after {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(160, 140, 200, 0.2);
+        top: 18px;
+        left: 14px;
+      }
+      .moon-decoration::before {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: rgba(160, 140, 200, 0.15);
+        bottom: 20px;
+        right: 16px;
+      }
+
+      /* 月亮小尺寸 */
+      .moon-small {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ddd4ec 0%, #bfb0d0 100%);
+        box-shadow:
+          0 0 24px rgba(180, 160, 220, 0.35),
+          0 0 48px rgba(150, 130, 200, 0.15),
+          inset -8px -4px 12px rgba(100, 80, 140, 0.2);
+      }
+
+      /* 星星闪烁动画 */
+      @keyframes star-twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+      .star-twinkle {
+        animation: star-twinkle 3s ease-in-out infinite;
+      }
+
+      /* 月光浮动动画 */
+      @keyframes moon-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      .moon-float {
+        animation: moon-float 6s ease-in-out infinite;
+      }
+
+      /* 输入模式 Tab */
+      .dream-tab {
+        padding: 8px 16px;
+        font-size: var(--text-sm);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+      }
+      .dream-tab:hover {
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+      .dream-tab.active {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        border-color: var(--color-primary);
+      }
+
+      /* 梦境标签 */
+      .dream-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 16px;
+        font-size: var(--text-sm);
+        border-radius: var(--radius-full);
+        border: 1px solid var(--color-border);
+        background: var(--color-bg-elevated);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+        shrink: 0;
+      }
+      .dream-tag:hover {
+        border-color: var(--color-primary-lighter);
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+
+      /* 情绪标签 */
+      .emotion-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        font-size: var(--text-sm);
+        border-radius: var(--radius-full);
+        border: 1px solid var(--color-border);
+        background: var(--color-bg-elevated);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+        shrink: 0;
+      }
+      .emotion-tag:hover {
+        border-color: #b39ddb;
+        background: rgba(179, 157, 219, 0.08);
+        color: #7e57c2;
+      }
+      .emotion-tag.selected {
+        border-color: #9575cd;
+        background: rgba(149, 117, 205, 0.12);
+        color: #673ab7;
+      }
+
+      /* 吉凶徽章 */
+      .fortune-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        font-size: var(--text-lg);
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .fortune-badge.fortune-zhongji {
+        background: linear-gradient(135deg, #1a8a5c 0%, #2ecc71 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(26, 138, 92, 0.3);
+      }
+
+      /* 结果卡片 */
+      .result-card {
+        background: var(--color-bg-elevated);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+      }
+
+      /* AI分析渐变边框 */
+      .ai-analysis-card {
+        position: relative;
+        background: linear-gradient(135deg, rgba(0, 75, 170, 0.03) 0%, rgba(149, 117, 205, 0.05) 100%);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+      }
+      .ai-analysis-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius-xl);
+        padding: 1px;
+        background: linear-gradient(135deg, var(--color-primary-lighter), #9575cd);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      /* 推荐卡片 */
+      .recommend-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-6) var(--space-4);
+        background: var(--color-bg-elevated);
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border-light);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        text-align: center;
+      }
+      .recommend-card:hover {
+        border-color: var(--color-primary-lighter);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+
+      /* 星光粒子背景 */
+      .dream-particles {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      .dream-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(180, 160, 220, 0.6);
+        animation: particle-float 8s ease-in-out infinite;
+      }
+      @keyframes particle-float {
+        0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+        50% { opacity: 1; transform: translateY(-30px) scale(1); }
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body);">
+
+    <!-- 导航栏（与首页一致，民俗趣味高亮） -->
+    <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========== 页面标题区：深蓝+淡紫+月光银 ========== -->
+        <section class="relative overflow-hidden" style="background: linear-gradient(180deg, #0a0e2e 0%, #1a1640 50%, #1e1a3a 100%);">
+            <!-- 星空粒子背景 -->
+            <div class="dream-particles">
+                <div class="dream-particle" style="left: 8%; top: 15%; animation-delay: 0s;"></div>
+                <div class="dream-particle" style="left: 18%; top: 35%; animation-delay: 1.5s;"></div>
+                <div class="dream-particle" style="left: 30%; top: 10%; animation-delay: 3s;"></div>
+                <div class="dream-particle" style="left: 45%; top: 25%; animation-delay: 0.8s;"></div>
+                <div class="dream-particle" style="left: 55%; top: 50%; animation-delay: 2s;"></div>
+                <div class="dream-particle" style="left: 68%; top: 12%; animation-delay: 4s;"></div>
+                <div class="dream-particle" style="left: 78%; top: 40%; animation-delay: 1.2s;"></div>
+                <div class="dream-particle" style="left: 88%; top: 20%; animation-delay: 2.5s;"></div>
+                <div class="dream-particle" style="left: 92%; top: 55%; animation-delay: 3.5s;"></div>
+                <div class="dream-particle" style="left: 12%; top: 60%; animation-delay: 5s;"></div>
+            </div>
+
+            <!-- 星星装饰 SVG -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full" viewBox="0 0 1280 360" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="80" cy="40" r="1.5" fill="#d0c0e8" class="star-twinkle" style="animation-delay: 0s;"/>
+                    <circle cx="200" cy="80" r="1" fill="#d0c0e8" class="star-twinkle" style="animation-delay: 0.5s;"/>
+                    <circle cx="350" cy="30" r="1.2" fill="#e0d0f0" class="star-twinkle" style="animation-delay: 1s;"/>
+                    <circle cx="500" cy="90" r="0.8" fill="#c8b8d8" class="star-twinkle" style="animation-delay: 1.5s;"/>
+                    <circle cx="620" cy="50" r="1.5" fill="#e0d0f0" class="star-twinkle" style="animation-delay: 0.3s;"/>
+                    <circle cx="750" cy="100" r="1" fill="#d0c0e8" class="star-twinkle" style="animation-delay: 2s;"/>
+                    <circle cx="900" cy="35" r="1.3" fill="#e8e0f0" class="star-twinkle" style="animation-delay: 0.8s;"/>
+                    <circle cx="1050" cy="70" r="0.8" fill="#c8b8d8" class="star-twinkle" style="animation-delay: 1.2s;"/>
+                    <circle cx="1180" cy="45" r="1.5" fill="#d0c0e8" class="star-twinkle" style="animation-delay: 1.8s;"/>
+                    <circle cx="150" cy="150" r="1" fill="#e0d0f0" class="star-twinkle" style="animation-delay: 2.5s;"/>
+                    <circle cx="420" cy="180" r="0.8" fill="#c8b8d8" class="star-twinkle" style="animation-delay: 0.7s;"/>
+                    <circle cx="680" cy="160" r="1.2" fill="#d0c0e8" class="star-twinkle" style="animation-delay: 1.3s;"/>
+                    <circle cx="950" cy="200" r="1" fill="#e8e0f0" class="star-twinkle" style="animation-delay: 0.4s;"/>
+                    <circle cx="1100" cy="170" r="0.8" fill="#c8b8d8" class="star-twinkle" style="animation-delay: 2.2s;"/>
+                </svg>
+            </div>
+
+            <!-- 月亮装饰 -->
+            <div class="absolute top-8 right-8 sm:top-12 sm:right-16 lg:right-24 moon-float opacity-60">
+                <div class="moon-decoration"></div>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20" style="max-width: var(--max-width);">
+                <!-- 面包屑 -->
+                <nav class="flex items-center gap-2 text-sm mb-6" style="color: var(--color-text-tertiary);">
+                    <a href="#" class="transition-colors hover:text-white">首页</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <a href="#" class="transition-colors hover:text-white">民俗趣味</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="color: #d0c0e8;">周公解梦</span>
+                </nav>
+
+                <!-- 标题 -->
+                <div class="flex items-start gap-6 sm:gap-8">
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mb-4" style="color: #f0eaff; font-family: 'Noto Serif SC', serif; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                            周公解梦
+                        </h1>
+                        <p class="text-base sm:text-lg max-w-2xl" style="color: rgba(208, 192, 232, 0.8); line-height: var(--leading-relaxed);">
+                            AI 智能梦境解读，揭示你潜意识中的吉凶预兆
+                        </p>
+                    </div>
+                    <!-- 月亮小图标 -->
+                    <div class="hidden sm:block flex-shrink-0 moon-float">
+                        <div class="moon-small"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 梦境描述输入区 ========== -->
+        <section class="relative" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <div class="result-card p-5 sm:p-8">
+                    <!-- 输入模式 Tab -->
+                    <div class="flex items-center gap-2 mb-5 flex-wrap">
+                        <button class="dream-tab active">自由描述</button>
+                        <button class="dream-tab">关键词输入</button>
+                        <button class="dream-tab">情绪标签</button>
+                    </div>
+
+                    <!-- 主输入框 -->
+                    <textarea
+                        rows="5"
+                        class="w-full rounded-xl p-4 sm:p-5 text-base resize-none outline-none transition-shadow"
+                        style="background: var(--color-bg-inset); border: 1.5px solid var(--color-border); color: var(--color-text); line-height: var(--leading-relaxed); font-family: var(--font-body);"
+                        placeholder="描述你的梦境，越详细越好。例如：梦见自己在一座很高的桥上，下面是平静的河水..."
+                        onfocus="this.style.borderColor='var(--color-primary-lighter)'; this.style.boxShadow='0 0 0 3px rgba(0,75,170,0.1)'"
+                        onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none'"
+                    ></textarea>
+
+                    <!-- 关键词输入区域（隐藏） -->
+                    <div class="hidden mt-4 p-4 rounded-xl" style="background: var(--color-bg-inset); border: 1.5px dashed var(--color-border-light);" id="keyword-area">
+                        <p class="text-sm mb-3" style="color: var(--color-text-tertiary);">输入关键词后按回车添加：</p>
+                        <div class="flex flex-wrap gap-2" id="keyword-tags">
+                            <span class="dream-tag">蛇</span>
+                            <span class="dream-tag">水</span>
+                            <span class="dream-tag">追逐</span>
+                        </div>
+                    </div>
+
+                    <!-- 情绪标签区域（隐藏） -->
+                    <div class="hidden mt-4" id="emotion-area">
+                        <p class="text-sm mb-3" style="color: var(--color-text-tertiary);">选择你醒来后的主要情绪：</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="emotion-tag">噩梦</span>
+                            <span class="emotion-tag">惊恐</span>
+                            <span class="emotion-tag selected">平静</span>
+                            <span class="emotion-tag">困惑</span>
+                            <span class="emotion-tag">喜悦</span>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="flex justify-end mt-5">
+                        <button
+                            data-dom-id="dream-submit"
+                            class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-base font-medium transition-all"
+                            style="background: var(--color-primary); color: var(--color-text-inverse); box-shadow: 0 4px 12px rgba(0,75,170,0.25);"
+                            onmouseover="this.style.background='var(--color-primary-light)'; this.style.boxShadow='0 6px 20px rgba(0,75,170,0.35)'"
+                            onmouseout="this.style.background='var(--color-primary)'; this.style.boxShadow='0 4px 12px rgba(0,75,170,0.25)'"
+                        >
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            解梦
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 常见梦境标签云 ========== -->
+        <section style="background: var(--color-bg-elevated);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10" style="max-width: var(--max-width);">
+                <h2 class="text-lg sm:text-xl font-semibold mb-5" style="color: var(--color-text); font-family: 'Noto Serif SC', serif;">
+                    常见梦境
+                </h2>
+                <div class="flex flex-wrap gap-2 sm:gap-3">
+                    <span class="dream-tag">蛇</span>
+                    <span class="dream-tag">水</span>
+                    <span class="dream-tag">飞行</span>
+                    <span class="dream-tag">掉落</span>
+                    <span class="dream-tag">牙齿</span>
+                    <span class="dream-tag">考试</span>
+                    <span class="dream-tag">迟到</span>
+                    <span class="dream-tag">迷路</span>
+                    <span class="dream-tag">房子</span>
+                    <span class="dream-tag">火</span>
+                    <span class="dream-tag">死亡</span>
+                    <span class="dream-tag">怀孕</span>
+                    <span class="dream-tag">雨</span>
+                    <span class="dream-tag">猫</span>
+                    <span class="dream-tag">狗</span>
+                    <span class="dream-tag">龙</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 解梦结果展示（Mockup 静态） ========== -->
+        <section style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <!-- 结果卡片 -->
+                <div class="result-card mb-6">
+                    <!-- 卡片头部：标题 + 吉凶徽章 -->
+                    <div class="flex items-center gap-4 sm:gap-5 p-5 sm:p-8 pb-0 sm:pb-0">
+                        <div class="fortune-badge fortune-zhongji">中吉</div>
+                        <div class="flex-1 min-w-0">
+                            <h2 class="text-xl sm:text-2xl font-semibold truncate" style="color: var(--color-text); font-family: 'Noto Serif SC', serif;">
+                                梦境分析：蛇
+                            </h2>
+                            <p class="text-sm mt-1 truncate" style="color: var(--color-text-tertiary);">
+                                基于《周公解梦》与 AI 心理学分析
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 各元素解读表格 -->
+                    <div class="p-5 sm:p-8">
+                        <h3 class="text-base font-semibold mb-4" style="color: var(--color-text);">元素解读</h3>
+                        <div class="overflow-x-auto rounded-xl border" style="border-color: var(--color-border);">
+                            <table class="w-full text-sm" style="min-width: 320px;">
+                                <thead>
+                                    <tr style="background: var(--color-bg-inset);">
+                                        <th class="text-left px-4 py-3 font-medium whitespace-nowrap" style="color: var(--color-text-secondary);">元素</th>
+                                        <th class="text-left px-4 py-3 font-medium whitespace-nowrap" style="color: var(--color-text-secondary);">象征</th>
+                                        <th class="text-left px-4 py-3 font-medium whitespace-nowrap" style="color: var(--color-text-secondary);">吉凶</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-top: 1px solid var(--color-border-light);">
+                                        <td class="px-4 py-3 font-medium whitespace-nowrap" style="color: var(--color-text);">蛇</td>
+                                        <td class="px-4 py-3" style="color: var(--color-text-secondary);">变化、智慧</td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background: rgba(26,138,92,0.1); color: var(--state-success);">中吉</span>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-top: 1px solid var(--color-border-light);">
+                                        <td class="px-4 py-3 font-medium whitespace-nowrap" style="color: var(--color-text);">水</td>
+                                        <td class="px-4 py-3" style="color: var(--color-text-secondary);">财富、情感</td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background: rgba(26,138,92,0.12); color: var(--state-success);">吉</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 心理暗示 -->
+                    <div class="px-5 sm:px-8 pb-5 sm:pb-8">
+                        <h3 class="text-base font-semibold mb-3" style="color: var(--color-text);">心理暗示</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                            梦见蛇通常象征着潜意识中的变革力量。蛇的蜕皮过程代表着新生与转变，暗示你正面临人生中的重要转折点。水中出现的蛇更加积极的意象，水象征着情感的流动，两者结合预示着情感层面的成熟与智慧的增长。
+                        </p>
+                    </div>
+
+                    <!-- 化解建议 -->
+                    <div class="px-5 sm:px-8 pb-5 sm:pb-8">
+                        <h3 class="text-base font-semibold mb-3" style="color: var(--color-text);">化解建议</h3>
+                        <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                            近期可多关注自身直觉，在重要决策前静心思考。建议佩戴翡翠或绿松石饰品以增强气场，保持规律作息，适当进行冥想或瑜伽来平衡身心能量。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- AI 深度分析区 -->
+                <div class="ai-analysis-card p-5 sm:p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary) 0%, #7e57c2 100%);">
+                            <i data-lucide="brain" class="w-4 h-4" style="color: white;"></i>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-semibold" style="color: var(--color-text);">AI 深度分析</h3>
+                    </div>
+                    <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                        综合梦境解析心理学（Dreamwork Theory）与荣格原型分析，此梦境中的蛇与水的意象组合具有深层意义。在荣格心理学中，蛇是"阴影"（Shadow）的典型象征，代表被压抑的潜意识内容。而水则是集体无意识最常见的容器符号。
+                    </p>
+                    <p class="text-sm leading-relaxed mt-3" style="color: var(--color-text-secondary);">
+                        从情感图式（Emotional Schema）的角度分析，"蛇在水中"的平静场景暗示你当前对人生变革的态度是接纳的、而非抗拒的。这与你的情绪标签"平静"高度吻合。建议在接下来的两周内关注新旧交替的机遇，避免因过度谨慎而错失良机。
+                    </p>
+                </div>
+
+                <!-- 追问 + 收藏 + 分享 -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="flex-1 relative">
+                        <input
+                            type="text"
+                            class="w-full rounded-xl pl-4 pr-4 py-3 text-sm outline-none transition-shadow"
+                            style="background: var(--color-bg-elevated); border: 1.5px solid var(--color-border); color: var(--color-text);"
+                            placeholder="追问 AI：继续深入解析..."
+                            onfocus="this.style.borderColor='var(--color-primary-lighter)'; this.style.boxShadow='0 0 0 3px rgba(0,75,170,0.1)'"
+                            onblur="this.style.borderColor='var(--color-border)'; this.style.boxShadow='none'"
+                        />
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <button class="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all" style="background: var(--color-primary); color: var(--color-text-inverse); box-shadow: 0 2px 8px rgba(0,75,170,0.2);" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            追问
+                        </button>
+                        <button class="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all" style="background: var(--color-bg-inset); color: var(--color-text-secondary); border: 1.5px solid var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary-lighter)'; this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-secondary)'">
+                            <i data-lucide="bookmark" class="w-4 h-4"></i>
+                            收藏
+                        </button>
+                        <button class="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all" style="background: var(--color-bg-inset); color: var(--color-text-secondary); border: 1.5px solid var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary-lighter)'; this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-secondary)'">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                            分享
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 底部推荐 ========== -->
+        <section style="background: var(--color-bg-elevated);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14" style="max-width: var(--max-width);">
+                <h2 class="text-lg sm:text-xl font-semibold mb-6 text-center" style="color: var(--color-text); font-family: 'Noto Serif SC', serif;">
+                    推荐工具
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <!-- 签诗抽签 -->
+                    <a href="#" class="recommend-card">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary-bg-strong), rgba(149,117,205,0.1));">
+                            <i data-lucide="scroll-text" class="w-7 h-7" style="color: var(--color-primary);"></i>
+                        </div>
+                        <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">签诗抽签</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">随机抽取灵签，获取签诗指引</p>
+                    </a>
+                    <!-- 姓名测算 -->
+                    <a href="#" class="recommend-card">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary-bg-strong), rgba(149,117,205,0.1));">
+                            <i data-lucide="pen-tool" class="w-7 h-7" style="color: var(--color-primary);"></i>
+                        </div>
+                        <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">姓名测算</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">解析姓名笔画五行与命理</p>
+                    </a>
+                    <!-- 生肖运势 -->
+                    <a href="#" class="recommend-card">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary-bg-strong), rgba(149,117,205,0.1));">
+                            <i data-lucide="star" class="w-7 h-7" style="color: var(--color-primary);"></i>
+                        </div>
+                        <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">生肖运势</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">查看今日生肖运势与宜忌</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer style="background: #0a0e2e; border-top: 1px solid rgba(200,168,78,0.1);">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center" style="max-width: var(--max-width);">
+            <p class="text-sm" style="color: rgba(255,255,255,0.4);">
+                天机 AI 运势查询 — 仅供参考，切勿迷信
+            </p>
+        </div>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

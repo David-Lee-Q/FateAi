@@ -1,0 +1,873 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>符文占卜 — 天机</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 符文卡片样式 */
+    .rune-card {
+      position: relative;
+      background: linear-gradient(145deg, #002060 0%, #003580 40%, #004baa 100%);
+      border: 2px solid var(--color-gold);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: transform var(--transition-base), box-shadow var(--transition-base);
+      cursor: default;
+    }
+    .rune-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0, 32, 96, 0.35), 0 0 24px rgba(200, 168, 78, 0.12);
+    }
+    /* 符文内边框装饰 */
+    .rune-card-inner-border {
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(200, 168, 78, 0.3);
+      border-radius: calc(var(--radius-lg) - 3px);
+      pointer-events: none;
+    }
+    /* 符文字符发光效果 */
+    .rune-glyph {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      line-height: 1;
+      color: var(--color-gold);
+      text-shadow: 0 0 20px rgba(200, 168, 78, 0.4), 0 0 40px rgba(200, 168, 78, 0.15);
+      transition: text-shadow var(--transition-base);
+    }
+    .rune-card:hover .rune-glyph {
+      text-shadow: 0 0 28px rgba(200, 168, 78, 0.6), 0 0 56px rgba(200, 168, 78, 0.25);
+    }
+    /* 抽取选项卡片 */
+    .spread-option {
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      background: var(--color-bg-elevated);
+      text-align: center;
+    }
+    .spread-option:hover {
+      border-color: var(--color-primary-light);
+      box-shadow: var(--shadow-md);
+    }
+    .spread-option.active {
+      border-color: var(--color-gold);
+      box-shadow: 0 0 0 3px rgba(200, 168, 78, 0.15), var(--shadow-lg);
+    }
+    /* 可折叠面板 */
+    .collapse-panel .collapse-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    .collapse-panel.open .collapse-content {
+      max-height: 2000px;
+    }
+    .collapse-panel .collapse-arrow {
+      transition: transform var(--transition-base);
+    }
+    .collapse-panel.open .collapse-arrow {
+      transform: rotate(180deg);
+    }
+    /* 导航链接激活态 */
+    .nav-link {
+      transition: color var(--transition-fast);
+      white-space: nowrap;
+    }
+    .nav-link:hover {
+      color: var(--color-primary-light);
+    }
+    .nav-link.active {
+      color: var(--color-gold);
+    }
+    /* 推荐卡片 */
+    .recommend-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: transform var(--transition-base), box-shadow var(--transition-base);
+      cursor: pointer;
+    }
+    .recommend-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    /* 北欧装饰分隔线 */
+    .nordic-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .nordic-divider::before,
+    .nordic-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+        <!-- ===== 1. 导航栏 ===== -->
+        <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+        <!-- ===== 2. 面包屑 + 标题 ===== -->
+        <section style="background: linear-gradient(180deg, var(--color-primary-darker) 0%, var(--color-primary-dark) 100%); padding: var(--space-10) 0 var(--space-16);">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <!-- 面包屑 -->
+                <nav class="flex items-center gap-2 text-xs mb-6" style="color: var(--color-primary-lighter);">
+                    <a href="#" class="hover:underline" style="color: var(--color-gold-light);">首页</a>
+                    <i data-lucide="chevron-right" style="width: 12px; height: 12px;"></i>
+                    <a href="#" class="hover:underline" style="color: var(--color-gold-light);">西方占卜</a>
+                    <i data-lucide="chevron-right" style="width: 12px; height: 12px;"></i>
+                    <span style="color: var(--color-gold);">符文占卜</span>
+                </nav>
+                <!-- 标题区 -->
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                    <div class="min-w-0">
+                        <h1 class="display-font truncate"
+                            style="font-size: clamp(28px, 4vw, 48px); color: var(--color-gold); line-height: var(--leading-tight); letter-spacing: var(--tracking-wide); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                            符文占卜
+                        </h1>
+                        <p class="mt-3 truncate" style="font-size: var(--text-lg); color: var(--color-primary-lightest); line-height: var(--leading-snug);">
+                            北欧古老符文的智慧启示
+                        </p>
+                    </div>
+                    <div class="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg"
+                         style="background: rgba(200, 168, 78, 0.1); border: 1px solid rgba(200, 168, 78, 0.2);">
+                        <i data-lucide="sparkles" style="width: 16px; height: 16px; color: var(--color-gold);"></i>
+                        <span class="text-sm whitespace-nowrap" style="color: var(--color-gold);">AI 深度解读</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 3. 问题输入 + 抽取数量选择 ===== -->
+        <section style="background: var(--color-bg-elevated); padding: var(--space-12) 0;">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <!-- 问题输入 -->
+                <div class="mb-8">
+                    <label class="block text-sm font-medium mb-2" style="color: var(--color-text-secondary);">心中默念的问题（可选）</label>
+                    <div class="flex items-center gap-3 rounded-lg px-4 py-3"
+                         style="background: var(--color-bg); border: 1px solid var(--color-border); transition: border-color var(--transition-fast);"
+                         onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
+                        <i data-lucide="message-circle" style="width: 18px; height: 18px; color: var(--color-text-tertiary); flex-shrink: 0;"></i>
+                        <input type="text" placeholder="例如：我的事业下一步应该如何发展？"
+                               class="flex-1 bg-transparent outline-none text-base min-w-0"
+                               style="color: var(--color-text);">
+                    </div>
+                </div>
+                <!-- 抽取数量选择 -->
+                <h2 class="text-lg font-semibold mb-4" style="color: var(--color-text);">选择占卜牌阵</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- 单符文 -->
+                    <div class="spread-option active" onclick="selectSpread(this)">
+                        <div class="flex justify-center mb-3">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect x="8" y="4" width="32" height="40" rx="4" stroke="#c8a84e" stroke-width="1.5" fill="rgba(200,168,78,0.08)"/>
+                                <text x="24" y="30" text-anchor="middle" font-family="serif" font-size="22" fill="#c8a84e">&#x16A0;</text>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold mb-1" style="color: var(--color-text);">1 枚 · 单符文</h3>
+                        <p class="text-sm line-clamp-2" style="color: var(--color-text-secondary);">快速获取一个明确的指引方向</p>
+                    </div>
+                    <!-- 过去现在未来 -->
+                    <div class="spread-option" onclick="selectSpread(this)">
+                        <div class="flex justify-center mb-3">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect x="2" y="4" width="12" height="40" rx="2" stroke="#c8a84e" stroke-width="1" fill="rgba(200,168,78,0.05)"/>
+                                <rect x="18" y="4" width="12" height="40" rx="2" stroke="#c8a84e" stroke-width="1.5" fill="rgba(200,168,78,0.12)"/>
+                                <rect x="34" y="4" width="12" height="40" rx="2" stroke="#c8a84e" stroke-width="1" fill="rgba(200,168,78,0.05)"/>
+                                <text x="8" y="28" text-anchor="middle" font-family="serif" font-size="10" fill="rgba(200,168,78,0.6)">&#x16A2;</text>
+                                <text x="24" y="28" text-anchor="middle" font-family="serif" font-size="10" fill="#c8a84e">&#x16A0;</text>
+                                <text x="40" y="28" text-anchor="middle" font-family="serif" font-size="10" fill="rgba(200,168,78,0.6)">&#x16A6;</text>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold mb-1" style="color: var(--color-text);">3 枚 · 过去/现在/未来</h3>
+                        <p class="text-sm line-clamp-2" style="color: var(--color-text-secondary);">揭示事件发展的时间线索</p>
+                    </div>
+                    <!-- 十字牌阵 -->
+                    <div class="spread-option" onclick="selectSpread(this)">
+                        <div class="flex justify-center mb-3">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect x="17" y="2" width="14" height="10" rx="2" stroke="#c8a84e" stroke-width="1" fill="rgba(200,168,78,0.05)"/>
+                                <rect x="17" y="36" width="14" height="10" rx="2" stroke="#c8a84e" stroke-width="1" fill="rgba(200,168,78,0.05)"/>
+                                <rect x="2" y="19" width="14" height="10" rx="2" stroke="#c8a84e" stroke-width="1" fill="rgba(200,168,78,0.05)"/>
+                                <rect x="32" y="19" width="14" height="10" rx="2" stroke="#c8a84e" stroke-width="1" fill="rgba(200,168,78,0.05)"/>
+                                <rect x="17" y="19" width="14" height="10" rx="2" stroke="#c8a84e" stroke-width="1.5" fill="rgba(200,168,78,0.12)"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold mb-1" style="color: var(--color-text);">5 枚 · 十字牌阵</h3>
+                        <p class="text-sm line-clamp-2" style="color: var(--color-text-secondary);">全方位深度解读人生关键问题</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 4. 抽取按钮 ===== -->
+        <section style="padding: var(--space-10) 0;">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8 text-center">
+                <button class="inline-flex items-center gap-3 px-10 py-4 rounded-lg font-semibold text-lg transition-all"
+                        style="background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold)); color: var(--color-primary-darker); box-shadow: 0 4px 16px rgba(200, 168, 78, 0.3);"
+                        onmouseover="this.style.boxShadow='0 8px 24px rgba(200, 168, 78, 0.45)'; this.style.transform='translateY(-2px)'"
+                        onmouseout="this.style.boxShadow='0 4px 16px rgba(200, 168, 78, 0.3)'; this.style.transform='translateY(0)'">
+                    <i data-lucide="zap" style="width: 22px; height: 22px;"></i>
+                    <span>抽取符文</span>
+                </button>
+                <p class="mt-3 text-sm" style="color: var(--color-text-tertiary);">集中意念，点击按钮揭晓命运启示</p>
+            </div>
+        </section>
+
+        <!-- ===== 5. 符文展示区（Mockup 3 枚） ===== -->
+        <section style="background: linear-gradient(180deg, var(--color-primary-darker) 0%, #001a4d 100%); padding: var(--space-16) 0;">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <!-- 区域标题 -->
+                <div class="text-center mb-10">
+                    <h2 class="display-font text-2xl md:text-3xl tracking-wide" style="color: var(--color-gold);">Rune Casting</h2>
+                    <p class="mt-2 text-sm" style="color: var(--color-primary-lighter);">符文已揭示，命运的指引降临</p>
+                </div>
+                <!-- 符文卡片 -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
+                    <!-- 符文 1：Fehu -->
+                    <div class="rune-card p-6 text-center flex flex-col items-center">
+                        <div class="rune-card-inner-border"></div>
+                        <p class="text-xs uppercase tracking-widest mb-4" style="color: var(--color-primary-lighter);">过去</p>
+                        <div class="rune-glyph mb-3">&#x16A0;</div>
+                        <h3 class="display-font text-xl tracking-wide mb-1" style="color: var(--color-gold-light);">Fehu</h3>
+                        <p class="text-sm mb-4" style="color: var(--color-primary-lightest);">财富 · 牛</p>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+                              style="background: rgba(200, 168, 78, 0.15); color: var(--color-gold);">
+                            <i data-lucide="sun" style="width: 12px; height: 12px;"></i>
+                            正位
+                        </span>
+                        <div class="mt-4 pt-4 w-full" style="border-top: 1px solid rgba(200, 168, 78, 0.2);">
+                            <p class="text-sm leading-relaxed" style="color: var(--color-primary-lightest);">象征物质富足与原始能量。过去你积累了宝贵的资源与经验，为当前奠定了稳固的根基。</p>
+                        </div>
+                    </div>
+                    <!-- 符文 2：Uruz -->
+                    <div class="rune-card p-6 text-center flex flex-col items-center">
+                        <div class="rune-card-inner-border"></div>
+                        <p class="text-xs uppercase tracking-widest mb-4" style="color: var(--color-primary-lighter);">现在</p>
+                        <div class="rune-glyph mb-3">&#x16A2;</div>
+                        <h3 class="display-font text-xl tracking-wide mb-1" style="color: var(--color-gold-light);">Uruz</h3>
+                        <p class="text-sm mb-4" style="color: var(--color-primary-lightest);">力量 · 野牛</p>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+                              style="background: rgba(200, 168, 78, 0.15); color: var(--color-gold);">
+                            <i data-lucide="sun" style="width: 12px; height: 12px;"></i>
+                            正位
+                        </span>
+                        <div class="mt-4 pt-4 w-full" style="border-top: 1px solid rgba(200, 168, 78, 0.2);">
+                            <p class="text-sm leading-relaxed" style="color: var(--color-primary-lightest);">代表原始力量与健康活力。此刻你正处于力量充沛的时期，应勇敢面对挑战，释放内在潜能。</p>
+                        </div>
+                    </div>
+                    <!-- 符文 3：Thurisaz -->
+                    <div class="rune-card p-6 text-center flex flex-col items-center">
+                        <div class="rune-card-inner-border"></div>
+                        <p class="text-xs uppercase tracking-widest mb-4" style="color: var(--color-primary-lighter);">未来</p>
+                        <div class="rune-glyph mb-3">&#x16A6;</div>
+                        <h3 class="display-font text-xl tracking-wide mb-1" style="color: var(--color-gold-light);">Thurisaz</h3>
+                        <p class="text-sm mb-4" style="color: var(--color-primary-lightest);">荆棘 · 巨人</p>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+                              style="background: rgba(196, 58, 58, 0.15); color: #e06060;">
+                            <i data-lucide="moon" style="width: 12px; height: 12px;"></i>
+                            逆位
+                        </span>
+                        <div class="mt-4 pt-4 w-full" style="border-top: 1px solid rgba(200, 168, 78, 0.2);">
+                            <p class="text-sm leading-relaxed" style="color: var(--color-primary-lightest);">暗示防御与谨慎的必要性。未来可能出现意想不到的障碍，需要耐心等待时机，避免冲动行事。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 6. AI 综合启示 ===== -->
+        <section style="background: var(--color-bg-elevated); padding: var(--space-12) 0;">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <div class="rounded-xl p-6 md:p-8"
+                     style="background: var(--color-bg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+                    <!-- AI 解读标题 -->
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-lg"
+                             style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));">
+                            <i data-lucide="brain" style="width: 20px; height: 20px; color: var(--color-text-inverse);"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h2 class="text-lg font-semibold truncate" style="color: var(--color-text);">AI 综合启示</h2>
+                            <p class="text-xs truncate" style="color: var(--color-text-tertiary);">基于 Fehu + Uruz + Thurisaz 逆位 的组合解读</p>
+                        </div>
+                    </div>
+                    <!-- 解读内容 -->
+                    <div class="space-y-4" style="color: var(--color-text-secondary); font-size: var(--text-base); line-height: var(--leading-relaxed);">
+                        <div>
+                            <h3 class="font-semibold mb-2" style="color: var(--color-text);">符文组合解读</h3>
+                            <p>Fehu（财富）与 Uruz（力量）的正位组合，预示你正处于一个能量充沛、资源丰富的有利阶段。过去的积累为现在提供了坚实的支撑，而当前的力量让你足以应对大多数挑战。然而，Thurisaz 的逆位提醒我们：真正的智慧不在于莽撞前行，而在于知何时进、何时守。</p>
+                        </div>
+                        <div class="nordic-divider my-4">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 1 L9 7 L15 8 L9 9 L8 15 L7 9 L1 8 L7 7 Z" fill="#c8a84e" opacity="0.6"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-2" style="color: var(--color-text);">人生指引</h3>
+                            <p>这段时期的最佳策略是「蓄势待发，审慎行动」。你具备成功的条件——资源、能力与机遇都已就位，但需要在关键决策前进行深思熟虑。避免因急躁而错过最佳时机，保持内心的平静与外在的警觉。近期适合巩固现有成果、制定长远计划，而非贸然开拓新领域。</p>
+                        </div>
+                        <!-- 关键词 -->
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">蓄势待发</span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">审慎决策</span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold-dark);">财富积累</span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold-dark);">内在力量</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 7. 追问输入 + 保存记录 ===== -->
+        <section style="background: var(--color-bg); padding: var(--space-10) 0;">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 追问输入 -->
+                    <div class="rounded-xl p-6"
+                         style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text);">
+                            <i data-lucide="message-square-plus" style="width: 18px; height: 18px; color: var(--color-primary);"></i>
+                            继续追问
+                        </h3>
+                        <textarea rows="3" placeholder="对本次占卜结果有疑问？输入更具体的问题获取深入解读..."
+                                  class="w-full rounded-lg px-4 py-3 text-sm resize-none outline-none"
+                                  style="background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); transition: border-color var(--transition-fast);"
+                                  onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'"></textarea>
+                        <button class="mt-3 inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                                style="background: var(--color-primary); color: var(--color-text-inverse);"
+                                onmouseover="this.style.background='var(--color-primary-light)'"
+                                onmouseout="this.style.background='var(--color-primary)'">
+                            <i data-lucide="send" style="width: 14px; height: 14px;"></i>
+                            发送追问
+                        </button>
+                    </div>
+                    <!-- 保存记录 -->
+                    <div class="rounded-xl p-6"
+                         style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text);">
+                            <i data-lucide="bookmark" style="width: 18px; height: 18px; color: var(--color-primary);"></i>
+                            保存占卜记录
+                        </h3>
+                        <p class="text-sm mb-4" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                            本次占卜时间：2026年7月10日 14:32
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                                    style="background: var(--color-primary); color: var(--color-text-inverse);"
+                                    onmouseover="this.style.background='var(--color-primary-light)'"
+                                    onmouseout="this.style.background='var(--color-primary)'">
+                                <i data-lucide="save" style="width: 14px; height: 14px;"></i>
+                                保存到记录
+                            </button>
+                            <button class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                                    style="background: var(--color-bg); color: var(--color-text-secondary); border: 1px solid var(--color-border);"
+                                    onmouseover="this.style.borderColor='var(--color-primary-light)'; this.style.color='var(--color-primary)'"
+                                    onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-secondary)'">
+                                <i data-lucide="share-2" style="width: 14px; height: 14px;"></i>
+                                分享结果
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 8. 24 枚符文速查（可折叠面板） ===== -->
+        <section style="background: var(--color-bg-elevated); padding: var(--space-12) 0;">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <!-- 面板头部 -->
+                <div class="collapse-panel open" id="runeReference">
+                    <button class="w-full flex items-center justify-between py-4 rounded-t-lg px-6"
+                            style="background: var(--color-primary-darker);"
+                            onclick="togglePanel('runeReference')">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="book-open" style="width: 20px; height: 20px; color: var(--color-gold);"></i>
+                            <h2 class="font-semibold text-lg" style="color: var(--color-gold);">24 枚符文速查</h2>
+                            <span class="text-xs px-2 py-0.5 rounded" style="background: rgba(200, 168, 78, 0.15); color: var(--color-gold-light);">Elder Futhark</span>
+                        </div>
+                        <svg class="collapse-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 8 L10 13 L15 8" stroke="#c8a84e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="collapse-content">
+                        <div class="rounded-b-lg overflow-hidden" style="border: 1px solid var(--color-border); border-top: none;">
+                            <!-- 符文表格 -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm" style="min-width: 600px;">
+                                    <thead>
+                                        <tr style="background: var(--color-bg-inset);">
+                                            <th class="px-4 py-3 text-left font-medium" style="color: var(--color-text-secondary);">符文</th>
+                                            <th class="px-4 py-3 text-left font-medium" style="color: var(--color-text-secondary);">名称</th>
+                                            <th class="px-4 py-3 text-left font-medium" style="color: var(--color-text-secondary);">含义</th>
+                                            <th class="px-4 py-3 text-left font-medium" style="color: var(--color-text-secondary);">关键词</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16A0;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Fehu</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">财富、牛、流动的能量</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">丰盛、收获</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16A2;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Uruz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">力量、野牛、健康</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">活力、坚韧</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16A6;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Thurisaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">荆棘、巨人、守护</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">防御、考验</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16A8;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Ansuz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">神谕、奥丁、智慧</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">沟通、启示</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16B1;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Raidho</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">旅途、轮、节奏</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">旅程、秩序</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16B2;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Kenaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">火炬、知识、创造</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">洞见、灵感</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16B7;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Gebo</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">礼物、伙伴、平衡</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">合作、联结</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16B9;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Wunjo</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">喜悦、和谐、愿望</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">幸福、满足</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16BA;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Hagalaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">冰雹、破坏、变革</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">转型、释放</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16BE;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Nauthiz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">需求、 necessity、约束</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">忍耐、纪律</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16C1;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Isa</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">冰、静止、等待</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">暂停、反思</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16C3;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Jera</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">丰收、年、周期</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">回报、循环</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16C7;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Eihwaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">紫杉、坚韧、防御</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">毅力、保护</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16C8;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Perthro</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">命运之骰、秘密</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">神秘、机遇</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16C9;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Algiz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">保护、 Elk、守护</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">安全、觉醒</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16CA;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Sowilo</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">太阳、胜利、力量</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">光明、成功</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16CB;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Tiwaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">战神、正义、牺牲</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">荣誉、勇气</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16CC;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Berkano</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">桦树、新生、成长</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">滋养、繁衍</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16CE;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Ehwaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">马、信任、伙伴</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">协作、前进</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16CF;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Mannaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">人类、自我、智慧</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">自省、理性</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16D0;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Laguz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">水流、直觉、潜意识</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">流动、感知</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16D2;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Ingwaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">丰饶之神、潜能、孕育</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">成长、完成</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16D6;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Dagaz</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">黎明、突破、觉醒</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">转化、清晰</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-2.5 display-font text-xl" style="color: var(--color-primary);">&#x16DA;</td>
+                                            <td class="px-4 py-2.5 font-medium truncate" style="color: var(--color-text);">Othala</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-secondary);">传承、家园、祖先</td>
+                                            <td class="px-4 py-2.5 truncate" style="color: var(--color-text-tertiary);">根基、归属</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 9. 相关推荐 ===== -->
+        <section style="background: var(--color-bg); padding: var(--space-12) 0 var(--space-16);">
+            <div style="max-width: var(--max-width);" class="mx-auto px-4 md:px-8">
+                <h2 class="text-xl font-semibold mb-6" style="color: var(--color-text);">相关推荐</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+                    <!-- 塔罗牌占卜 -->
+                    <a href="tarot.html" class="recommend-card no-underline">
+                        <div class="rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 50%, #1a1e5e 100%); aspect-ratio: 16/9;">
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                    <rect x="16" y="8" width="32" height="48" rx="4" stroke="#c8a84e" stroke-width="1.5" fill="rgba(200,168,78,0.06)"/>
+                                    <rect x="20" y="12" width="24" height="40" rx="2" stroke="rgba(200,168,78,0.3)" stroke-width="0.5"/>
+                                    <circle cx="32" cy="28" r="8" stroke="#c8a84e" stroke-width="1" fill="none"/>
+                                    <path d="M32 20 L32 22 M32 34 L32 36 M24 28 L26 28 M38 28 L40 28" stroke="#c8a84e" stroke-width="1"/>
+                                    <path d="M32 24 L34 28 L32 32 L30 28 Z" fill="rgba(200,168,78,0.4)"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="p-4" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-top: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                            <h3 class="font-semibold truncate" style="color: var(--color-text);">塔罗牌占卜</h3>
+                            <p class="text-sm mt-1 line-clamp-2" style="color: var(--color-text-secondary);">78张塔罗牌揭示深层心理与未来趋势</p>
+                        </div>
+                    </a>
+                    <!-- 月相能量 -->
+                    <a href="moonphase.html" class="recommend-card no-underline">
+                        <div class="rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #0a1628 0%, #1a2d5e 50%, #0d1f3c 100%); aspect-ratio: 16/9;">
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                    <circle cx="32" cy="32" r="18" stroke="#c8a84e" stroke-width="1.5" fill="rgba(200,168,78,0.06)"/>
+                                    <circle cx="32" cy="32" r="14" fill="#c8a84e" opacity="0.2"/>
+                                    <circle cx="38" cy="32" r="14" fill="#1a2d5e"/>
+                                    <circle cx="20" cy="8" r="1.5" fill="#c8a84e" opacity="0.4"/>
+                                    <circle cx="48" cy="16" r="1" fill="#c8a84e" opacity="0.3"/>
+                                    <circle cx="12" cy="20" r="1" fill="#c8a84e" opacity="0.35"/>
+                                    <circle cx="52" cy="40" r="1.2" fill="#c8a84e" opacity="0.25"/>
+                                    <circle cx="10" cy="48" r="0.8" fill="#c8a84e" opacity="0.3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="p-4" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-top: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                            <h3 class="font-semibold truncate" style="color: var(--color-text);">月相能量</h3>
+                            <p class="text-sm mt-1 line-clamp-2" style="color: var(--color-text-secondary);">追踪月相周期，把握最佳行动时机</p>
+                        </div>
+                    </a>
+                    <!-- 星座运势 -->
+                    <a href="zodiac.html" class="recommend-card no-underline">
+                        <div class="rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #0a1e3e 0%, #0e2a5a 50%, #081830 100%); aspect-ratio: 16/9;">
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                    <circle cx="32" cy="32" r="22" stroke="#c8a84e" stroke-width="1" fill="none"/>
+                                    <circle cx="32" cy="32" r="18" stroke="rgba(200,168,78,0.3)" stroke-width="0.5" fill="none" stroke-dasharray="2 4"/>
+                                    <circle cx="32" cy="32" r="2" fill="#c8a84e" opacity="0.6"/>
+                                    <!-- 星座连线 -->
+                                    <circle cx="28" cy="18" r="1.5" fill="#c8a84e" opacity="0.5"/>
+                                    <circle cx="40" cy="22" r="1.5" fill="#c8a84e" opacity="0.5"/>
+                                    <circle cx="44" cy="34" r="1.5" fill="#c8a84e" opacity="0.5"/>
+                                    <circle cx="38" cy="46" r="1.5" fill="#c8a84e" opacity="0.5"/>
+                                    <circle cx="24" cy="44" r="1.5" fill="#c8a84e" opacity="0.5"/>
+                                    <circle cx="18" cy="32" r="1.5" fill="#c8a84e" opacity="0.5"/>
+                                    <line x1="28" y1="18" x2="40" y2="22" stroke="rgba(200,168,78,0.3)" stroke-width="0.8"/>
+                                    <line x1="40" y1="22" x2="44" y2="34" stroke="rgba(200,168,78,0.3)" stroke-width="0.8"/>
+                                    <line x1="44" y1="34" x2="38" y2="46" stroke="rgba(200,168,78,0.3)" stroke-width="0.8"/>
+                                    <line x1="38" y1="46" x2="24" y2="44" stroke="rgba(200,168,78,0.3)" stroke-width="0.8"/>
+                                    <line x1="24" y1="44" x2="18" y2="32" stroke="rgba(200,168,78,0.3)" stroke-width="0.8"/>
+                                    <line x1="18" y1="32" x2="28" y2="18" stroke="rgba(200,168,78,0.3)" stroke-width="0.8"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="p-4" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-top: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                            <h3 class="font-semibold truncate" style="color: var(--color-text);">星座运势</h3>
+                            <p class="text-sm mt-1 line-clamp-2" style="color: var(--color-text-secondary);">十二星座每日/每周运势详解与建议</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 最小交互脚本：牌阵选择 + 折叠面板 -->
+    <script>
+      /* 牌阵选项切换 */
+      function selectSpread(el) {
+        document.querySelectorAll('.spread-option').forEach(function(opt) {
+          opt.classList.remove('active');
+        });
+        el.classList.add('active');
+      }
+
+      /* 折叠面板切换 */
+      function togglePanel(id) {
+        document.getElementById(id).classList.toggle('open');
+      }
+
+      /* 初始化图标 */
+      lucide.createIcons();
+    </script>
+</body>
+</html>
+

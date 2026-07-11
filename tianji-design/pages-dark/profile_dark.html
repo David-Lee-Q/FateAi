@@ -1,0 +1,682 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 — 天机</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Dark Mode Overrides ---- */
+.dark {
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1220;
+  --color-text: #e8ecf4;
+  --color-text-secondary: #a0aac0;
+  --color-text-tertiary: #6b7590;
+  --color-border: #1e2740;
+  --color-border-light: #161e35;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 内容容器 */
+    .content-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+    }
+    /* 导航栏玻璃效果 */
+    .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    /* 导航链接 */
+    .nav-link {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      transition: color var(--transition-fast);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-link:hover {
+      color: var(--color-text-inverse);
+    }
+    /* 侧边导航项 */
+    .side-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .side-nav-item:hover {
+      background: var(--color-primary-bg-strong);
+      color: var(--color-text);
+    }
+    .side-nav-item.active {
+      background: rgba(0, 75, 170, 0.15);
+      color: var(--color-gold);
+    }
+    /* 信息行 */
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    /* 编辑按钮 */
+    .btn-edit {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .btn-edit:hover {
+      border-color: var(--color-primary-lighter);
+      color: var(--color-primary-lighter);
+      background: var(--color-primary-bg);
+    }
+    /* Toggle 开关 */
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      background: var(--color-border);
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background var(--transition-base);
+      flex-shrink: 0;
+    }
+    .toggle-switch.active {
+      background: var(--color-primary);
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: var(--color-text-inverse);
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform var(--transition-base);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    .toggle-switch.active::after {
+      transform: translateX(22px);
+    }
+    /* 卡片容器 */
+    .profile-card {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      transition: all var(--transition-base);
+    }
+    /* 数据统计卡片 */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(0, 75, 170, 0.1), rgba(200, 168, 78, 0.05));
+      border: 1px solid rgba(0, 75, 170, 0.15);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      text-align: center;
+    }
+    /* 操作按钮 */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 12px 24px;
+      border-radius: var(--radius-lg);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      white-space: nowrap;
+      border: none;
+    }
+    .btn-action-primary {
+      background: var(--color-primary);
+      color: var(--color-text-inverse);
+    }
+    .btn-action-primary:hover {
+      background: var(--color-primary-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 75, 170, 0.3);
+    }
+    .btn-action-danger {
+      background: transparent;
+      color: var(--state-error);
+      border: 1px solid rgba(196, 58, 58, 0.3);
+    }
+    .btn-action-danger:hover {
+      background: rgba(196, 58, 58, 0.08);
+      border-color: rgba(196, 58, 58, 0.5);
+    }
+    .btn-action-outline {
+      background: transparent;
+      color: var(--color-gold);
+      border: 1px solid rgba(200, 168, 78, 0.3);
+    }
+    .btn-action-outline:hover {
+      background: rgba(200, 168, 78, 0.08);
+      border-color: rgba(200, 168, 78, 0.5);
+    }
+    /* Select 下拉 */
+    .custom-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--color-bg-inset);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      padding: 10px 40px 10px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b92a8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      width: 100%;
+      max-width: 240px;
+    }
+    .custom-select:focus {
+      outline: none;
+      border-color: var(--color-primary-lighter);
+      box-shadow: 0 0 0 3px rgba(0, 75, 170, 0.15);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* 移动端菜单按钮 */
+      .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-lg);
+        background: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        color: var(--color-text-secondary);
+        transition: all var(--transition-fast);
+      }
+      .mobile-menu-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--color-text-inverse);
+      }
+      @media (min-width: 768px) {
+        .mobile-menu-btn { display: none !important; }
+      }
+
+      /* Tab 活跃指示条 */
+      .side-nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: var(--color-gold);
+        border-radius: 2px;
+      }
+      .side-nav-item {
+        position: relative;
+      }
+
+      /* 头像装饰光环 */
+      .avatar-ring {
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid rgba(200, 168, 78, 0.4);
+        animation: pulse-ring 3s ease-in-out infinite;
+      }
+      @keyframes pulse-ring {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.04); }
+      }
+
+      /* 用户卡片背景渐变 */
+      .user-card-bg {
+        background: linear-gradient(135deg, #002060 0%, #003580 40%, #004baa 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      .user-card-bg::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -10%;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(200, 168, 78, 0.12) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .user-card-bg::after {
+        content: '';
+        position: absolute;
+        bottom: -20%;
+        left: -5%;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(0, 75, 170, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+      <!-- ==================== 1. 顶部导航栏（固定） ==================== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header><!-- ==================== 2. 主内容区 ==================== -->
+      <div class="content-container" style="padding-top: calc(var(--nav-height) + var(--space-8)); padding-bottom: var(--space-16);" data-dom-id="profile-edit">
+
+        <div class="flex flex-col lg:flex-row gap-6">
+
+          <!-- ========== 左侧：侧边导航（桌面端纵向，移动端横向 Tab） ========== -->
+          <aside class="w-full lg:w-60 shrink-0" data-dom-id="profile-sidebar">
+            <!-- 桌面端：纵向侧边栏 -->
+            <nav class="hidden lg:flex flex-col gap-1 sticky top-24 profile-card" data-dom-id="sidebar-nav">
+              <a class="side-nav-item active" data-dom-id="tab-personal" href="#section-personal">
+                <i data-lucide="user-circle" style="width:18px;height:18px;"></i>
+                <span>个人信息</span>
+              </a>
+              <a class="side-nav-item" data-dom-id="tab-preferences" href="#section-preferences">
+                <i data-lucide="settings" style="width:18px;height:18px;"></i>
+                <span>偏好设置</span>
+              </a>
+              <a class="side-nav-item" data-dom-id="tab-data" href="#section-data">
+                <i data-lucide="database" style="width:18px;height:18px;"></i>
+                <span>数据管理</span>
+              </a>
+              <a class="side-nav-item" data-dom-id="tab-history" href="result.html">
+                <i data-lucide="clock" style="width:18px;height:18px;"></i>
+                <span>历史记录</span>
+              </a>
+            </nav>
+            <!-- 移动端：横向 Tab -->
+            <div class="flex lg:hidden overflow-x-auto gap-2 no-scrollbar" data-dom-id="mobile-tabs">
+              <a class="side-nav-item active" data-dom-id="tab-personal-m" href="#section-personal">
+                <i data-lucide="user-circle" style="width:16px;height:16px;"></i>
+                <span>个人信息</span>
+              </a>
+              <a class="side-nav-item" data-dom-id="tab-preferences-m" href="#section-preferences">
+                <i data-lucide="settings" style="width:16px;height:16px;"></i>
+                <span>偏好设置</span>
+              </a>
+              <a class="side-nav-item" data-dom-id="tab-data-m" href="#section-data">
+                <i data-lucide="database" style="width:16px;height:16px;"></i>
+                <span>数据管理</span>
+              </a>
+              <a class="side-nav-item" data-dom-id="tab-history-m" href="result.html">
+                <i data-lucide="clock" style="width:16px;height:16px;"></i>
+                <span>历史记录</span>
+              </a>
+            </div>
+          </aside>
+
+          <!-- ========== 右侧：内容区 ========== -->
+          <div class="flex-1 min-w-0 flex flex-col gap-6">
+
+            <!-- ===== 2a. 用户信息卡片（深蓝渐变大卡片） ===== -->
+            <section class="user-card-bg profile-card" style="border-color: rgba(200, 168, 78, 0.15);" data-dom-id="section-user-card">
+              <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                <!-- CSS 绘制头像 -->
+                <div class="relative shrink-0" data-dom-id="user-avatar">
+                  <div class="avatar-ring"></div>
+                  <div class="w-20 h-20 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark)); box-shadow: 0 4px 20px rgba(200, 168, 78, 0.3);">
+                    <span class="display-font text-3xl font-bold" style="color: var(--color-primary-darker);">T</span>
+                  </div>
+                </div>
+                <!-- 用户信息 -->
+                <div class="flex-1 min-w-0 text-center sm:text-left">
+                  <h1 class="text-2xl font-bold truncate" style="color: var(--color-text-inverse); font-family: var(--font-body);">天机用户</h1>
+                  <div class="flex items-center justify-center sm:justify-start gap-2 mt-2">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap" style="background: rgba(200, 168, 78, 0.15); color: var(--color-gold-light); border: 1px solid rgba(200, 168, 78, 0.25);" data-dom-id="user-level">
+                      <i data-lucide="award" style="width:12px;height:12px;"></i>
+                      <span>普通会员</span>
+                    </span>
+                    <span class="text-xs whitespace-nowrap" style="color: var(--color-text-secondary);">已使用 128 天</span>
+                  </div>
+                </div>
+                <!-- 编辑资料按钮 -->
+                <button class="btn-action btn-action-outline shrink-0" data-dom-id="btn-edit-profile">
+                  <i data-lucide="edit-3" style="width:16px;height:16px;"></i>
+                  <span>编辑资料</span>
+                </button>
+              </div>
+            </section>
+
+            <!-- ===== 2b. 个人信息管理区 ===== -->
+            <section id="section-personal" class="profile-card" data-dom-id="section-personal">
+              <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="user-circle" style="width:20px;height:20px;color:var(--color-primary-lighter);"></i>
+                <h2 class="text-lg font-semibold" style="color: var(--color-text);">个人信息</h2>
+              </div>
+              <!-- 出生日期 -->
+              <div class="info-row" data-dom-id="info-birthday">
+                <div class="min-w-0">
+                  <p class="text-xs font-medium" style="color: var(--color-text-tertiary);">出生日期</p>
+                  <p class="text-sm mt-1 truncate" style="color: var(--color-text);">1995年6月15日（阳历）</p>
+                  <p class="text-xs mt-0.5 truncate" style="color: var(--color-text-tertiary);">农历：乙亥年五月十八</p>
+                </div>
+                <button class="btn-edit shrink-0" data-dom-id="btn-edit-birthday">编辑</button>
+              </div>
+              <!-- 出生时间 -->
+              <div class="info-row" data-dom-id="info-birthtime">
+                <div class="min-w-0">
+                  <p class="text-xs font-medium" style="color: var(--color-text-tertiary);">出生时间</p>
+                  <p class="text-sm mt-1 truncate" style="color: var(--color-text);">14:30</p>
+                </div>
+                <button class="btn-edit shrink-0" data-dom-id="btn-edit-birthtime">编辑</button>
+              </div>
+              <!-- 出生地 -->
+              <div class="info-row" data-dom-id="info-birthplace">
+                <div class="min-w-0">
+                  <p class="text-xs font-medium" style="color: var(--color-text-tertiary);">出生地</p>
+                  <p class="text-sm mt-1 truncate" style="color: var(--color-text);">广东省 · 广州市</p>
+                </div>
+                <button class="btn-edit shrink-0" data-dom-id="btn-edit-birthplace">编辑</button>
+              </div>
+              <!-- 性别 -->
+              <div class="info-row" data-dom-id="info-gender">
+                <div class="min-w-0">
+                  <p class="text-xs font-medium" style="color: var(--color-text-tertiary);">性别</p>
+                  <p class="text-sm mt-1 truncate" style="color: var(--color-text);">男</p>
+                </div>
+                <button class="btn-edit shrink-0" data-dom-id="btn-edit-gender">编辑</button>
+              </div>
+            </section>
+
+            <!-- ===== 2c. 偏好设置区 ===== -->
+            <section id="section-preferences" class="profile-card" data-dom-id="section-preferences">
+              <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="settings" style="width:20px;height:20px;color:var(--color-primary-lighter);"></i>
+                <h2 class="text-lg font-semibold" style="color: var(--color-text);">偏好设置</h2>
+              </div>
+              <!-- 默认占卜体系 -->
+              <div class="info-row" data-dom-id="pref-system">
+                <div class="min-w-0">
+                  <p class="text-xs font-medium" style="color: var(--color-text-tertiary);">默认占卜体系</p>
+                  <p class="text-xs mt-1 truncate" style="color: var(--color-text-tertiary);">选择查询时默认使用的占卜体系</p>
+                </div>
+                <select class="custom-select shrink-0" data-dom-id="select-system">
+                  <option value="bazi">八字命理</option>
+                  <option value="tarot">塔罗占卜</option>
+                  <option value="zodiac">星座运势</option>
+                  <option value="dream">周公解梦</option>
+                </select>
+              </div>
+              <!-- 推送通知开关 -->
+              <div class="info-row" data-dom-id="pref-notification">
+                <div class="min-w-0">
+                  <p class="text-sm font-medium truncate" style="color: var(--color-text);">推送通知</p>
+                  <p class="text-xs mt-0.5 truncate" style="color: var(--color-text-tertiary);">接收每日运势推送和提醒</p>
+                </div>
+                <div class="toggle-switch active" data-dom-id="toggle-notification" role="switch" aria-checked="true" tabindex="0"></div>
+              </div>
+              <!-- 深色模式开关 -->
+              <div class="info-row" data-dom-id="pref-darkmode">
+                <div class="min-w-0">
+                  <p class="text-sm font-medium truncate" style="color: var(--color-text);">深色模式</p>
+                  <p class="text-xs mt-0.5 truncate" style="color: var(--color-text-tertiary);">切换页面显示主题</p>
+                </div>
+                <div class="toggle-switch active" data-dom-id="toggle-darkmode" role="switch" aria-checked="true" tabindex="0"></div>
+              </div>
+            </section>
+
+            <!-- ===== 2d. 数据管理区 ===== -->
+            <section id="section-data" class="profile-card" data-dom-id="section-data">
+              <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="database" style="width:20px;height:20px;color:var(--color-primary-lighter);"></i>
+                <h2 class="text-lg font-semibold" style="color: var(--color-text);">数据管理</h2>
+              </div>
+              <!-- 统计数字 -->
+              <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-6" data-dom-id="data-stats">
+                <div class="stat-card" data-dom-id="stat-queries">
+                  <p class="display-font text-4xl font-bold whitespace-nowrap" style="color: var(--color-gold);">86</p>
+                  <p class="text-sm mt-2 whitespace-nowrap" style="color: var(--color-text-secondary);">历史查询总数</p>
+                </div>
+                <div class="stat-card" data-dom-id="stat-favorites">
+                  <p class="display-font text-4xl font-bold whitespace-nowrap" style="color: var(--color-gold);">23</p>
+                  <p class="text-sm mt-2 whitespace-nowrap" style="color: var(--color-text-secondary);">收藏结果数量</p>
+                </div>
+              </div>
+              <!-- 操作按钮 -->
+              <div class="flex flex-col sm:flex-row gap-3" data-dom-id="data-actions">
+                <button class="btn-action btn-action-primary flex-1" data-dom-id="btn-export">
+                  <i data-lucide="download" style="width:16px;height:16px;"></i>
+                  <span>导出所有数据</span>
+                </button>
+                <button class="btn-action btn-action-danger flex-1" data-dom-id="btn-delete">
+                  <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                  <span>删除所有数据</span>
+                </button>
+              </div>
+              <!-- 删除确认提示 -->
+              <p class="text-xs mt-3 truncate" style="color: var(--color-text-tertiary);">删除操作不可恢复，请谨慎操作。删除后将清除所有历史查询记录与收藏数据。</p>
+            </section>
+
+          </div>
+          <!-- /右侧内容区 -->
+
+        </div>
+        <!-- /flex 布局容器 -->
+
+      </div>
+      <!-- /content-container -->
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

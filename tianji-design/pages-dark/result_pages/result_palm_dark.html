@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手相算命解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-palm: #f59e0b;
+            --color-fate: #8b5cf6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .palm-outline {
+            position: relative;
+            width: 180px;
+            height: 220px;
+        }
+        .palm-svg {
+            width: 100%;
+            height: 100%;
+        }
+        .palm-line {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .life-line {
+            stroke: #ef4444;
+            filter: drop-shadow(0 0 4px #ef4444);
+        }
+        .heart-line {
+            stroke: #ec4899;
+            filter: drop-shadow(0 0 4px #ec4899);
+        }
+        .head-line {
+            stroke: #3b82f6;
+            filter: drop-shadow(0 0 4px #3b82f6);
+        }
+        .fate-line {
+            stroke: #8b5cf6;
+            filter: drop-shadow(0 0 4px #8b5cf6);
+        }
+        .marriage-line {
+            stroke: #f59e0b;
+            filter: drop-shadow(0 0 3px #f59e0b);
+        }
+        .palm-type-badge {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .line-analysis-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 20px var(--color-palm);
+        }
+        .finger-indicator {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">手相算命</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-amber-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 手相头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-amber-900/40 via-slate-900/50 to-violet-900/40 rounded-2xl p-6 border border-amber-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                    <i class="fas fa-hand-paper text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white glow-text">手相算命</h1>
+                    <p class="text-amber-300">掌纹分析 · 手型解读</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-hand-fist mr-1"></i>手型：土形手
+                </span>
+                <span class="px-3 py-1 bg-violet-500/20 text-violet-300 rounded-full text-sm border border-violet-500/40">
+                    <i class="fas fa-genderless mr-1"></i>性别：男
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-check-circle mr-1"></i>分析完成
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 手型分析 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-hand-fist text-amber-400"></i>
+                手型分析
+            </h2>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-center">
+                <!-- 手型图示 -->
+                <div class="flex-shrink-0 flex flex-col items-center">
+                    <div class="palm-outline bg-gradient-to-b from-amber-100 to-amber-200 rounded-b-3xl rounded-t-lg relative">
+                        <svg class="palm-svg" viewBox="0 0 180 220">
+                            <!-- 手掌轮廓 -->
+                            <path d="M50 180 Q30 160 35 130 Q38 100 45 80 L50 60 Q52 50 58 48 L68 48 L68 30 Q70 20 78 20 L82 20 Q90 20 92 30 L92 48 L102 48 L102 30 Q104 20 112 20 L116 20 Q124 20 126 30 L126 48 L136 48 L136 30 Q138 20 146 20 L150 20 Q158 20 160 30 L160 48 L155 55 Q160 50 165 55 L165 90 Q168 130 160 160 Q155 180 140 195 L90 215 L40 195 Q25 180 20 160 Q12 130 15 90 L10 55 Q15 50 20 55 L25 48 L25 30 Q27 20 35 20 L39 20 Q47 20 49 30 L49 48 L50 55 Q50 45 55 48 L55 80 Q58 100 55 130 Q52 160 50 180 Z" fill="rgba(251,191,36,0.3)" stroke="#92400e" stroke-width="1"/>
+                        </svg>
+                        
+                        <!-- 手型标签 -->
+                        <div class="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-amber-500 text-white text-xs rounded-full">
+                            土形手
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 手型说明 -->
+                <div class="flex-1">
+                    <div class="palm-type-badge rounded-xl p-5 mb-4">
+                        <h3 class="text-amber-400 font-bold text-lg mb-2">土形手</h3>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            手掌宽厚方正，手指粗短，指节分明，掌心充实没有太多纹路。土形手的人性格稳重踏实，勤劳朴实，有很强的耐力和责任心，重视实际利益。
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <p class="text-gray-400 text-xs">手掌特点</p>
+                            <p class="text-white text-sm">宽厚方正·充实</p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <p class="text-gray-400 text-xs">手指特点</p>
+                            <p class="text-white text-sm">粗短有力</p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <p class="text-gray-400 text-xs">性格特质</p>
+                            <p class="text-white text-sm">稳重·务实</p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <p class="text-gray-400 text-xs">幸运数字</p>
+                            <p class="text-white text-sm">5 · 8 · 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 掌纹详解 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-lines-leaning text-amber-400"></i>
+                掌纹分析
+            </h2>
+
+            <!-- 掌纹图示 -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-gradient-to-b from-amber-50 to-amber-100 rounded-2xl p-6 relative">
+                    <svg width="200" height="240" viewBox="0 0 200 240">
+                        <!-- 生命线 -->
+                        <path class="palm-line life-line" d="M55 200 Q35 150 40 100 Q50 60 80 40"/>
+                        <!-- 感情线 -->
+                        <path class="palm-line heart-line" d="M30 70 Q80 85 150 65 Q165 60 170 55"/>
+                        <!-- 智慧线 -->
+                        <path class="palm-line head-line" d="M45 110 Q90 100 150 105 Q165 108 175 115"/>
+                        <!-- 命运线 -->
+                        <path class="palm-line fate-line" d="M100 230 L105 100 Q110 70 115 50"/>
+                        <!-- 婚姻线 -->
+                        <path class="palm-line marriage-line" d="M145 50 L150 58 M155 48 L160 56"/>
+                        <!-- 太阳线 -->
+                        <path class="palm-line fate-line" d="M115 130 Q125 100 130 70" stroke-dasharray="4,4"/>
+                    </svg>
+                    
+                    <!-- 图例 -->
+                    <div class="absolute top-2 left-2 bg-slate-900/80 rounded-lg p-2 text-xs">
+                        <div class="flex items-center gap-2 mb-1"><span class="w-4 h-0.5 bg-red-500 rounded"></span><span class="text-gray-300">生命线</span></div>
+                        <div class="flex items-center gap-2 mb-1"><span class="w-4 h-0.5 bg-pink-500 rounded"></span><span class="text-gray-300">感情线</span></div>
+                        <div class="flex items-center gap-2 mb-1"><span class="w-4 h-0.5 bg-blue-500 rounded"></span><span class="text-gray-300">智慧线</span></div>
+                        <div class="flex items-center gap-2 mb-1"><span class="w-4 h-0.5 bg-violet-500 rounded"></span><span class="text-gray-300">命运线</span></div>
+                        <div class="flex items-center gap-2"><span class="w-4 h-0.5 bg-amber-500 rounded"></span><span class="text-gray-300">婚姻线</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 各掌纹详解 -->
+            <div class="grid md:grid-cols-2 gap-4">
+                <!-- 生命线 -->
+                <div class="line-analysis-card rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center">
+                            <span class="w-4 h-0.5 bg-red-500 rounded"></span>
+                        </div>
+                        <div>
+                            <h3 class="text-red-400 font-semibold">生命线</h3>
+                            <p class="text-gray-500 text-xs">起始：拇指与食指间</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        生命线深长有力，弧度优美，延伸至手腕。代表生命力旺盛，身体素质好，有很强的抗压能力和恢复力。精力充沛，寿命较长。
+                    </p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded">旺盛</span>
+                        <span class="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded">中等长度</span>
+                    </div>
+                </div>
+
+                <!-- 感情线 -->
+                <div class="line-analysis-card rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                            <span class="w-4 h-0.5 bg-pink-500 rounded"></span>
+                        </div>
+                        <div>
+                            <h3 class="text-pink-400 font-semibold">感情线</h3>
+                            <p class="text-gray-500 text-xs">位置：手掌上部</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        感情线清晰完整，长度适中，微微弯曲。代表感情丰富，善于表达，能理性处理感情问题。对家庭有责任感，姻缘运平稳。
+                    </p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded">清晰完整</span>
+                        <span class="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">理性</span>
+                    </div>
+                </div>
+
+                <!-- 智慧线 -->
+                <div class="line-analysis-card rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <span class="w-4 h-0.5 bg-blue-500 rounded"></span>
+                        </div>
+                        <div>
+                            <h3 class="text-blue-400 font-semibold">智慧线</h3>
+                            <p class="text-gray-500 text-xs">位置：手掌中部</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        智慧线平直有力，长度适中。代表思维清晰，逻辑性强，善于分析和解决问题。学习能力强，适合从事技术或管理工作。
+                    </p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded">平直有力</span>
+                        <span class="px-2 py-0.5 bg-violet-500/20 text-violet-400 text-xs rounded">逻辑思维</span>
+                    </div>
+                </div>
+
+                <!-- 命运线 -->
+                <div class="line-analysis-card rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                            <span class="w-4 h-0.5 bg-violet-500 rounded"></span>
+                        </div>
+                        <div>
+                            <h3 class="text-violet-400 font-semibold">命运线</h3>
+                            <p class="text-gray-500 text-xs">起始：手腕中央</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        命运线笔直清晰，从手腕延伸至中指根部。代表人生目标明确，有较强的上进心和事业心。中年后运势渐佳，能有所成就。
+                    </p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded">笔直清晰</span>
+                        <span class="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded">事业心强</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 手相综合分析 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-amber-900/30 to-slate-900/50 rounded-2xl p-6 border border-amber-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-mixed text-amber-400"></i>
+                综合分析
+            </h2>
+
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/30 text-center">
+                    <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-heart text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-emerald-400 font-semibold mb-1">感情运势</h3>
+                    <p class="text-white text-lg font-bold">85%</p>
+                    <p class="text-gray-400 text-xs mt-1">姻缘稳定，家庭和睦</p>
+                </div>
+                <div class="bg-blue-500/10 rounded-xl p-4 border border-blue-500/30 text-center">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-brain text-blue-400"></i>
+                    </div>
+                    <h3 class="text-blue-400 font-semibold mb-1">事业发展</h3>
+                    <p class="text-white text-lg font-bold">78%</p>
+                    <p class="text-gray-400 text-xs mt-1">稳步上升，中年发达</p>
+                </div>
+                <div class="bg-red-500/10 rounded-xl p-4 border border-red-500/30 text-center">
+                    <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-stethoscope text-red-400"></i>
+                    </div>
+                    <h3 class="text-red-400 font-semibold mb-1">健康状况</h3>
+                    <p class="text-white text-lg font-bold">90%</p>
+                    <p class="text-gray-400 text-xs mt-1">体质强健，精力充沛</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/50 rounded-xl p-5">
+                <h3 class="text-amber-400 font-semibold mb-3">整体手相评价</h3>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    土形手配合清晰完整的掌纹格局，属于上佳手相。生命线旺盛显示身体健康、精力充沛；感情线清晰表示感情生活稳定；智慧线平直体现思维理性、处事稳重；命运线笔直有力，预示着人生方向明确、事业有成。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-amber-900/30 to-slate-900/60 rounded-2xl p-6 border border-amber-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-violet-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于手相学的个性化分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    您的手相呈现出「厚土载物」的格局，是非常难得的好手相。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">手型解读：</span>土形手的人天生具有「承托」的能力——无论是财富、家庭还是事业，您都有能力承担并守护。这也意味着您是一个可靠的人，身边人往往会对您产生依赖。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">掌纹启示：</span>您的主要掌纹都呈现出「清晰完整」的特点，这在相学中是极为吉利的信号。清晰的生命线预示长寿与健康；完整的感情线预示稳定的情感生活；笔直的命运线则意味着您的人生方向从一开始就比较明确，不太会有大的迷失。
+                    <br><br>
+                    <span class="text-emerald-400 font-medium">人生建议：</span>您的手相显示「中年发福」的格局，30-50岁将是您人生最辉煌的时期。建议在年轻时就做好职业规划，积累的资源将在中年时期发挥最大效用。人际方面，您需要学会适当拒绝，避免因过度承担责任而疲惫。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

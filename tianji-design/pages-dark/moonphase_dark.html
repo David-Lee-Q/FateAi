@@ -1,0 +1,813 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月相能量 — 天机</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* Moon silver accent */
+  --color-moon-silver: #c0c8d8;
+  --color-moon-silver-light: #dce2ec;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 月相Tab样式 */
+    .moon-tab {
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      white-space: nowrap;
+      border: 1px solid transparent;
+      color: var(--color-text-secondary);
+      background: transparent;
+    }
+    .moon-tab:hover {
+      color: var(--color-gold-light);
+      background: rgba(200, 168, 78, 0.06);
+    }
+    .moon-tab.active {
+      color: var(--color-gold-light);
+      background: rgba(200, 168, 78, 0.12);
+      border-color: rgba(200, 168, 78, 0.25);
+    }
+    /* 月相速查卡片 */
+    .phase-card {
+      position: relative;
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      transition: all var(--transition-base);
+      overflow: hidden;
+    }
+    .phase-card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-lighter);
+      transform: translateY(-2px);
+    }
+    /* 月相可视化容器 */
+    .moon-visual {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+    /* 适合/不适合列表项 */
+    .advice-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .advice-item:last-child {
+      border-bottom: none;
+    }
+    /* 推荐卡片 */
+    .recommend-card {
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+    }
+    .recommend-card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-lighter);
+    }
+    /* 星星闪烁动画 */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    .star-twinkle {
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    /* 月光辉光动画 */
+    @keyframes moon-glow {
+      0%, 100% { box-shadow: 0 0 40px rgba(192, 200, 216, 0.15), 0 0 80px rgba(192, 200, 216, 0.08); }
+      50% { box-shadow: 0 0 60px rgba(192, 200, 216, 0.25), 0 0 120px rgba(192, 200, 216, 0.12); }
+    }
+    .moon-glow {
+      animation: moon-glow 4s ease-in-out infinite;
+    }
+    /* 月相周期进度条动画 */
+    @keyframes progress-shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .progress-shimmer {
+      background: linear-gradient(90deg, transparent 0%, rgba(200,168,78,0.3) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: progress-shimmer 3s ease-in-out infinite;
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body);">
+
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========== 页面标题区 ========== -->
+        <section class="relative overflow-hidden" style="background: linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%);">
+            <!-- 背景星星装饰 -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full" viewBox="0 0 1280 320" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="80" cy="40" r="1.5" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 0s;"/>
+                    <circle cx="200" cy="80" r="1" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 0.5s;"/>
+                    <circle cx="350" cy="30" r="1.2" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1s;"/>
+                    <circle cx="500" cy="90" r="0.8" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 1.5s;"/>
+                    <circle cx="620" cy="50" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.3s;"/>
+                    <circle cx="750" cy="100" r="1" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 2s;"/>
+                    <circle cx="900" cy="35" r="1.3" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 0.8s;"/>
+                    <circle cx="1050" cy="70" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1.2s;"/>
+                    <circle cx="1180" cy="45" r="1.5" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 1.8s;"/>
+                    <circle cx="150" cy="150" r="1" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 2.5s;"/>
+                    <circle cx="420" cy="180" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.7s;"/>
+                    <circle cx="680" cy="160" r="1.2" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 1.3s;"/>
+                    <circle cx="950" cy="200" r="1" fill="var(--color-moon-silver-light)" class="star-twinkle" style="animation-delay: 0.4s;"/>
+                    <circle cx="1100" cy="170" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 2.2s;"/>
+                </svg>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20" style="max-width: var(--max-width);">
+                <!-- 面包屑 -->
+                <nav class="flex items-center gap-2 text-sm mb-6" style="color: var(--color-text-tertiary);">
+                    <a href="#" class="transition-colors hover:text-white">首页</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="color: var(--color-gold-light);">西方占卜</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="color: var(--color-gold-light);">月相能量</span>
+                </nav>
+
+                <!-- 标题 -->
+                <div class="text-center">
+                    <div class="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full" style="background: rgba(192, 200, 216, 0.1); border: 1px solid rgba(192, 200, 216, 0.2);">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M10 2 A6 6 0 1 0 10 14 A4.5 4.5 0 1 1 10 2Z" fill="var(--color-moon-silver-light)"/>
+                        </svg>
+                        <span class="text-sm font-medium" style="color: var(--color-moon-silver-light);">月亮智慧</span>
+                    </div>
+                    <h1 class="display-font text-4xl sm:text-5xl lg:text-6xl font-bold mb-4" style="color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; line-height: var(--leading-tight); letter-spacing: var(--tracking-tight);">
+                        月相能量
+                    </h1>
+                    <p class="text-base sm:text-lg max-w-2xl mx-auto" style="color: rgba(255,255,255,0.65); line-height: var(--leading-relaxed);">
+                        顺应月相周期，顺势而为
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 日期选择区 ========== -->
+        <section class="py-10 sm:py-14" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <!-- 三个Tab -->
+                    <div class="flex flex-nowrap overflow-x-auto gap-2 no-scrollbar mb-6 pb-1">
+                        <button class="moon-tab active" onclick="this.classList.add('active');this.parentElement.querySelector('.moon-tab:nth-child(2)').classList.remove('active');this.parentElement.querySelector('.moon-tab:nth-child(3)').classList.remove('active')">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="sun" class="w-4 h-4"></i>
+                                今日月相
+                            </span>
+                        </button>
+                        <button class="moon-tab" onclick="this.classList.add('active');this.parentElement.querySelector('.moon-tab:nth-child(1)').classList.remove('active');this.parentElement.querySelector('.moon-tab:nth-child(3)').classList.remove('active')">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                选择日期
+                            </span>
+                        </button>
+                        <button class="moon-tab" onclick="this.classList.add('active');this.parentElement.querySelector('.moon-tab:nth-child(1)').classList.remove('active');this.parentElement.querySelector('.moon-tab:nth-child(2)').classList.remove('active')">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                月相周期
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- 今日月相信息 -->
+                    <div class="rounded-2xl p-6 sm:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-medium mb-1" style="color: var(--color-text-tertiary);">2025 年 7 月 10 日</p>
+                                <h2 class="text-2xl sm:text-3xl font-bold" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">盈凸月</h2>
+                                <p class="text-sm mt-1" style="color: var(--color-gold-dark);">Waxing Gibbous — 月亮渐圆，能量积蓄中</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-right">
+                                    <p class="text-xs" style="color: var(--color-text-tertiary);">照明度</p>
+                                    <p class="text-xl font-bold" style="color: var(--color-gold);">78%</p>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--color-primary-bg-strong);">
+                                    <i data-lucide="trending-up" class="w-5 h-5" style="color: var(--color-primary);"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 月相进度条 -->
+                        <div class="mt-6">
+                            <div class="flex justify-between text-xs mb-2" style="color: var(--color-text-tertiary);">
+                                <span>新月</span>
+                                <span>上弦月</span>
+                                <span>满月</span>
+                                <span>下弦月</span>
+                            </div>
+                            <div class="relative h-2 rounded-full overflow-hidden" style="background: var(--color-bg-inset);">
+                                <!-- 进度底色 -->
+                                <div class="absolute inset-y-0 left-0 rounded-full" style="width: 78%; background: linear-gradient(90deg, var(--color-primary-lighter), var(--color-gold));"></div>
+                                <!-- 当前位置指示器 -->
+                                <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2" style="left: 78%; margin-left: -8px; background: var(--color-gold); border-color: var(--color-bg-elevated); box-shadow: 0 0 8px rgba(200,168,78,0.4);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 月相可视化 + 阶段信息 ========== -->
+        <section class="relative py-12 sm:py-16 overflow-hidden" style="background: linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 60%, var(--color-primary-darker) 100%);">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full opacity-20" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="640" cy="300" r="250" fill="none" stroke="var(--color-moon-silver)" stroke-width="0.5" stroke-dasharray="4 8"/>
+                    <circle cx="640" cy="300" r="200" fill="none" stroke="var(--color-moon-silver)" stroke-width="0.5" stroke-dasharray="4 8"/>
+                    <circle cx="640" cy="300" r="150" fill="none" stroke="var(--color-moon-silver)" stroke-width="0.5" stroke-dasharray="4 8"/>
+                </svg>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+                    <!-- 月相可视化（纯CSS盈凸月） -->
+                    <div class="flex-shrink-0 flex flex-col items-center">
+                        <div class="moon-visual moon-glow" style="width: 200px; height: 200px;">
+                            <!-- 月亮亮面 -->
+                            <div style="width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #e8ecf4 0%, #c0c8d8 60%, #a8b4c8 100%); position: relative; box-shadow: inset -8px -4px 20px rgba(0,0,0,0.15), 0 0 60px rgba(192,200,216,0.2);">
+                                <!-- 月球表面纹理（浅坑） -->
+                                <div style="position: absolute; top: 30%; left: 25%; width: 24px; height: 24px; border-radius: 50%; background: rgba(160,170,190,0.3);"></div>
+                                <div style="position: absolute; top: 55%; left: 50%; width: 18px; height: 18px; border-radius: 50%; background: rgba(160,170,190,0.25);"></div>
+                                <div style="position: absolute; top: 35%; left: 60%; width: 14px; height: 14px; border-radius: 50%; background: rgba(160,170,190,0.2);"></div>
+                                <div style="position: absolute; top: 70%; left: 30%; width: 20px; height: 20px; border-radius: 50%; background: rgba(160,170,190,0.22);"></div>
+                                <div style="position: absolute; top: 20%; left: 45%; width: 10px; height: 10px; border-radius: 50%; background: rgba(160,170,190,0.15);"></div>
+                                <!-- 暗面（box-shadow覆盖右侧） -->
+                                <div style="position: absolute; top: -2px; right: -2px; width: 66px; height: 204px; border-radius: 0 100px 100px 0; background: radial-gradient(ellipse at 0% 50%, rgba(10,15,46,0.85) 0%, rgba(10,15,46,0.95) 100%);"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm font-medium mt-4" style="color: var(--color-moon-silver-light);">盈凸月 Waxing Gibbous</p>
+                    </div>
+
+                    <!-- 月相阶段信息卡片 -->
+                    <div class="flex-1 w-full">
+                        <div class="rounded-2xl p-6 sm:p-8" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(192, 200, 216, 0.12); backdrop-filter: blur(8px);">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(200, 168, 78, 0.15);">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path d="M12 2 A8 8 0 1 0 12 18 A6 6 0 1 1 12 2Z" fill="var(--color-gold-light)"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg sm:text-xl font-bold" style="color: var(--color-text-inverse); font-family: var(--font-display);">阶段详情</h3>
+                            </div>
+
+                            <!-- 信息行 -->
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-lg" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold-light);">阶段</span>
+                                    <div>
+                                        <p class="text-sm font-semibold" style="color: var(--color-text-inverse);">盈凸月</p>
+                                        <p class="text-xs" style="color: rgba(255,255,255,0.5);">月相周期第 10-14 天，月亮绝大部分可见</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-lg" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold-light);">持续</span>
+                                    <div>
+                                        <p class="text-sm font-semibold" style="color: var(--color-text-inverse);">约 3-4 天</p>
+                                        <p class="text-xs" style="color: rgba(255,255,255,0.5);">从上弦月到满月之间的过渡阶段</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-lg" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold-light);">能量</span>
+                                    <div>
+                                        <p class="text-sm font-semibold" style="color: var(--color-text-inverse);">积累与调整</p>
+                                        <p class="text-xs" style="color: rgba(255,255,255,0.5);">能量持续上升，适合巩固计划、修正方向、为满月的收获做准备</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 关键词标签 -->
+                            <div class="flex flex-wrap gap-2 mt-6 pt-5" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                                <span class="text-xs px-3 py-1 rounded-full whitespace-nowrap" style="background: rgba(192, 200, 216, 0.1); color: var(--color-moon-silver-light); border: 1px solid rgba(192, 200, 216, 0.15);">耐心等待</span>
+                                <span class="text-xs px-3 py-1 rounded-full whitespace-nowrap" style="background: rgba(192, 200, 216, 0.1); color: var(--color-moon-silver-light); border: 1px solid rgba(192, 200, 216, 0.15);">调整策略</span>
+                                <span class="text-xs px-3 py-1 rounded-full whitespace-nowrap" style="background: rgba(192, 200, 216, 0.1); color: var(--color-moon-silver-light); border: 1px solid rgba(192, 200, 216, 0.15);">积蓄力量</span>
+                                <span class="text-xs px-3 py-1 rounded-full whitespace-nowrap" style="background: rgba(192, 200, 216, 0.1); color: var(--color-moon-silver-light); border: 1px solid rgba(192, 200, 216, 0.15);">完善细节</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 适合/不适合做的事 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <h2 class="text-xl sm:text-2xl font-bold mb-8 text-center" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">月相指引</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <!-- 适合做的事 -->
+                    <div class="rounded-2xl p-6" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light); box-shadow: var(--shadow-sm);">
+                        <div class="flex items-center gap-2 mb-5">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(26, 138, 92, 0.1);">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <circle cx="8" cy="8" r="7" stroke="#1a8a5c" stroke-width="1.5"/>
+                                    <path d="M5 8.5l2 2 4-4.5" stroke="#1a8a5c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-base font-semibold" style="color: var(--state-success);">适合做的事</h3>
+                        </div>
+                        <div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#1a8a5c" stroke-width="1.2"/><path d="M5.5 8l2 2 3.5-3.5" stroke="#1a8a5c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">复习并完善已有的计划与项目</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#1a8a5c" stroke-width="1.2"/><path d="M5.5 8l2 2 3.5-3.5" stroke="#1a8a5c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">与重要的人进行深入沟通</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#1a8a5c" stroke-width="1.2"/><path d="M5.5 8l2 2 3.5-3.5" stroke="#1a8a5c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">锻炼身体，提升体能储备</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#1a8a5c" stroke-width="1.2"/><path d="M5.5 8l2 2 3.5-3.5" stroke="#1a8a5c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">学习新技能，充实内在</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#1a8a5c" stroke-width="1.2"/><path d="M5.5 8l2 2 3.5-3.5" stroke="#1a8a5c" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">整理居家环境，营造舒适空间</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 不适合做的事 -->
+                    <div class="rounded-2xl p-6" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light); box-shadow: var(--shadow-sm);">
+                        <div class="flex items-center gap-2 mb-5">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(196, 58, 58, 0.1);">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <circle cx="8" cy="8" r="7" stroke="#c43a3a" stroke-width="1.5"/>
+                                    <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#c43a3a" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-base font-semibold" style="color: var(--state-error);">不适合做的事</h3>
+                        </div>
+                        <div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#c43a3a" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#c43a3a" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">冲动消费或做重大财务决定</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#c43a3a" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#c43a3a" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">开始全新的大型项目</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#c43a3a" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#c43a3a" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">与人发生正面冲突或争执</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#c43a3a" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#c43a3a" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">熬夜或过度消耗精力</span>
+                            </div>
+                            <div class="advice-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0 mt-0.5"><circle cx="8" cy="8" r="6.5" stroke="#c43a3a" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#c43a3a" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <span class="text-sm" style="color: var(--color-text-secondary);">草率做出人生重大选择</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 四大月相阶段速查 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg-inset);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="text-center mb-10">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-2" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">四大月相阶段</h2>
+                    <p class="text-sm" style="color: var(--color-text-tertiary);">了解完整的月相周期，掌握每个阶段的能量特点</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- 新月 -->
+                    <div class="phase-card">
+                        <div class="flex flex-col items-center text-center">
+                            <!-- 新月SVG -->
+                            <div class="mb-4" style="width: 72px; height: 72px;">
+                                <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                                    <circle cx="36" cy="36" r="30" stroke="var(--color-moon-silver)" stroke-width="1.5" opacity="0.4"/>
+                                    <circle cx="36" cy="36" r="30" fill="#0a0f2e"/>
+                                    <circle cx="36" cy="36" r="30" fill="rgba(10,15,46,0.9)"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-base font-bold mb-1" style="color: var(--color-text);">新月</h3>
+                            <p class="text-xs mb-3" style="color: var(--color-text-tertiary);">New Moon</p>
+                            <p class="text-xs leading-relaxed" style="color: var(--color-text-secondary);">
+                                新的开始，播种希望的种子。适合设定目标、启动新计划。
+                            </p>
+                            <span class="inline-block mt-3 text-xs font-medium px-3 py-1 rounded-full" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">第 1-3 天</span>
+                        </div>
+                    </div>
+
+                    <!-- 上弦月 -->
+                    <div class="phase-card">
+                        <div class="flex flex-col items-center text-center">
+                            <!-- 上弦月SVG -->
+                            <div class="mb-4" style="width: 72px; height: 72px;">
+                                <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                                    <circle cx="36" cy="36" r="30" stroke="var(--color-moon-silver)" stroke-width="1" opacity="0.3"/>
+                                    <path d="M36 6 A30 30 0 1 1 36 66 A15 15 0 1 0 36 6Z" fill="var(--color-moon-silver-light)" opacity="0.9"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-base font-bold mb-1" style="color: var(--color-text);">上弦月</h3>
+                            <p class="text-xs mb-3" style="color: var(--color-text-tertiary);">First Quarter</p>
+                            <p class="text-xs leading-relaxed" style="color: var(--color-text-secondary);">
+                                克服阻碍，付诸行动。适合面对挑战、做出决定、推动进展。
+                            </p>
+                            <span class="inline-block mt-3 text-xs font-medium px-3 py-1 rounded-full" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">第 7-10 天</span>
+                        </div>
+                    </div>
+
+                    <!-- 满月 -->
+                    <div class="phase-card" style="border-color: rgba(200, 168, 78, 0.3); background: linear-gradient(180deg, var(--color-bg-elevated) 0%, rgba(200, 168, 78, 0.03) 100%);">
+                        <div class="flex flex-col items-center text-center">
+                            <!-- 满月SVG -->
+                            <div class="mb-4" style="width: 72px; height: 72px;">
+                                <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                                    <circle cx="36" cy="36" r="30" fill="var(--color-moon-silver-light)" opacity="0.95"/>
+                                    <circle cx="36" cy="36" r="30" fill="url(#fullMoonGrad)"/>
+                                    <defs>
+                                        <radialGradient id="fullMoonGrad" cx="40%" cy="40%" r="60%">
+                                            <stop offset="0%" stop-color="var(--color-moon-silver-light)"/>
+                                            <stop offset="100%" stop-color="var(--color-moon-silver)"/>
+                                        </radialGradient>
+                                    </defs>
+                                    <!-- 光环 -->
+                                    <circle cx="36" cy="36" r="33" fill="none" stroke="var(--color-gold-light)" stroke-width="0.5" opacity="0.4"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-base font-bold mb-1" style="color: var(--color-gold-dark);">满月</h3>
+                            <p class="text-xs mb-3" style="color: var(--color-text-tertiary);">Full Moon</p>
+                            <p class="text-xs leading-relaxed" style="color: var(--color-text-secondary);">
+                                能量顶峰，收获与觉察。适合庆祝成果、感恩反思、释放负面。
+                            </p>
+                            <span class="inline-block mt-3 text-xs font-medium px-3 py-1 rounded-full" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold-dark);">第 14-17 天</span>
+                        </div>
+                    </div>
+
+                    <!-- 下弦月 -->
+                    <div class="phase-card">
+                        <div class="flex flex-col items-center text-center">
+                            <!-- 下弦月SVG -->
+                            <div class="mb-4" style="width: 72px; height: 72px;">
+                                <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                                    <circle cx="36" cy="36" r="30" stroke="var(--color-moon-silver)" stroke-width="1" opacity="0.3"/>
+                                    <path d="M36 6 A30 30 0 0 0 36 66 A15 15 0 1 1 36 6Z" fill="var(--color-moon-silver-light)" opacity="0.9"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-base font-bold mb-1" style="color: var(--color-text);">下弦月</h3>
+                            <p class="text-xs mb-3" style="color: var(--color-text-tertiary);">Last Quarter</p>
+                            <p class="text-xs leading-relaxed" style="color: var(--color-text-secondary);">
+                                放下执念，清理整顿。适合断舍离、原谅释怀、回归内在。
+                            </p>
+                            <span class="inline-block mt-3 text-xs font-medium px-3 py-1 rounded-full" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">第 21-24 天</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== AI 个性化建议 + 月相提醒 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <!-- AI 建议标题 -->
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6" r="3" fill="var(--color-gold-light)"/><path d="M3 17 Q3 11 10 11 Q17 11 17 17" fill="var(--color-gold-light)" opacity="0.8"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">AI 个性化建议</h2>
+                            <p class="text-xs" style="color: var(--color-text-tertiary);">基于当前月相与你的星座定制</p>
+                        </div>
+                    </div>
+
+                    <!-- AI 建议内容 -->
+                    <div class="rounded-2xl p-6 sm:p-8 mb-6" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light); box-shadow: var(--shadow-sm);">
+                        <p class="text-sm leading-relaxed mb-5" style="color: var(--color-text-secondary);">
+                            当前处于<span class="font-semibold" style="color: var(--color-gold-dark);">盈凸月</span>阶段，月亮能量持续攀升。这是一个适合<span class="font-semibold" style="color: var(--color-text);">巩固和精进</span>的时期。你之前播下的种子正在发芽，现在是时候给予更多关注和耐心了。
+                        </p>
+                        <p class="text-sm leading-relaxed mb-5" style="color: var(--color-text-secondary);">
+                            <span class="font-semibold" style="color: var(--color-text);">事业方面</span>：近期工作中的项目进入关键阶段，建议回顾之前制定的计划，查漏补缺。避免急于求成，注重细节的完善会让你在即将到来的满月时刻收获更大的回报。
+                        </p>
+                        <p class="text-sm leading-relaxed mb-5" style="color: var(--color-text-secondary);">
+                            <span class="font-semibold" style="color: var(--color-text);">感情方面</span>：这是一个加深情感连接的好时机。盈凸月的能量有助于你更坦诚地表达内心想法。如果之前有未解的误会，趁现在主动沟通，为满月时的情感升华做好准备。
+                        </p>
+                        <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                            <span class="font-semibold" style="color: var(--color-text);">健康方面</span>：身体能量处于上升期，适合适度增加运动量。注意保持规律作息，为满月前后的高潮期储备充足的精力。
+                        </p>
+                    </div>
+
+                    <!-- 设置月相提醒 -->
+                    <div class="rounded-2xl p-6 sm:p-8" style="background: linear-gradient(135deg, rgba(0, 75, 170, 0.04), rgba(192, 200, 216, 0.06)); border: 1px solid rgba(200, 168, 78, 0.15);">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                                <i data-lucide="bell" class="w-4 h-4" style="color: var(--color-gold-dark);"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">月相提醒</h3>
+                                <p class="text-xs truncate" style="color: var(--color-text-tertiary);">不错过每个重要月相时刻</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="flex-1 flex flex-wrap items-center gap-2">
+                                <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg transition-colors" style="border: 1px solid var(--color-border); background: var(--color-bg-elevated);">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--color-gold);"/>
+                                    <span class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">满月提醒</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg transition-colors" style="border: 1px solid var(--color-border); background: var(--color-bg-elevated);">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded" style="accent-color: var(--color-gold);"/>
+                                    <span class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">新月提醒</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg transition-colors" style="border: 1px solid var(--color-border); background: var(--color-bg-elevated);">
+                                    <input type="checkbox" class="w-4 h-4 rounded" style="accent-color: var(--color-gold);"/>
+                                    <span class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">四相变化</span>
+                                </label>
+                            </div>
+                            <button class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all" style="background: var(--color-primary);" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">
+                                <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                                开启提醒
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 相关推荐 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg-inset);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <h2 class="text-xl sm:text-2xl font-bold mb-8 text-center" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">探索更多占卜</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <!-- 星座运势 -->
+                    <a href="#" class="recommend-card group block">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors" style="background: var(--color-primary-bg-strong);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+                        </div>
+                        <h3 class="text-base font-semibold mb-1.5 truncate" style="color: var(--color-text);">星座运势</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">查看十二星座每日、每周、每月运势详解</p>
+                    </a>
+
+                    <!-- 塔罗牌占卜 -->
+                    <a href="#" class="recommend-card group block">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors" style="background: var(--color-primary-bg-strong);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 6v12M9 9h6M9 15h6"/></svg>
+                        </div>
+                        <h3 class="text-base font-semibold mb-1.5 truncate" style="color: var(--color-text);">塔罗牌占卜</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">78 张塔罗牌的古老智慧，AI 帮你解读命运的启示</p>
+                    </a>
+
+                    <!-- 占星骰子 -->
+                    <a href="#" class="recommend-card group block">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors" style="background: var(--color-primary-bg-strong);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.5" fill="var(--color-primary)"/><circle cx="15" cy="9" r="1.5" fill="var(--color-primary)"/><circle cx="9" cy="15" r="1.5" fill="var(--color-primary)"/><circle cx="15" cy="15" r="1.5" fill="var(--color-primary)"/><circle cx="12" cy="12" r="1.5" fill="var(--color-primary)"/></svg>
+                        </div>
+                        <h3 class="text-base font-semibold mb-1.5 truncate" style="color: var(--color-text);">占星骰子</h3>
+                        <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">投掷三颗骰子，快速获取行星、星座、宫位的精准指引</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 页脚 ========== -->
+        <footer class="py-8" style="background: var(--color-primary-darker);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 text-center" style="max-width: var(--max-width);">
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="var(--color-gold)" stroke-width="1.5" opacity="0.6"/>
+                        <circle cx="16" cy="16" r="8" stroke="var(--color-gold-light)" stroke-width="1"/>
+                        <circle cx="16" cy="16" r="2" fill="var(--color-gold)"/>
+                    </svg>
+                    <span class="display-font text-sm font-semibold tracking-wide" style="color: var(--color-gold); opacity: 0.6;">TIANJI</span>
+                </div>
+                <p class="text-xs" style="color: rgba(255,255,255,0.35);">占卜结果仅供参考娱乐，不构成任何决策建议</p>
+            </div>
+        </footer>
+    </main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

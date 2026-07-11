@@ -1,0 +1,606 @@
+{
+  "meta": {
+    "project": "天机 (Tianji)",
+    "description": "AI 算命网页应用 - 页面命名与路由映射",
+    "version": "1.2.0",
+    "lastUpdated": "2026-07-11"
+  },
+  "namingRules": {
+    "filePattern": "{module}_{theme}.html",
+    "themeSuffix": {
+      "dark": "深色主题",
+      "light": "浅色主题"
+    },
+    "titleSuffix": "— 天机",
+    "resultPagePrefix": "result_"
+  },
+  "canvasZones": [
+    { "group": 0, "name": "首页", "xDark": 0, "xLight": 1400, "color": "#004baa" },
+    { "group": 1, "name": "东方命理分类", "xDark": 0, "xLight": 1400, "color": "#004baa" },
+    { "group": 2, "name": "东方命理子页", "xDark": 0, "xLight": 1400, "color": "按类型区分" },
+    { "group": 3, "name": "西方占卜", "xDark": 300, "xLight": 1700, "color": "#8b5cf6" },
+    { "group": 4, "name": "民俗趣味", "xDark": 600, "xLight": 2000, "color": "多色系" },
+    { "group": 5, "name": "AI功能/系统", "xDark": 900, "xLight": 2300, "color": "#004baa" }
+  ],
+  "pages": {
+    "input": {
+      "eastern": [
+        {
+          "module": "bazi",
+          "route": "/bazi",
+          "title": "八字排盘",
+          "description": "八字排盘输入页",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "bazi_dark.html",
+            "light": "bazi_light.html"
+          }
+        },
+        {
+          "module": "ziwei",
+          "route": "/ziwei",
+          "title": "紫微斗数",
+          "description": "紫微斗数输入页",
+          "themeColor": "#7c3aed",
+          "files": {
+            "dark": "ziwei_dark.html",
+            "light": "ziwei_light.html"
+          }
+        },
+        {
+          "module": "liuyao",
+          "route": "/liuyao",
+          "title": "六爻卦象",
+          "description": "六爻卦象输入页",
+          "themeColor": "#059669",
+          "files": {
+            "dark": "liuyao_dark.html",
+            "light": "liuyao_light.html"
+          }
+        },
+        {
+          "module": "qimen",
+          "route": "/qimen",
+          "title": "奇门遁甲",
+          "description": "奇门遁甲输入页",
+          "themeColor": "#7c3aed",
+          "files": {
+            "dark": "qimen_dark.html",
+            "light": "qimen_light.html"
+          }
+        },
+        {
+          "module": "meihua",
+          "route": "/meihua",
+          "title": "梅花易数",
+          "description": "梅花易数输入页",
+          "themeColor": "#ec4899",
+          "files": {
+            "dark": "meihua_dark.html",
+            "light": "meihua_light.html"
+          }
+        },
+        {
+          "module": "fengshui",
+          "route": "/fengshui",
+          "title": "风水罗盘",
+          "description": "风水堪舆输入页",
+          "themeColor": "#059669",
+          "files": {
+            "dark": "fengshui_dark.html",
+            "light": "fengshui_light.html"
+          }
+        },
+        {
+          "module": "tieban",
+          "route": "/tieban",
+          "title": "铁板神数",
+          "description": "铁板神数输入页",
+          "themeColor": "#7c3aed",
+          "files": {
+            "dark": "tieban_dark.html",
+            "light": "tieban_light.html"
+          }
+        },
+        {
+          "module": "daliuren",
+          "route": "/daliuren",
+          "title": "大六壬",
+          "description": "大六壬输入页",
+          "themeColor": "#f59e0b",
+          "files": {
+            "dark": "daliuren_dark.html",
+            "light": "daliuren_light.html"
+          }
+        }
+      ],
+      "western": [
+        {
+          "module": "zodiac",
+          "route": "/zodiac",
+          "title": "星座运势",
+          "description": "星座运势输入页",
+          "themeColor": "#8b5cf6",
+          "files": {
+            "dark": "zodiac_dark.html",
+            "light": "zodiac_light.html"
+          }
+        },
+        {
+          "module": "tarot",
+          "route": "/tarot",
+          "title": "塔罗牌占卜",
+          "description": "塔罗牌输入页",
+          "themeColor": "#7c3aed",
+          "files": {
+            "dark": "tarot_dark.html",
+            "light": "tarot_light.html"
+          }
+        },
+        {
+          "module": "astrodice",
+          "route": "/astrodice",
+          "title": "占星骰子",
+          "description": "占星骰子输入页",
+          "themeColor": "#6366f1",
+          "files": {
+            "dark": "astrodice_dark.html",
+            "light": "astrodice_light.html"
+          }
+        }
+      ],
+      "folk": [
+        {
+          "module": "moonphase",
+          "route": "/moonphase",
+          "title": "月相能量",
+          "description": "月相占卜输入页",
+          "themeColor": "#6366f1",
+          "files": {
+            "dark": "moonphase_dark.html",
+            "light": "moonphase_light.html"
+          }
+        },
+        {
+          "module": "rune",
+          "route": "/rune",
+          "title": "符文占卜",
+          "description": "符文占卜输入页",
+          "themeColor": "#ea580c",
+          "files": {
+            "dark": "rune_dark.html",
+            "light": "rune_light.html"
+          }
+        },
+        {
+          "module": "drawlot",
+          "route": "/drawlot",
+          "title": "签诗抽签",
+          "description": "抽签占卜输入页",
+          "themeColor": "#f59e0b",
+          "files": {
+            "dark": "drawlot_dark.html",
+            "light": "drawlot_light.html"
+          }
+        },
+        {
+          "module": "dream",
+          "route": "/dream",
+          "title": "周公解梦",
+          "description": "解梦输入页",
+          "themeColor": "#8b5cf6",
+          "files": {
+            "dark": "dream_dark.html",
+            "light": "dream_light.html"
+          }
+        },
+        {
+          "module": "palm",
+          "route": "/palm",
+          "title": "手相算命",
+          "description": "手相算命输入页",
+          "themeColor": "#c8a84e",
+          "files": {
+            "dark": "palm_dark.html",
+            "light": "palm_light.html"
+          }
+        },
+        {
+          "module": "nametest",
+          "route": "/nametest",
+          "title": "姓名测算",
+          "description": "姓名测算输入页",
+          "themeColor": "#06b6d4",
+          "files": {
+            "dark": "nametest_dark.html",
+            "light": "nametest_light.html"
+          }
+        },
+        {
+          "module": "numerology",
+          "route": "/numerology",
+          "title": "数字能量",
+          "description": "数字能量输入页",
+          "themeColor": "#06b6d4",
+          "files": {
+            "dark": "numerology_dark.html",
+            "light": "numerology_light.html"
+          }
+        },
+        {
+          "module": "shengxiao",
+          "route": "/shengxiao",
+          "title": "生肖运势",
+          "description": "生肖运势输入页",
+          "themeColor": "#f59e0b",
+          "files": {
+            "dark": "shengxiao_dark.html",
+            "light": "shengxiao_light.html"
+          }
+        }
+      ],
+      "system": [
+        {
+          "module": "home",
+          "route": "/",
+          "title": "首页",
+          "description": "首页",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "home_dark.html",
+            "light": "home_light.html"
+          }
+        },
+        {
+          "module": "profile",
+          "route": "/profile",
+          "title": "个人中心",
+          "description": "用户中心",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "profile_dark.html",
+            "light": "profile_light.html"
+          }
+        },
+        {
+          "module": "history",
+          "route": "/history",
+          "title": "历史记录",
+          "description": "算命记录",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "history_dark.html",
+            "light": "history_light.html"
+          }
+        },
+        {
+          "module": "search",
+          "route": "/search",
+          "title": "搜索",
+          "description": "全局搜索",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "search_dark.html",
+            "light": "search_light.html"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "module": "almanac",
+          "route": "/almanac",
+          "title": "黄历宜忌",
+          "description": "黄历查询",
+          "themeColor": "#f59e0b",
+          "files": {
+            "dark": "almanac_dark.html",
+            "light": "almanac_light.html"
+          }
+        },
+        {
+          "module": "calendar",
+          "route": "/calendar",
+          "title": "运势日历",
+          "description": "日历功能",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "calendar_dark.html",
+            "light": "calendar_light.html"
+          }
+        },
+        {
+          "module": "trend",
+          "route": "/trend",
+          "title": "趋势追踪",
+          "description": "趋势分析",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "trend_dark.html",
+            "light": "trend_light.html"
+          }
+        },
+        {
+          "module": "compare",
+          "route": "/compare",
+          "title": "多维对比",
+          "description": "多维对比",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "compare_dark.html",
+            "light": "compare_light.html"
+          }
+        }
+      ],
+      "ai": [
+        {
+          "module": "aiinsight",
+          "route": "/aiinsight",
+          "title": "AI 洞察",
+          "description": "AI洞察",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "aiinsight_dark.html",
+            "light": "aiinsight_light.html"
+          }
+        },
+        {
+          "module": "advice",
+          "route": "/advice",
+          "title": "个性化建议",
+          "description": "AI建议",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "advice_dark.html",
+            "light": "advice_light.html"
+          }
+        },
+        {
+          "module": "report",
+          "route": "/report",
+          "title": "综合运势报告",
+          "description": "运势报告",
+          "themeColor": "#004baa",
+          "files": {
+            "dark": "report_dark.html",
+            "light": "report_light.html"
+          }
+        }
+      ]
+    },
+    "result": {
+      "bazi": {
+        "route": "/result/bazi",
+        "title": "八字命盘分析",
+        "description": "八字排盘结果分析",
+        "themeColor": "#004baa",
+        "files": {
+          "dark": "result_bazi_dark.html",
+          "light": "result_bazi_light.html"
+        }
+      },
+      "ziwei": {
+        "route": "/result/ziwei",
+        "title": "紫微斗数分析",
+        "description": "紫微斗数结果分析",
+        "themeColor": "#7c3aed",
+        "files": {
+          "dark": "result_ziwei_dark.html",
+          "light": "result_ziwei_light.html"
+        }
+      },
+      "liuyao": {
+        "route": "/result/liuyao",
+        "title": "六爻占卜分析",
+        "description": "六爻占卜结果分析",
+        "themeColor": "#059669",
+        "files": {
+          "dark": "result_liuyao_dark.html",
+          "light": "result_liuyao_light.html"
+        }
+      },
+      "qimen": {
+        "route": "/result/qimen",
+        "title": "奇门遁甲分析",
+        "description": "奇门遁甲结果分析",
+        "themeColor": "#7c3aed",
+        "files": {
+          "dark": "result_qimen_dark.html",
+          "light": "result_qimen_light.html"
+        }
+      },
+      "meihua": {
+        "route": "/result/meihua",
+        "title": "梅花易数分析",
+        "description": "梅花易数结果分析",
+        "themeColor": "#ec4899",
+        "files": {
+          "dark": "result_meihua_dark.html",
+          "light": "result_meihua_light.html"
+        }
+      },
+      "daliuren": {
+        "route": "/result/daliuren",
+        "title": "大六壬分析",
+        "description": "大六壬结果分析",
+        "themeColor": "#f59e0b",
+        "files": {
+          "dark": "result_daliuren_dark.html",
+          "light": "result_daliuren_light.html"
+        }
+      },
+      "tieban": {
+        "route": "/result/tieban",
+        "title": "铁板神数分析",
+        "description": "铁板神数结果分析",
+        "themeColor": "#7c3aed",
+        "files": {
+          "dark": "result_tieban_dark.html",
+          "light": "result_tieban_light.html"
+        }
+      },
+      "fengshui": {
+        "route": "/result/fengshui",
+        "title": "风水堪舆分析",
+        "description": "风水堪舆结果分析",
+        "themeColor": "#059669",
+        "files": {
+          "dark": "result_fengshui_dark.html",
+          "light": "result_fengshui_light.html"
+        }
+      },
+      "xingzuo": {
+        "route": "/result/xingzuo",
+        "title": "星座运势分析",
+        "description": "星座运势结果分析",
+        "themeColor": "#8b5cf6",
+        "files": {
+          "dark": "result_xingzuo_dark.html",
+          "light": "result_xingzuo_light.html"
+        }
+      },
+      "tarot": {
+        "route": "/result/tarot",
+        "title": "塔罗牌分析",
+        "description": "塔罗牌结果分析",
+        "themeColor": "#7c3aed",
+        "files": {
+          "dark": "result_tarot_dark.html",
+          "light": "result_tarot_light.html"
+        }
+      },
+      "astrology": {
+        "route": "/result/astrology",
+        "title": "占星骰子分析",
+        "description": "占星骰子结果分析",
+        "themeColor": "#6366f1",
+        "files": {
+          "dark": "result_astrology_dark.html",
+          "light": "result_astrology_light.html"
+        }
+      },
+      "moon": {
+        "route": "/result/moon",
+        "title": "月相占卜分析",
+        "description": "月相占卜结果分析",
+        "themeColor": "#6366f1",
+        "files": {
+          "dark": "result_moon_dark.html",
+          "light": "result_moon_light.html"
+        }
+      },
+      "rune": {
+        "route": "/result/rune",
+        "title": "符文占卜分析",
+        "description": "符文占卜结果分析",
+        "themeColor": "#ea580c",
+        "files": {
+          "dark": "result_rune_dark.html",
+          "light": "result_rune_light.html"
+        }
+      },
+      "number": {
+        "route": "/result/number",
+        "title": "数字能量分析",
+        "description": "数字能量结果分析",
+        "themeColor": "#06b6d4",
+        "files": {
+          "dark": "result_number_dark.html",
+          "light": "result_number_light.html"
+        }
+      },
+      "zodiac": {
+        "route": "/result/zodiac",
+        "title": "生肖运势分析",
+        "description": "生肖运势结果分析",
+        "themeColor": "#f59e0b",
+        "files": {
+          "dark": "result_zodiac_dark.html",
+          "light": "result_zodiac_light.html"
+        }
+      },
+      "sign": {
+        "route": "/result/sign",
+        "title": "抽签占卜结果",
+        "description": "抽签占卜结果页",
+        "themeColor": "#f59e0b",
+        "files": {
+          "dark": "result_sign_dark.html"
+        }
+      },
+      "dream": {
+        "route": "/result/dream",
+        "title": "解梦结果",
+        "description": "解梦结果页",
+        "themeColor": "#8b5cf6",
+        "files": {
+          "dark": "result_dream_dark.html"
+        }
+      },
+      "palm": {
+        "route": "/result/palm",
+        "title": "手相算命结果",
+        "description": "手相算命结果页",
+        "themeColor": "#c8a84e",
+        "files": {
+          "dark": "result_palm_dark.html"
+        }
+      },
+      "name": {
+        "route": "/result/name",
+        "title": "姓名测算结果",
+        "description": "姓名测算结果页",
+        "themeColor": "#06b6d4",
+        "files": {
+          "dark": "result_name_dark.html"
+        }
+      }
+    },
+    "generic": {
+      "result": {
+        "route": "/result",
+        "title": "运势结果",
+        "description": "通用结果页",
+        "themeColor": "#004baa",
+        "files": {
+          "dark": "result_dark.html",
+          "light": "result_light.html"
+        }
+      }
+    }
+  },
+  "statistics": {
+    "inputPages": {
+      "total": 62,
+      "byCategory": {
+        "eastern": 16,
+        "western": 6,
+        "folk": 16,
+        "system": 8,
+        "tools": 8,
+        "ai": 6
+      }
+    },
+    "resultPages": {
+      "total": 19,
+      "completed": {
+        "dark": 19,
+        "light": 17
+      },
+      "missing": {
+        "light": ["result_sign_light.html", "result_dream_light.html", "result_palm_light.html", "result_name_light.html"]
+      }
+    },
+    "totalPages": 50
+  },
+  "themeColorSystem": [
+    { "name": "蓝色", "value": "#004baa", "pages": ["八字排盘", "系统页面"] },
+    { "name": "紫色", "value": "#7c3aed", "pages": ["紫微斗数", "奇门遁甲", "塔罗牌", "星座", "铁板神数", "解梦"] },
+    { "name": "绿色", "value": "#059669", "pages": ["六爻", "风水堪舆"] },
+    { "name": "金色", "value": "#f59e0b", "pages": ["大六壬", "抽签", "生肖", "黄历"] },
+    { "name": "粉色", "value": "#ec4899", "pages": ["梅花易数"] },
+    { "name": "青色", "value": "#06b6d4", "pages": ["姓名测算", "数字能量"] },
+    { "name": "橙色", "value": "#ea580c", "pages": ["符文占卜"] },
+    { "name": "靛蓝", "value": "#6366f1", "pages": ["占星骰子", "月相占卜"] },
+    { "name": "金棕", "value": "#c8a84e", "pages": ["手相算命"] }
+  ]
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星座运势分析 — 天机</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+:root { --color-primary: #004baa; --color-gold: #c8a84e; --color-bg: #0a0e1a; --color-bg-elevated: #111827; --color-bg-inset: #0d1424; --color-text: #e8ecf4; --color-text-secondary: #8b95a8; --color-text-tertiary: #5a6278; --color-border: rgba(255,255,255,0.08); --font-body: 'Noto Sans SC', sans-serif; --max-width: 1280px; --nav-height: 64px; }
+.nav-glass { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(40px); border-bottom: 1px solid rgba(255,255,255,0.12); }
+.nav-link { color: var(--color-text-secondary); font-size: 0.875rem; }
+.nav-link:hover { color: var(--color-text-inverse); }
+[data-icon] { display: inline-flex; align-items: center; justify-content: center; background-color: currentColor; }
+@keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body); background: var(--color-bg); color: var(--color-text);">
+    <!-- 星空背景 -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="15%" cy="20%" r="1.5" fill="var(--color-gold)" opacity="0.6" style="animation: twinkle 2s infinite;"/>
+            <circle cx="35%" cy="10%" r="1" fill="var(--color-gold-light)" opacity="0.4" style="animation: twinkle 2.5s infinite 0.3s;"/>
+            <circle cx="55%" cy="25%" r="2" fill="var(--color-gold)" opacity="0.5" style="animation: twinkle 3s infinite 0.5s;"/>
+            <circle cx="75%" cy="15%" r="1.5" fill="var(--color-gold-light)" opacity="0.4" style="animation: twinkle 2.2s infinite 0.8s;"/>
+            <circle cx="85%" cy="30%" r="1" fill="var(--color-gold)" opacity="0.5" style="animation: twinkle 2.8s infinite 0.2s;"/>
+        </svg>
+    </div>
+    <main class="relative z-10">
+        <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+            <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <a href="#"><span class="text-xl font-semibold" style="color: var(--color-gold);">天机</span></a>
+                <nav class="hidden md:flex items-center gap-8"><a href="#" class="nav-link">首页</a><a href="#" class="nav-link">东方命理</a><a href="#" class="nav-link">西方占卜</a><a href="#" class="nav-link">民俗趣味</a><a href="#" class="nav-link">AI 洞察</a><a href="#" class="nav-link">个人中心</a></nav>
+                <div class="flex items-center gap-4"><button style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);"><i data-lucide="search" style="width:20px;height:20px;"></i></button><div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold));"><i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i></div></div>
+            </div>
+        </header>
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-32" style="max-width: var(--max-width);">
+            <div class="flex items-center gap-3 mb-6">
+                <button class="inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg" style="color: var(--color-primary); background: rgba(0,75,170,0.06);"><i data-lucide="chevron-left" class="w-4 h-4"></i>返回</button>
+                <div class="flex items-center gap-2 text-sm" style="color: var(--color-text-tertiary);"><span>西方占卜</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>星座运势</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span style="color: var(--color-text-secondary);">分析结果</span></div>
+            </div>
+            <!-- 星座专属头部 -->
+            <section class="mb-8 p-6 rounded-xl text-center" style="background: linear-gradient(180deg, rgba(147,51,234,0.1) 0%, transparent 100%); border: 1px solid rgba(147,51,234,0.2);">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold" style="background: linear-gradient(135deg, #9333ea, #c026d3); color: #fff;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    西方占卜 · 星座运势
+                </span>
+                <div class="flex items-center justify-center gap-4 mt-6">
+                    <span class="text-7xl">♌</span>
+                    <div class="text-left">
+                        <h1 class="text-3xl md:text-4xl font-bold" style="color: var(--color-gold);">狮子座</h1>
+                        <p class="text-sm" style="color: var(--color-text-secondary);">7月23日 - 8月22日 · 火象星座</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm" style="color: var(--color-text-tertiary);">2026年7月10日 周五 · 巨蟹月</p>
+            </section>
+            <!-- 综合运势 -->
+            <section class="mb-8 p-6 md:p-8 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+                <h2 class="text-lg font-bold flex items-center gap-2 mb-6" style="color: var(--color-text);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c026d3" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+                    本月综合运势
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="text-center p-4 rounded-lg" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);"><div class="text-2xl mb-1">💰</div><div class="text-sm font-medium" style="color: #f87171;">财运</div><div class="text-lg font-bold mt-1" style="color: #f87171;">★★★★☆</div></div>
+                    <div class="text-center p-4 rounded-lg" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);"><div class="text-2xl mb-1">💼</div><div class="text-sm font-medium" style="color: #60a5fa;">事业</div><div class="text-lg font-bold mt-1" style="color: #60a5fa;">★★★★★</div></div>
+                    <div class="text-center p-4 rounded-lg" style="background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2);"><div class="text-2xl mb-1">❤️</div><div class="text-sm font-medium" style="color: #f472b6;">感情</div><div class="text-lg font-bold mt-1" style="color: #f472b6;">★★★☆☆</div></div>
+                    <div class="text-center p-4 rounded-lg" style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);"><div class="text-2xl mb-1">🏥</div><div class="text-sm font-medium" style="color: #4ade80;">健康</div><div class="text-lg font-bold mt-1" style="color: #4ade80;">★★★★☆</div></div>
+                    <div class="text-center p-4 rounded-lg" style="background: rgba(147,51,234,0.1); border: 1px solid rgba(147,51,234,0.2);"><div class="text-2xl mb-1">📚</div><div class="text-sm font-medium" style="color: #a855f7;">学习</div><div class="text-lg font-bold mt-1" style="color: #a855f7;">★★★★☆</div></div>
+                </div>
+                <!-- 综合评分 -->
+                <div class="flex items-center justify-center gap-6 p-4 rounded-lg" style="background: var(--color-bg-inset);">
+                    <svg class="w-24 h-24" style="transform: rotate(-90deg);">
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="var(--color-border)" stroke-width="6"/>
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="url(#goldGradient)" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="37.68" style="filter: drop-shadow(0 0 6px var(--color-gold));"/>
+                        <defs><linearGradient id="goldGradient"><stop offset="0%" stop-color="var(--color-gold-light)"/><stop offset="100%" stop-color="var(--color-gold)"/></linearGradient></defs>
+                    </svg>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold" style="color: var(--color-gold);">85</div>
+                        <div class="text-sm" style="color: var(--color-text-secondary);">综合评分</div>
+                    </div>
+                </div>
+            </section>
+            <!-- 行星相位 -->
+            <section class="mb-8 p-6 md:p-8 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+                <h2 class="text-lg font-bold mb-6" style="color: var(--color-text);">行星状态</h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-lg" style="background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, transparent 100%); border: 1px solid rgba(245,158,11,0.2);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-2xl">☀️</span><span class="text-sm font-medium" style="color: #fbbf24;">太阳</span></div>
+                        <p class="text-xs" style="color: var(--color-text-secondary);">在狮子座 · 庙旺位置</p>
+                        <p class="text-xs mt-1" style="color: var(--color-text-tertiary);">领导力、创造力爆发期</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, transparent 100%); border: 1px solid rgba(59,130,246,0.2);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-2xl">🌙</span><span class="text-sm font-medium" style="color: #60a5fa;">月亮</span></div>
+                        <p class="text-xs" style="color: var(--color-text-secondary);">在白羊座 · 旺相</p>
+                        <p class="text-xs mt-1" style="color: var(--color-text-tertiary);">情感表达直接有力</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: linear-gradient(135deg, rgba(236,72,153,0.1) 0%, transparent 100%); border: 1px solid rgba(236,72,153,0.2);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-2xl">♀</span><span class="text-sm font-medium" style="color: #f472b6;">金星</span></div>
+                        <p class="text-xs" style="color: var(--color-text-secondary);">在双子座 · 失势</p>
+                        <p class="text-xs mt-1" style="color: var(--color-text-tertiary);">感情观念趋于理性</p>
+                    </div>
+                </div>
+            </section>
+            <!-- AI解读 -->
+            <section class="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style="background: linear-gradient(135deg, #581c87 0%, #7c3aed 100%);">
+                <div class="absolute inset-0 pointer-events-none"><div class="absolute -top-10 -right-10 w-40 h-40 rounded-full" style="background: radial-gradient(circle, rgba(192,132,252,0.3) 0%, transparent 70%);"></div></div>
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(192,132,252,0.2);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
+                        <h2 class="text-lg font-bold" style="color: #fff;">AI 深度解读</h2>
+                        <span class="ml-auto text-[10px] px-2 py-0.5 rounded" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);">Powered by AI</span>
+                    </div>
+                    <div class="h-px mb-6" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);"></div>
+                    <div class="space-y-4 mb-6">
+                        <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.9);">本月狮子座运势强劲，<strong style="color: #e9d5ff;">太阳在庙旺位置</strong>，您的领导力和创造力将达到巅峰。事业方面水星与木星形成吉相，贵人运旺盛。</p>
+                        <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.8);">感情方面，金星失势需要注意表达方式，避免过于理性而显得冷淡。建议本月<strong style="color: #e9d5ff;">大胆展现才华</strong>，把握职场展示机会。健康方面需注意休息，避免过度劳累。</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1 flex items-center px-4 py-3 rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);"><input type="text" placeholder="继续追问星座..." class="bg-transparent outline-none text-sm flex-1" style="color: #fff;"></div>
+                        <button class="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--color-gold); color: #0a0e1a;"><i data-lucide="send" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="fixed bottom-0 left-0 right-0 z-40" style="background: var(--color-bg-elevated); border-top: 1px solid var(--color-border-light);">
+            <div class="mx-auto flex items-center justify-center gap-4 md:gap-8 px-6 py-3" style="max-width: var(--max-width);">
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="heart" class="w-5 h-5"></i><span class="text-xs">收藏</span></button>
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="share-2" class="w-5 h-5"></i><span class="text-xs">分享</span></button>
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="file-text" class="w-5 h-5"></i><span class="text-xs">报告</span></button>
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="refresh-cw" class="w-5 h-5"></i><span class="text-xs">重测</span></button>
+            </div>
+        </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

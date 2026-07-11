@@ -1,0 +1,1312 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个性化建议 — 天机</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Dark Mode Overrides ---- */
+.dark {
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1220;
+  --color-text: #e8ecf4;
+  --color-text-secondary: #a0aac0;
+  --color-text-tertiary: #6b7590;
+  --color-border: #1e2740;
+  --color-border-light: #161e35;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 内容容器 */
+    .content-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+    }
+    /* Section 标题 */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+      color: var(--color-text-inverse);
+      text-wrap: balance;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+    .section-subtitle {
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ========== 导航栏玻璃效果 ========== */
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ========== 导航链接 ========== */
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+
+      /* ========== 移动端菜单按钮 ========== */
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--color-text);
+        cursor: pointer;
+        padding: 8px;
+      }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .nav-links { display: none !important; }
+        .nav-actions { display: none !important; }
+      }
+
+      /* ========== 面包屑 ========== */
+      .breadcrumb-link {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        transition: color var(--transition-fast);
+      }
+      .breadcrumb-link:hover { color: var(--color-gold-light); }
+      .breadcrumb-sep {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        margin: 0 6px;
+        opacity: 0.5;
+      }
+
+      /* ========== 命理概要卡片 ========== */
+      .profile-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        position: relative;
+        overflow: hidden;
+      }
+      .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+        opacity: 0.3;
+      }
+
+      /* ========== 时间线 ========== */
+      .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        padding-bottom: var(--space-8);
+      }
+      .timeline-item:last-child {
+        padding-bottom: 0;
+      }
+      .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 32px;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, rgba(0, 75, 170, 0.4), rgba(200, 168, 78, 0.2));
+      }
+      .timeline-item:last-child::before {
+        display: none;
+      }
+      .timeline-dot {
+        position: absolute;
+        left: 6px;
+        top: 8px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+        border: 2px solid rgba(200, 168, 78, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+      }
+      .timeline-dot-inner {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-gold);
+      }
+      .timeline-date-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: var(--radius-md);
+        background: rgba(0, 75, 170, 0.15);
+        color: var(--color-primary-lighter);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        white-space: nowrap;
+        margin-bottom: var(--space-3);
+      }
+
+      /* ========== 建议卡片 ========== */
+      .advice-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        transition: all var(--transition-base);
+      }
+      .advice-card:hover {
+        border-color: rgba(200, 168, 78, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 75, 170, 0.08);
+      }
+
+      /* ========== 重点事项卡片 ========== */
+      .priority-card {
+        background: linear-gradient(135deg, rgba(0, 75, 170, 0.12), rgba(200, 168, 78, 0.06));
+        border: 1px solid rgba(200, 168, 78, 0.25);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        position: relative;
+        overflow: hidden;
+        transition: all var(--transition-base);
+      }
+      .priority-card:hover {
+        border-color: rgba(200, 168, 78, 0.4);
+        box-shadow: 0 0 24px rgba(200, 168, 78, 0.1);
+      }
+      .priority-card::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 120px; height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(200, 168, 78, 0.1), transparent 70%);
+        pointer-events: none;
+      }
+
+      /* ========== 本月规划卡片 ========== */
+      .plan-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        transition: all var(--transition-base);
+      }
+      .plan-card:hover {
+        border-color: rgba(0, 75, 170, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 75, 170, 0.08);
+      }
+
+      /* ========== 避坑提醒卡片 ========== */
+      .warning-card {
+        background: rgba(196, 58, 58, 0.06);
+        border: 1px solid rgba(196, 58, 58, 0.3);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        position: relative;
+        overflow: hidden;
+      }
+      .warning-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--state-error);
+        border-radius: 4px 0 0 4px;
+      }
+
+      /* ========== 展开折叠详情 ========== */
+      .detail-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--color-primary-lighter);
+        font-size: var(--text-sm);
+        cursor: pointer;
+        transition: color var(--transition-fast);
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: var(--font-body);
+      }
+      .detail-toggle:hover {
+        color: var(--color-gold-light);
+      }
+      .detail-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height var(--transition-slow);
+      }
+      .detail-content.open {
+        max-height: 300px;
+      }
+
+      /* ========== 自定义需求输入 ========== */
+      .custom-input-area {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        position: relative;
+      }
+      .custom-textarea {
+        width: 100%;
+        min-height: 100px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4) var(--space-5);
+        color: var(--color-text);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        line-height: var(--leading-relaxed);
+        resize: vertical;
+        outline: none;
+        transition: border-color var(--transition-base);
+      }
+      .custom-textarea::placeholder {
+        color: var(--color-text-tertiary);
+      }
+      .custom-textarea:focus {
+        border-color: rgba(200, 168, 78, 0.4);
+      }
+
+      /* ========== 操作按钮 ========== */
+      .btn-gold {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 22px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold));
+        color: #ffffff;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        white-space: nowrap;
+      }
+      .btn-gold:hover {
+        box-shadow: 0 4px 16px rgba(200, 168, 78, 0.3);
+        transform: translateY(-1px);
+      }
+      .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 22px;
+        border-radius: var(--radius-lg);
+        background: transparent;
+        color: var(--color-text-secondary);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        white-space: nowrap;
+      }
+      .btn-outline:hover {
+        border-color: rgba(0, 75, 170, 0.3);
+        color: var(--color-primary-lighter);
+      }
+
+      /* ========== 标签 ========== */
+      .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      /* ========== Section 头部 ========== */
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-8);
+      }
+      .section-header-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* ========== Footer ========== */
+      .footer-link {
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+        transition: color var(--transition-fast);
+      }
+      .footer-link:hover { color: var(--color-gold-light); }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background: #0a0e1a; color: var(--color-text);">
+    <main>
+
+      <!-- ==================== 1. 顶部导航栏（固定） ==================== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header><!-- ==================== 2. 面包屑 + 标题区 ==================== -->
+      <section style="background: linear-gradient(180deg, #002060 0%, #0a0e1a 100%); padding: calc(var(--nav-height) + var(--space-12)) 0 var(--space-12);" data-dom-id="breadcrumb-title-section">
+        <div class="content-container">
+          <!-- 面包屑 -->
+          <nav class="flex items-center flex-wrap" style="margin-bottom: var(--space-6);" data-dom-id="breadcrumb">
+            <a href="#" class="breadcrumb-link no-underline" data-dom-id="breadcrumb-home">首页</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="#" class="breadcrumb-link no-underline" data-dom-id="breadcrumb-ai">AI 洞察</a>
+            <span class="breadcrumb-sep">/</span>
+            <span style="color: var(--color-gold-light); font-size: var(--text-sm);" data-dom-id="breadcrumb-current">个性化建议</span>
+          </nav>
+          <!-- 标题 + 副标题 -->
+          <div style="max-width: 640px;">
+            <h1 class="display-font font-bold leading-tight" style="font-size: clamp(28px, 3.5vw, 48px); color: #ffffff; text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; margin-bottom: var(--space-4);" data-dom-id="page-title">
+              个性化建议
+            </h1>
+            <p class="section-subtitle" style="max-width: 560px;" data-dom-id="page-subtitle">
+              基于命理信息，生成可执行的行动建议
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 3. 用户命理概要卡片 ==================== -->
+      <section style="background: #0a0e1a; padding: 0 0 var(--space-16);" data-dom-id="profile-section">
+        <div class="content-container">
+          <div class="profile-card" data-dom-id="profile-card">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <!-- 头像 -->
+              <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold));" data-dom-id="profile-avatar">
+                <i data-lucide="user" style="width:28px;height:28px;color:#fff;"></i>
+              </div>
+              <!-- 姓名与基本信息 -->
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold truncate" style="font-size: var(--text-xl); color: var(--color-text);" data-dom-id="profile-name">张天明</h3>
+                <p class="mt-1 truncate" style="color: var(--color-text-secondary); font-size: var(--text-sm);" data-dom-id="profile-meta">命理档案已生成</p>
+              </div>
+              <!-- 命理标签 -->
+              <div class="flex flex-wrap items-center gap-3" data-dom-id="profile-tags">
+                <span class="tag-pill" style="background: rgba(0, 75, 170, 0.15); color: var(--color-primary-lighter);">
+                  <i data-lucide="rabbit" style="width:14px;height:14px;"></i>
+                  <span>属兔</span>
+                </span>
+                <span class="tag-pill" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold);">
+                  <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                  <span>狮子座</span>
+                </span>
+                <span class="tag-pill" style="background: rgba(26, 138, 92, 0.12); color: var(--state-success);">
+                  <i data-lucide="flame" style="width:14px;height:14px;"></i>
+                  <span>日主丙火</span>
+                </span>
+                <span class="tag-pill" style="background: rgba(200, 168, 78, 0.08); color: var(--color-gold-light);">
+                  <span>甲子年 · 庚午月</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. 近 7 天行动建议（时间线） ==================== -->
+      <section style="background: #0d1220; padding: var(--space-16) 0;" data-dom-id="timeline-section">
+        <div class="content-container">
+          <div class="section-header" data-dom-id="timeline-header">
+            <div class="section-header-icon" style="background: rgba(200, 168, 78, 0.12);">
+              <i data-lucide="calendar-days" style="width:20px;height:20px;color:var(--color-gold);"></i>
+            </div>
+            <div>
+              <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                近 7 天行动建议
+              </h2>
+              <p class="mt-1" style="color: var(--color-text-tertiary); font-size: var(--text-sm);">根据每日运势波动，精细安排日程</p>
+            </div>
+          </div>
+
+          <!-- 时间线列表 -->
+          <div data-dom-id="timeline-list">
+
+            <!-- 7月10日（今天） -->
+            <div class="timeline-item" data-dom-id="timeline-day-1">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day1-date">
+                <i data-lucide="star" style="width:12px;height:12px;"></i>
+                7月10日 · 今天
+              </div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day1-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(26, 138, 92, 0.12);">
+                      <i data-lucide="briefcase" style="width:16px;height:16px;color:var(--state-success);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">上午处理重要邮件与汇报</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        今日水星与木星呈三分相，思维清晰、表达力强，适合沟通协调类工作。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 行星相位</strong>：水星巨蟹座与木星白羊座呈 120 度三分相，增强心智表达与商业判断力。<br>
+                            <strong style="color: var(--color-primary-lighter);">八字 · 日主旺衰</strong>：今日庚午月丙火日主得禄，火旺有利于文书、沟通、教育类事务。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="advice-card" data-dom-id="day1-advice-2">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                      <i data-lucide="heart" style="width:16px;height:16px;color:var(--color-gold);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">傍晚约朋友或伴侣散步</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        金星入驻交流宫，傍晚社交氛围温暖，适合增进感情联络。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 金星过宫</strong>：金星狮子座过第三宫（沟通宫），语言魅力增强，社交互动有利。<br>
+                            <strong style="color: var(--color-primary-lighter);">紫微斗数 · 化科入命</strong>：天机化科，有利于人际交往、口碑建立。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7月11日 -->
+            <div class="timeline-item" data-dom-id="timeline-day-2">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day2-date">7月11日 · 周六</div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day2-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(0, 75, 170, 0.15);">
+                      <i data-lucide="wallet" style="width:16px;height:16px;color:var(--color-primary-lighter);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">适合梳理财务、制定预算计划</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        土星与冥王星和谐相位，适合处理结构性、长期性的财务规划。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">八字 · 食伤生财</strong>：辛丑日食神泄秀，利于理性分析与资源统筹。<br>
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 土星三分冥王</strong>：有利于深度财务分析和长期投资布局。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7月12日 -->
+            <div class="timeline-item" data-dom-id="timeline-day-3">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day3-date">
+                <i data-lucide="zap" style="width:12px;height:12px;"></i>
+                7月12日 · 高峰日
+              </div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day3-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(26, 138, 92, 0.12);">
+                      <i data-lucide="rocket" style="width:16px;height:16px;color:var(--state-success);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">启动新项目或提交关键方案</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        木星三分本命太阳达到精确相位，是本周最强运势窗口，适合开创性事务。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 木星精确三分</strong>：木星白羊座与太阳狮子座精确 120 度，扩展力与行动力同时达到峰值。<br>
+                            <strong style="color: var(--color-primary-lighter);">紫微斗数 · 天机化科</strong>：天机星化科入迁移宫，外出、提案、出行均有利。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="advice-card" data-dom-id="day3-advice-2">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                      <i data-lucide="users" style="width:16px;height:16px;color:var(--color-gold);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">参加社交活动，拓展人脉</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        木星扩展社交宫位能量，聚会中可能遇到有价值的贵人。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 十一宫激活</strong>：木星过十一宫（人际宫）三分本命太阳，社交运势上扬。<br>
+                            <strong style="color: var(--color-primary-lighter);">八字 · 贵人星显</strong>：壬寅日天乙贵人临日，易得贵人助力。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="advice-card" data-dom-id="day3-advice-3">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(0, 75, 170, 0.15);">
+                      <i data-lucide="file-signature" style="width:16px;height:16px;color:var(--color-primary-lighter);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">签署合同或完成签约</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        木星护佑法律事务，文书签约类事项成功率显著提升。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 木星九宫</strong>：木星天然守护法律与契约事务，三分相时期特别有利。<br>
+                            <strong style="color: var(--color-primary-lighter);">六爻 · 世应相生</strong>：壬寅日测签约得世应相生之卦，签约顺遂。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7月13日 -->
+            <div class="timeline-item" data-dom-id="timeline-day-4">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day4-date">7月13日 · 周一</div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day4-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(26, 138, 92, 0.12);">
+                      <i data-lucide="book-open" style="width:16px;height:16px;color:var(--state-success);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">学习新技能或阅读专业书籍</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        水星进入学习宫，吸收能力增强，适合知识型任务。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 水星入三宫</strong>：水星回归守护的第三宫，学习效率达到高点。<br>
+                            <strong style="color: var(--color-primary-lighter);">八字 · 印星得力</strong>：癸卯日偏印透出，利于学习思考、技艺提升。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7月14日 -->
+            <div class="timeline-item" data-dom-id="timeline-day-5">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day5-date">7月14日 · 周二</div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day5-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                      <i data-lucide="home" style="width:16px;height:16px;color:var(--color-gold);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">整理家居环境、处理家务</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        月亮入驻第四宫（家庭宫），适合整理、收纳、家居装饰等事务。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 月亮入四宫</strong>：月亮回归本位，家庭事务运增强。<br>
+                            <strong style="color: var(--color-primary-lighter);">风水 · 气场整理</strong>：甲辰日属木，木旺利于植物养护、空间疏通。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="advice-card" data-dom-id="day5-advice-2">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(0, 75, 170, 0.15);">
+                      <i data-lucide="stethoscope" style="width:16px;height:16px;color:var(--color-primary-lighter);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">安排体检或关注健康状况</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        六宫健康能量受月亮相位影响，适合健康管理类事务。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 六宫月亮</strong>：月亮六分六宫（健康宫），提醒关注身体信号。<br>
+                            <strong style="color: var(--color-primary-lighter);">中医 · 五行养生</strong>：火日旺木，注意肝胆保养，宜早睡。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7月15日 -->
+            <div class="timeline-item" data-dom-id="timeline-day-6">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day6-date">7月15日 · 周三</div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day6-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                      <i data-lucide="dumbbell" style="width:16px;height:16px;color:var(--color-gold);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">进行中等强度运动</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        火星能量平稳，适合跑步、游泳等有氧运动，提升体能。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 火星过一宫</strong>：火星恢复顺行，体能与行动力回升。<br>
+                            <strong style="color: var(--color-primary-lighter);">八字 · 比肩帮身</strong>：丙午日比肩旺，适合运动竞技、体力消耗类活动。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7月16日 -->
+            <div class="timeline-item" data-dom-id="timeline-day-7">
+              <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+              <div class="timeline-date-tag" data-dom-id="day7-date">7月16日 · 周四</div>
+              <div class="flex flex-col gap-3">
+                <div class="advice-card" data-dom-id="day7-advice-1">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center" style="background: rgba(26, 138, 92, 0.12);">
+                      <i data-lucide="target" style="width:16px;height:16px;color:var(--state-success);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium truncate" style="font-size: var(--text-sm); color: var(--color-text);">复盘本周成果，制定下周计划</h5>
+                      <p class="mt-1 line-clamp-2" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                        周四土星能量增强，适合总结归档、规划下阶段目标。
+                      </p>
+                      <button class="detail-toggle mt-2" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('span').textContent = this.nextElementSibling.classList.contains('open') ? '收起依据' : '查看命理依据';">
+                        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        <span>查看命理依据</span>
+                      </button>
+                      <div class="detail-content mt-2">
+                        <div class="rounded-lg p-3" style="background: rgba(0, 75, 170, 0.06); border: 1px solid rgba(0, 75, 170, 0.1);">
+                          <p class="line-clamp-4" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                            <strong style="color: var(--color-primary-lighter);">西洋占星 · 土星十宫</strong>：土星过十宫（事业宫），规划与执行力增强。<br>
+                            <strong style="color: var(--color-primary-lighter);">梅花易数 · 艮卦</strong>：丁未日得艮为山卦，宜止宜静、反思总结。
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 本周重点区 ==================== -->
+      <section style="background: #0a0e1a; padding: var(--space-16) 0;" data-dom-id="priority-section">
+        <div class="content-container">
+          <div class="section-header" data-dom-id="priority-header">
+            <div class="section-header-icon" style="background: rgba(200, 168, 78, 0.12);">
+              <i data-lucide="alert-circle" style="width:20px;height:20px;color:var(--color-gold);"></i>
+            </div>
+            <div>
+              <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                本周重点
+              </h2>
+              <p class="mt-1" style="color: var(--color-text-tertiary); font-size: var(--text-sm);">高优先级事项，建议优先安排</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-dom-id="priority-cards">
+            <!-- 重点1 -->
+            <div class="priority-card" data-dom-id="priority-1">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="tag-pill" style="background: rgba(196, 58, 58, 0.15); color: var(--state-error);">紧急</span>
+                <span class="tag-pill" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold);">事业</span>
+              </div>
+              <h4 class="font-semibold mb-2" style="color: var(--color-text); font-size: var(--text-base);">提交季度报告</h4>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                木星三分相带来表达力提升，7 月 12 日前完成报告撰写与提交，成功率最高。拖延至周末运势回落期可能影响质量。
+              </p>
+              <div class="flex items-center gap-2 mt-4">
+                <i data-lucide="clock" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">建议截止：7月12日</span>
+              </div>
+            </div>
+
+            <!-- 重点2 -->
+            <div class="priority-card" data-dom-id="priority-2">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="tag-pill" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold);">重要</span>
+                <span class="tag-pill" style="background: rgba(0, 75, 170, 0.15); color: var(--color-primary-lighter);">感情</span>
+              </div>
+              <h4 class="font-semibold mb-2" style="color: var(--color-text); font-size: var(--text-base);">与重要的人深度沟通</h4>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                金星与水星同时活跃于交流宫位，10-12 日是处理感情问题、进行重要对话的最佳窗口。真诚表达能化解积压矛盾。
+              </p>
+              <div class="flex items-center gap-2 mt-4">
+                <i data-lucide="clock" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">最佳时段：7月10日-12日</span>
+              </div>
+            </div>
+
+            <!-- 重点3 -->
+            <div class="priority-card" data-dom-id="priority-3">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="tag-pill" style="background: rgba(200, 168, 78, 0.12); color: var(--color-gold);">重要</span>
+                <span class="tag-pill" style="background: rgba(26, 138, 92, 0.12); color: var(--state-success);">财运</span>
+              </div>
+              <h4 class="font-semibold mb-2" style="color: var(--color-text); font-size: var(--text-base);">锁定投资机会</h4>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                木星扩展财运宫能量，本周可能出现有价值的投资信号。土星三分冥王利于深度分析，建议结合理性判断果断行动。
+              </p>
+              <div class="flex items-center gap-2 mt-4">
+                <i data-lucide="clock" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">观察期：7月11日-14日</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 6. 本月规划建议 ==================== -->
+      <section style="background: #0d1220; padding: var(--space-16) 0;" data-dom-id="plan-section">
+        <div class="content-container">
+          <div class="section-header" data-dom-id="plan-header">
+            <div class="section-header-icon" style="background: rgba(0, 75, 170, 0.15);">
+              <i data-lucide="map" style="width:20px;height:20px;color:var(--color-primary-lighter);"></i>
+            </div>
+            <div>
+              <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                本月规划建议
+              </h2>
+              <p class="mt-1" style="color: var(--color-text-tertiary); font-size: var(--text-sm);">基于七月整体运势走势，推荐启动或完成的事项</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" data-dom-id="plan-cards">
+            <!-- 规划1 -->
+            <div class="plan-card" data-dom-id="plan-1">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(26, 138, 92, 0.12);">
+                  <i data-lucide="graduation-cap" style="width:20px;height:20px;color:var(--state-success);"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">启动专业认证考试准备</h4>
+                  <span class="tag-pill mt-1" style="background: rgba(26, 138, 92, 0.1); color: var(--state-success); font-size: var(--text-xs);">上旬启动</span>
+                </div>
+              </div>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                7 月上旬水星能量活跃，学习效率处于月内高点。建议本月上旬完成考试报名、制定复习计划，中旬开始系统学习。
+              </p>
+              <div class="flex items-center gap-4 mt-4 pt-4" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="trending-up" style="width:14px;height:14px;color:var(--state-success);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">匹配度 92%</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">7月1日-15日</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 规划2 -->
+            <div class="plan-card" data-dom-id="plan-2">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                  <i data-lucide="home" style="width:20px;height:20px;color:var(--color-gold);"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">完成居家环境改造</h4>
+                  <span class="tag-pill mt-1" style="background: rgba(200, 168, 78, 0.1); color: var(--color-gold); font-size: var(--text-xs);">中旬执行</span>
+                </div>
+              </div>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                月中月亮多次经过家庭宫，家居改造、装修、整理的运势较好。建议提前规划方案，中旬集中执行。
+              </p>
+              <div class="flex items-center gap-4 mt-4 pt-4" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="trending-up" style="width:14px;height:14px;color:var(--state-success);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">匹配度 85%</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">7月10日-20日</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 规划3 -->
+            <div class="plan-card" data-dom-id="plan-3">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(0, 75, 170, 0.15);">
+                  <i data-lucide="plane" style="width:20px;height:20px;color:var(--color-primary-lighter);"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">安排出差或旅行</h4>
+                  <span class="tag-pill mt-1" style="background: rgba(0, 75, 170, 0.1); color: var(--color-primary-lighter); font-size: var(--text-xs);">下旬适宜</span>
+                </div>
+              </div>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                下旬木星进入第九宫（远行宫），出行的运势显著提升。差旅行程、商务考察或休闲旅行均有利，提前规划可享受优惠。
+              </p>
+              <div class="flex items-center gap-4 mt-4 pt-4" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="trending-up" style="width:14px;height:14px;color:var(--state-warning);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">匹配度 78%</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">7月20日-31日</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 规划4 -->
+            <div class="plan-card" data-dom-id="plan-4">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                  <i data-lucide="handshake" style="width:20px;height:20px;color:var(--color-gold);"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">拓展合作或寻找合伙人</h4>
+                  <span class="tag-pill mt-1" style="background: rgba(200, 168, 78, 0.1); color: var(--color-gold); font-size: var(--text-xs);">全月适宜</span>
+                </div>
+              </div>
+              <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                木星整月过十一宫（人际宫），合作运势贯穿全月。上旬建立联系，中旬深入洽谈，下旬签约落地，节奏分明。
+              </p>
+              <div class="flex items-center gap-4 mt-4 pt-4" style="border-top: 1px solid rgba(255,255,255,0.06);">
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="trending-up" style="width:14px;height:14px;color:var(--state-success);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">匹配度 88%</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="calendar" style="width:14px;height:14px;color:var(--color-text-tertiary);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">7月全月</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 7. 避坑提醒区 ==================== -->
+      <section style="background: #0a0e1a; padding: var(--space-16) 0;" data-dom-id="warning-section">
+        <div class="content-container">
+          <div class="section-header" data-dom-id="warning-header">
+            <div class="section-header-icon" style="background: rgba(196, 58, 58, 0.12);">
+              <i data-lucide="shield-alert" style="width:20px;height:20px;color:var(--state-error);"></i>
+            </div>
+            <div>
+              <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                避坑提醒
+              </h2>
+              <p class="mt-1" style="color: var(--color-text-tertiary); font-size: var(--text-sm);">命理信号预警，以下事项需特别注意</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-dom-id="warning-cards">
+            <!-- 避坑1 -->
+            <div class="warning-card" data-dom-id="warning-1">
+              <div class="flex items-center gap-2 mb-4" style="padding-left: var(--space-4);">
+                <i data-lucide="ban" style="width:18px;height:18px;color:var(--state-error); flex-shrink:0;"></i>
+                <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">避免重大财务决策</h4>
+              </div>
+              <div style="padding-left: var(--space-4);">
+                <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                  7 月 14-16 日海王星与金星形成刑克相位，判断力易受情绪干扰。期间避免冲动消费、大额投资、借贷等决策。
+                </p>
+                <div class="flex items-center gap-2 mt-3 pt-3" style="border-top: 1px solid rgba(196, 58, 58, 0.15);">
+                  <i data-lucide="calendar-x" style="width:14px;height:14px;color:var(--state-error);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">高风险期：7月14日-16日</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 避坑2 -->
+            <div class="warning-card" data-dom-id="warning-2">
+              <div class="flex items-center gap-2 mb-4" style="padding-left: var(--space-4);">
+                <i data-lucide="ban" style="width:18px;height:18px;color:var(--state-error); flex-shrink:0;"></i>
+                <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">谨慎处理人际冲突</h4>
+              </div>
+              <div style="padding-left: var(--space-4);">
+                <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                  火星与土星对冲期间，人际摩擦概率上升。7 月 18-20 日尽量避免争论、批评他人，或做出离职、分手等冲动决定。
+                </p>
+                <div class="flex items-center gap-2 mt-3 pt-3" style="border-top: 1px solid rgba(196, 58, 58, 0.15);">
+                  <i data-lucide="calendar-x" style="width:14px;height:14px;color:var(--state-error);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">高风险期：7月18日-20日</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 避坑3 -->
+            <div class="warning-card" data-dom-id="warning-3">
+              <div class="flex items-center gap-2 mb-4" style="padding-left: var(--space-4);">
+                <i data-lucide="ban" style="width:18px;height:18px;color:var(--state-error); flex-shrink:0;"></i>
+                <h4 class="font-semibold truncate" style="color: var(--color-text); font-size: var(--text-base);">注意饮食与作息规律</h4>
+              </div>
+              <div style="padding-left: var(--space-4);">
+                <p class="line-clamp-3" style="color: var(--color-text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                  本月火象能量偏旺，丙火日主容易过度消耗。下旬火星换座后体力下降，需提前调整作息，避免熬夜与暴饮暴食。
+                </p>
+                <div class="flex items-center gap-2 mt-3 pt-3" style="border-top: 1px solid rgba(196, 58, 58, 0.15);">
+                  <i data-lucide="calendar-x" style="width:14px;height:14px;color:var(--state-error);"></i>
+                  <span style="color: var(--color-text-tertiary); font-size: var(--text-xs);">需注意：7月下旬持续</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 8. 自定义需求输入框 ==================== -->
+      <section style="background: #0d1220; padding: var(--space-16) 0 var(--space-20);" data-dom-id="custom-section">
+        <div class="content-container">
+          <div class="section-header" data-dom-id="custom-header">
+            <div class="section-header-icon" style="background: rgba(200, 168, 78, 0.12);">
+              <i data-lucide="message-square-plus" style="width:20px;height:20px;color:var(--color-gold);"></i>
+            </div>
+            <div>
+              <h2 class="display-font font-semibold" style="font-size: clamp(var(--text-xl), 2vw, var(--text-2xl)); color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                自定义需求
+              </h2>
+              <p class="mt-1" style="color: var(--color-text-tertiary); font-size: var(--text-sm);">告诉 AI 你的具体情况，获取更精准的建议</p>
+            </div>
+          </div>
+
+          <div class="custom-input-area" data-dom-id="advice-custom">
+            <textarea class="custom-textarea" placeholder="告诉 AI 你的具体需求，例如：&quot;下周有一个重要面试，应该在哪天安排？&quot;、&quot;本月适合搬家吗？&quot;、&quot;想和老板谈加薪，什么时机比较好？&quot;" data-dom-id="custom-textarea"></textarea>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-5">
+              <p class="line-clamp-2" style="color: var(--color-text-tertiary); font-size: var(--text-xs); max-width: 480px;">
+                AI 将结合你的命理信息（生肖、星座、八字日主等）与当前星象，生成针对性的行动建议。
+              </p>
+              <div class="flex items-center gap-3 flex-shrink-0">
+                <button class="btn-gold" data-dom-id="custom-submit">
+                  <i data-lucide="sparkles" style="width:16px;height:16px;"></i>
+                  获取建议
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== 10. 操作按钮区 ==================== -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mt-10 pt-8" style="border-top: 1px solid rgba(255,255,255,0.06);" data-dom-id="action-bar">
+            <p class="line-clamp-2" style="color: var(--color-text-tertiary); font-size: var(--text-sm); max-width: 480px;">
+              将建议同步到日历，或保存为 PDF 以便随时查看。
+            </p>
+            <div class="flex items-center gap-3 flex-shrink-0">
+              <button class="btn-outline" data-dom-id="btn-calendar">
+                <i data-lucide="calendar-plus" style="width:16px;height:16px;"></i>
+                设置日历提醒
+              </button>
+              <button class="btn-outline" data-dom-id="btn-save">
+                <i data-lucide="bookmark" style="width:16px;height:16px;"></i>
+                保存建议
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 页脚 ==================== -->
+      <footer style="background: #060a14; border-top: 1px solid rgba(255,255,255,0.06); padding: var(--space-12) 0 var(--space-8);" data-dom-id="footer">
+        <div class="content-container">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div class="max-w-md">
+              <span class="display-font text-base font-semibold" style="color: var(--color-gold);">天机</span>
+              <p class="mt-2" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                免责声明：本工具所有占卜结果仅供娱乐参考，不构成任何决策建议。命运掌握在自己手中。
+              </p>
+            </div>
+            <div class="flex items-center gap-6">
+              <a href="#" class="footer-link no-underline" data-dom-id="footer-about">关于我们</a>
+              <a href="#" class="footer-link no-underline" data-dom-id="footer-terms">使用条款</a>
+              <a href="#" class="footer-link no-underline" data-dom-id="footer-privacy">隐私政策</a>
+            </div>
+          </div>
+          <div class="mt-8 pt-6 text-center" style="border-top: 1px solid rgba(255,255,255,0.04);">
+            <p style="color: var(--color-text-tertiary); font-size: var(--text-xs);">
+              &copy; 2026 天机 AI 运势查询工具. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

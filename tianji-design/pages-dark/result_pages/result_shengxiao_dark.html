@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生肖运势解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-zodiac: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .zodiac-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+        }
+        .luck-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--color-gold), var(--color-zodiac));
+        }
+        .aspect-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        .month-cell {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .month-cell:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: scale(1.02);
+        }
+        .month-cell.good {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .month-cell.warning {
+            border-color: rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .glow-text {
+            text-shadow: 0 0 20px var(--color-zodiac);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">生肖运势</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-amber-400">2025年运势</span>
+        </div>
+    </div>
+
+    <!-- 生肖头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-amber-900/40 via-slate-900/50 to-amber-900/40 rounded-2xl p-6 border border-amber-500/30">
+            <div class="flex items-center gap-6 mb-4">
+                <div class="zodiac-icon">
+                    🐉
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h1 class="text-3xl font-bold text-white glow-text">龙</h1>
+                        <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                            2025值太岁
+                        </span>
+                    </div>
+                    <p class="text-gray-400">2025 乙巳年 · 生肖龙</p>
+                    <p class="text-gray-500 text-sm mt-1">出生年份：1940、1952、1964、1976、1988、2000、2012、2024</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-rose-500/20 text-rose-300 rounded-full text-sm border border-rose-500/40">
+                    <i class="fas fa-calendar mr-1"></i>本命年
+                </span>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-fire mr-1"></i>事业：85%
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-heart mr-1"></i>感情：78%
+                </span>
+                <span class="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm border border-cyan-500/40">
+                    <i class="fas fa-coins mr-1"></i>财运：72%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 五维运势 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-line text-amber-400"></i>
+                五维运势分析
+            </h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-slate-900/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm">事业学业</span>
+                        <span class="text-amber-400 text-sm">85%</span>
+                    </div>
+                    <div class="luck-bar mb-2" style="width: 85%"></div>
+                    <p class="text-xs text-gray-500">值太岁带来机遇与挑战</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm">感情桃花</span>
+                        <span class="text-amber-400 text-sm">78%</span>
+                    </div>
+                    <div class="luck-bar mb-2" style="width: 78%"></div>
+                    <p class="text-xs text-gray-500">吉星相助姻缘稳定</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm">财富财运</span>
+                        <span class="text-amber-400 text-sm">72%</span>
+                    </div>
+                    <div class="luck-bar mb-2" style="width: 72%"></div>
+                    <p class="text-xs text-gray-500">开源节流谨慎投资</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm">健康安全</span>
+                        <span class="text-amber-400 text-sm">68%</span>
+                    </div>
+                    <div class="luck-bar mb-2" style="width: 68%"></div>
+                    <p class="text-xs text-gray-500">注意作息调节身心</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm">人际关系</span>
+                        <span class="text-amber-400 text-sm">82%</span>
+                    </div>
+                    <div class="luck-bar mb-2" style="width: 82%"></div>
+                    <p class="text-xs text-gray-500">社交活跃贵人运佳</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 月度运势 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-calendar-week text-amber-400"></i>
+                月度运势一览
+            </h2>
+
+            <div class="month-grid">
+                <div class="month-cell good">
+                    <span class="text-amber-400 font-bold">1月</span>
+                    <p class="text-xs text-emerald-400 mt-1">开门大吉</p>
+                </div>
+                <div class="month-cell">
+                    <span class="text-gray-400 font-bold">2月</span>
+                    <p class="text-xs text-gray-500 mt-1">稳步前行</p>
+                </div>
+                <div class="month-cell">
+                    <span class="text-gray-400 font-bold">3月</span>
+                    <p class="text-xs text-gray-500 mt-1">蓄势待发</p>
+                </div>
+                <div class="month-cell good">
+                    <span class="text-amber-400 font-bold">4月</span>
+                    <p class="text-xs text-emerald-400 mt-1">贵人扶持</p>
+                </div>
+                <div class="month-cell warning">
+                    <span class="text-gray-400 font-bold">5月</span>
+                    <p class="text-xs text-rose-400 mt-1">注意调整</p>
+                </div>
+                <div class="month-cell">
+                    <span class="text-gray-400 font-bold">6月</span>
+                    <p class="text-xs text-gray-500 mt-1">柳暗花明</p>
+                </div>
+                <div class="month-cell good">
+                    <span class="text-amber-400 font-bold">7月</span>
+                    <p class="text-xs text-emerald-400 mt-1">事业攀升</p>
+                </div>
+                <div class="month-cell">
+                    <span class="text-gray-400 font-bold">8月</span>
+                    <p class="text-xs text-gray-500 mt-1">财运回升</p>
+                </div>
+                <div class="month-cell warning">
+                    <span class="text-gray-400 font-bold">9月</span>
+                    <p class="text-xs text-rose-400 mt-1">低调行事</p>
+                </div>
+                <div class="month-cell">
+                    <span class="text-gray-400 font-bold">10月</span>
+                    <p class="text-xs text-gray-500 mt-1">渐入佳境</p>
+                </div>
+                <div class="month-cell good">
+                    <span class="text-amber-400 font-bold">11月</span>
+                    <p class="text-xs text-emerald-400 mt-1">收获满满</p>
+                </div>
+                <div class="month-cell">
+                    <span class="text-gray-400 font-bold">12月</span>
+                    <p class="text-xs text-gray-500 mt-1">圆满收官</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 mt-4 text-xs text-gray-500">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded bg-emerald-500/50"></span>
+                    <span>吉月</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded bg-rose-500/50"></span>
+                    <span>注意月</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded bg-gray-500/50"></span>
+                    <span>平稳月</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 生肖特质 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-amber-900/30 to-slate-900/50 rounded-2xl p-6 border border-amber-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-paw text-amber-400"></i>
+                生肖龙特质
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="aspect-card rounded-xl p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2 flex items-center gap-2">
+                        <i class="fas fa-thumbs-up"></i> 优势特质
+                    </h3>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• 天生领导力，气场强大</li>
+                        <li>• 充满活力，积极向上</li>
+                        <li>• 目标远大，志向高远</li>
+                        <li>• 善于把握机遇</li>
+                        <li>• 人格魅力非凡</li>
+                    </ul>
+                </div>
+                <div class="aspect-card rounded-xl p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2 flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> 需要注意
+                    </h3>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• 避免过于自负</li>
+                        <li>• 控制急躁情绪</li>
+                        <li>• 本命年行事低调</li>
+                        <li>• 注意健康管理</li>
+                        <li>• 理财需谨慎</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/50 rounded-xl p-4">
+                <h3 class="text-amber-400 font-semibold mb-2">开运建议</h3>
+                <p class="text-sm text-gray-300 leading-relaxed">
+                    本命年建议佩戴红色内衣或配饰化解太岁，可摆放龙形摆件增强运势。多做公益慈善，积累福报。保持低调谦和的态度，将迎来转折性的进步。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-amber-900/30 to-slate-900/60 rounded-2xl p-6 border border-amber-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">2025年全年运势深度分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    2025年是属龙人的本命年值太岁之年。从运势角度来看，这是充满挑战与机遇的一年。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">事业方面：</span>上半年较为平顺，有贵人相助推动事业发展。下半年需注意人际关系的处理，避免锋芒太露。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">感情方面：</span>单身者有不错的桃花运，但本命年不宜急于确定重大感情决定。已婚者需多沟通，避免误会。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">财富方面：</span>正财稳定，偏财需谨慎。投资理财以保守为主，避免高风险投资。
+                    <br><br>
+                    <span class="text-emerald-400 font-medium">开运提示：</span>穿红、戴龙形饰品、年初祈福可化解本命年不利影响。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

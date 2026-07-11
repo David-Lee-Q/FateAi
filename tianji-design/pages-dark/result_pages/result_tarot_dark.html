@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔罗牌解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-tarot-purple: #8b5cf6;
+            --color-tarot-gold: #fbbf24;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .tarot-card {
+            background: linear-gradient(145deg, #1a2235, #0f1525);
+            border: 2px solid var(--color-tarot-purple);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        .tarot-symbol {
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        .card-spread {
+            position: relative;
+        }
+        .card-spread .card:nth-child(1) { transform: rotate(-5deg); z-index: 3; }
+        .card-spread .card:nth-child(2) { transform: rotate(3deg) translateY(-10px); z-index: 2; }
+        .card-spread .card:nth-child(3) { transform: rotate(-2deg) translateY(-5px); z-index: 1; }
+        .card-spread .card { 
+            transition: all 0.3s ease;
+        }
+        .card-spread .card:hover {
+            transform: translateY(-15px) scale(1.05);
+            z-index: 10;
+        }
+        .spread-diagram {
+            position: relative;
+        }
+        .spread-pos {
+            position: absolute;
+            width: 70px;
+            height: 100px;
+            border: 2px dashed var(--color-tarot-purple);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--color-tarot-purple);
+        }
+        .interpretation-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(251, 191, 36, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 20px var(--color-tarot-purple);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">塔罗牌</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-purple-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 塔罗牌头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-purple-900/40 via-purple-800/20 to-amber-900/40 rounded-2xl p-6 border border-purple-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-magic text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white glow-text">塔罗牌解读</h1>
+                    <p class="text-purple-300">维特塔罗 · 经典牌阵</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/40">
+                    <i class="fas fa-dice mr-1"></i>三牌阵
+                </span>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-history mr-1"></i>2025年1月15日
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-check-circle mr-1"></i>解读完成
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 牌阵展示区 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-8 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-cards text-purple-400"></i>
+                牌阵布局
+            </h2>
+            
+            <!-- 三牌阵可视化 -->
+            <div class="card-spread flex justify-center gap-6 mb-8 py-8">
+                <!-- 过去 -->
+                <div class="tarot-card w-32 h-48 rounded-xl p-3 flex flex-col">
+                    <div class="text-center mb-2">
+                        <i class="fas fa-hourglass-start text-purple-400 text-2xl"></i>
+                        <p class="text-xs text-gray-400 mt-1">过去</p>
+                    </div>
+                    <div class="flex-1 bg-gradient-to-b from-amber-800/30 to-amber-900/30 rounded-lg flex items-center justify-center p-2">
+                        <div class="text-center">
+                            <p class="text-amber-400 font-bold text-sm">The Fool</p>
+                            <p class="text-amber-300 text-xs">愚人</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-center">
+                        <span class="text-xs text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded">正位</span>
+                    </div>
+                </div>
+                
+                <!-- 现在 -->
+                <div class="tarot-card w-32 h-48 rounded-xl p-3 flex flex-col ring-2 ring-purple-500">
+                    <div class="text-center mb-2">
+                        <i class="fas fa-hourglass-half text-amber-400 text-2xl"></i>
+                        <p class="text-gray-400 mt-1">现在</p>
+                    </div>
+                    <div class="flex-1 bg-gradient-to-b from-purple-800/30 to-purple-900/30 rounded-lg flex items-center justify-center p-2">
+                        <div class="text-center">
+                            <p class="text-purple-400 font-bold text-sm">The Lovers</p>
+                            <p class="text-purple-300 text-xs">恋人</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-center">
+                        <span class="text-xs text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded">逆位</span>
+                    </div>
+                </div>
+                
+                <!-- 未来 -->
+                <div class="tarot-card w-32 h-48 rounded-xl p-3 flex flex-col">
+                    <div class="text-center mb-2">
+                        <i class="fas fa-hourglass-end text-cyan-400 text-2xl"></i>
+                        <p class="text-gray-400 mt-1">未来</p>
+                    </div>
+                    <div class="flex-1 bg-gradient-to-b from-cyan-800/30 to-cyan-900/30 rounded-lg flex items-center justify-center p-2">
+                        <div class="text-center">
+                            <p class="text-cyan-400 font-bold text-sm">The Star</p>
+                            <p class="text-cyan-300 text-xs">星星</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-center">
+                        <span class="text-xs text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded">正位</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 牌义解读 -->
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="interpretation-card rounded-xl p-4">
+                    <h3 class="text-purple-400 font-medium mb-2 flex items-center gap-2">
+                        <i class="fas fa-history"></i> 过去 · 愚人
+                    </h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        你正处于一个全新的起点，充满了冒险精神和无限可能。过去的你勇于追随内心的声音，不惧未知。
+                    </p>
+                </div>
+                <div class="interpretation-card rounded-xl p-4">
+                    <h3 class="text-amber-400 font-medium mb-2 flex items-center gap-2">
+                        <i class="fas fa-clock"></i> 现在 · 恋人(逆位)
+                    </h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        目前你面临重要的抉择，内心存在矛盾与挣扎。人际关系可能出现紧张或需要重新审视的阶段。
+                    </p>
+                </div>
+                <div class="interpretation-card rounded-xl p-4">
+                    <h3 class="text-cyan-400 font-medium mb-2 flex items-center gap-2">
+                        <i class="fas fa-rocket"></i> 未来 · 星星
+                    </h3>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        前方充满希望与疗愈。经历当前的困境后，你将迎来内心的平静与灵感的指引，找到人生的方向。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 综合指引 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-purple-900/30 to-slate-900/50 rounded-2xl p-6 border border-purple-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-lightbulb text-amber-400"></i>
+                综合指引
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-heart text-purple-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-300">感情方面需要冷静思考，逆位恋人提醒你避免冲动决定，给彼此空间。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-briefcase text-amber-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-300">事业上将有新机遇，星星的能量指引你保持创意与希望。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-spa text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-300">健康注意调节身心，适当的休息与放松有助于恢复能量。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-gem text-cyan-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-300">幸运色：紫色与金色；幸运方位：东方；幸运数字：7</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-purple-900/30 to-slate-900/60 rounded-2xl p-6 border border-purple-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于牌面符号与位置的个性化分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    这三张牌形成了一个完整的人生叙事：从愚人的天真冒险，到恋人的抉择考验，再到星星的希望疗愈。
+                    <br><br>
+                    <span class="text-purple-400 font-medium">关键启示：</span>你在感情或关系的十字路口。逆位恋人并非全然负面，它在提醒你审视这段关系是否真正符合内心所需。愚人的正位给了你勇气——你完全有能力做出改变。星星的出现是极大的吉兆，预示着经历了当前的考验后，等待你的是希望与和谐。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">行动建议：</span>给自己一周的时间冷静思考，与伴侣或相关人士坦诚沟通。无论结果如何，请相信内在的智慧会引导你走向正确的道路。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-purple-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

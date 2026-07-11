@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八字命盘分析 — 天机</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style>
+:root {
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-bg: #f8fafc;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #f1f5f9;
+  --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+  --color-gold: #b8960f;
+  --color-gold-light: #d4a824;
+  --color-gold-dark: #9a7b0a;
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+.nav-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.nav-link { color: var(--color-text-secondary); font-size: 0.875rem; transition: color 150ms ease; }
+.nav-link:hover { color: var(--color-primary); }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-pulse { animation: pulse 3s ease-in-out infinite; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+[data-icon] { display: inline-flex; align-items: center; justify-content: center; background-color: currentColor; }
+@layer base { body { background: var(--color-bg); color: var(--color-text); } }
+</style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body);">
+    <!-- 背景装饰层 -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      <!-- 渐变光晕 -->
+      <svg class="absolute top-0 left-1/4 w-[600px] h-[600px] opacity-30" viewBox="0 0 600 600">
+        <defs>
+          <radialGradient id="glowLight" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#004baa" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+        </defs>
+        <circle cx="300" cy="300" r="300" fill="url(#glowLight)"/>
+      </svg>
+      <!-- 八卦图案 -->
+      <svg class="absolute bottom-20 right-[5%] w-48 h-48 opacity-5" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" stroke="var(--color-gold)" stroke-width="2" fill="none"/>
+        <path d="M100 5 L100 195 M5 100 L195 100" stroke="var(--color-gold)" stroke-width="1"/>
+        <path d="M29.3 29.3 L170.7 170.7 M170.7 29.3 L29.3 170.7" stroke="var(--color-gold)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <main class="relative z-10">
+      <!-- 导航栏 -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+          <a href="#" class="flex items-center gap-3">
+            <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+          </a>
+          <nav class="hidden md:flex items-center gap-8">
+            <a href="#" class="nav-link">首页</a>
+            <a href="#" class="nav-link">东方命理</a>
+            <a href="#" class="nav-link">西方占卜</a>
+            <a href="#" class="nav-link">民俗趣味</a>
+            <a href="#" class="nav-link">AI 洞察</a>
+            <a href="#" class="nav-link">个人中心</a>
+          </nav>
+          <div class="flex items-center gap-4">
+            <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" style="border:none;cursor:pointer;color:var(--color-text-secondary);"><i data-lucide="search" style="width:20px;height:20px;"></i></button>
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold));"><i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 页面主体 -->
+      <div class="mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-32" style="max-width: var(--max-width);">
+
+        <!-- 返回导航 -->
+        <div class="flex items-center gap-3 mb-6">
+          <button class="inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors" style="color: var(--color-primary); background: var(--color-primary-bg);">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>返回
+          </button>
+          <div class="flex items-center gap-2 text-sm" style="color: var(--color-text-tertiary);">
+            <span>东方命理</span><i data-lucide="chevron-right" class="w-3 h-3"></i>
+            <span>八字排盘</span><i data-lucide="chevron-right" class="w-3 h-3"></i>
+            <span style="color: var(--color-text-secondary);">分析结果</span>
+          </div>
+        </div>
+
+        <!-- 八字专属头部：命盘时间线 -->
+        <section class="mb-8 p-6 rounded-xl relative overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border: 1px solid var(--color-border);">
+          <div class="absolute top-0 right-0 w-32 h-32 opacity-10">
+            <svg viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" stroke="var(--color-gold)" stroke-width="2" fill="none"/><circle cx="64" cy="64" r="45" stroke="var(--color-gold)" stroke-width="1" fill="none"/><circle cx="64" cy="64" r="30" stroke="var(--color-gold)" stroke-width="0.5" fill="none"/></svg>
+          </div>
+          <div class="flex items-start justify-between flex-wrap gap-4">
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold" style="background: var(--color-primary); color: #fff;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>
+                八字排盘
+              </span>
+              <h1 class="mt-4 text-2xl md:text-3xl font-bold" style="color: var(--color-text);">壬寅年 丙午月 壬午日 庚子时</h1>
+              <p class="mt-2 text-sm" style="color: var(--color-text-secondary);">公历 2026年7月10日 14:30 | 农历 六月十五 午时</p>
+            </div>
+            <!-- 八字简盘预览 -->
+            <div class="flex flex-col items-center p-3 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border);">
+              <div class="grid grid-cols-4 gap-1 text-center">
+                <div class="p-2"><div class="text-lg font-bold" style="color: var(--color-gold);">甲</div><div class="text-xs" style="color: var(--color-text-tertiary);">年</div></div>
+                <div class="p-2"><div class="text-lg font-bold" style="color: var(--color-gold);">丙</div><div class="text-xs" style="color: var(--color-text-tertiary);">月</div></div>
+                <div class="p-2" style="background: rgba(184,150,15,0.1); border: 1px solid var(--color-gold); border-radius: 6px;"><div class="text-lg font-bold" style="color: var(--color-gold);">壬</div><div class="text-xs" style="color: var(--color-gold);">日</div></div>
+                <div class="p-2"><div class="text-lg font-bold" style="color: var(--color-gold);">庚</div><div class="text-xs" style="color: var(--color-text-tertiary);">时</div></div>
+              </div>
+              <div class="mt-2 text-xs" style="color: var(--color-text-tertiary);">日主壬水 得令</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 综合评分卡 -->
+        <section class="mb-8 p-6 rounded-xl shadow-sm" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+          <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <!-- 环形评分 -->
+            <div class="shrink-0 relative">
+              <svg class="w-28 h-28" style="transform: rotate(-90deg);">
+                <circle cx="56" cy="56" r="48" fill="none" stroke="var(--color-border)" stroke-width="6"/>
+                <circle cx="56" cy="56" r="48" fill="none" stroke="var(--color-gold)" stroke-width="6" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="45" style="filter: drop-shadow(0 0 6px rgba(184,150,15,0.3));"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="display-font text-3xl font-bold" style="color: var(--color-gold);">85</span>
+                <span class="text-[10px]" style="color: var(--color-text-tertiary);">命格评分</span>
+              </div>
+            </div>
+            <!-- 评分说明 -->
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-3">
+                <h2 class="text-lg font-bold" style="color: var(--color-text);">水火既济 · 中上命格</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-medium" style="background: rgba(16,185,129,0.1); color: #059669;">优+</span>
+              </div>
+              <p class="text-sm leading-relaxed mb-4" style="color: var(--color-text-secondary);">
+                壬水日主生于午月，火势旺盛而水火相济。命局中木火土金水五行俱全，日主得令有力，整体格局较为平衡。甲木偏印透出，智慧聪颖；庚金正财在时柱，中晚年财运渐佳。
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);">水火既济</span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);">身旺财旺</span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);">贵人扶助</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 四柱详情 - 八字专属布局 -->
+        <section class="mb-8 p-6 md:p-8 rounded-xl shadow-sm" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+          <h2 class="text-lg font-bold flex items-center gap-2 mb-6" style="color: var(--color-text);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            四柱详细分析
+          </h2>
+          <div class="grid md:grid-cols-4 gap-4">
+            <!-- 年柱 -->
+            <div class="text-center p-4 rounded-lg" style="background: linear-gradient(180deg, rgba(184,150,15,0.08) 0%, transparent 100%); border: 1px solid rgba(184,150,15,0.15);">
+              <div class="text-xs mb-2" style="color: var(--color-text-tertiary);">年柱 · 祖上</div>
+              <div class="flex justify-center gap-4 mb-2">
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">甲</div>
+                  <div class="text-[10px]" style="color: var(--color-text-tertiary);">天干 · 阳木</div>
+                </div>
+                <div class="w-px" style="background: var(--color-border);"></div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">子</div>
+                  <div class="text-[10px]" style="color: var(--color-text-tertiary);">地支 · 阳水</div>
+                </div>
+              </div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">纳音金 · 鼠</div>
+            </div>
+            <!-- 月柱 -->
+            <div class="text-center p-4 rounded-lg" style="background: linear-gradient(180deg, rgba(184,150,15,0.08) 0%, transparent 100%); border: 1px solid rgba(184,150,15,0.15);">
+              <div class="text-xs mb-2" style="color: var(--color-text-tertiary);">月柱 · 父母</div>
+              <div class="flex justify-center gap-4 mb-2">
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">丙</div>
+                  <div class="text-[10px]" style="color: var(--color-text-tertiary);">天干 · 阳火</div>
+                </div>
+                <div class="w-px" style="background: var(--color-border);"></div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">寅</div>
+                  <div class="text-[10px]" style="color: var(--color-text-tertiary);">地支 · 阳木</div>
+                </div>
+              </div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">纳音火 · 虎</div>
+            </div>
+            <!-- 日柱 - 强调 -->
+            <div class="text-center p-4 rounded-lg relative" style="background: linear-gradient(180deg, rgba(184,150,15,0.12) 0%, rgba(184,150,15,0.04) 100%); border: 2px solid var(--color-gold);">
+              <div class="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[10px]" style="background: var(--color-gold); color: #fff;">日主</div>
+              <div class="text-xs mb-2 mt-1" style="color: var(--color-gold);">日柱 · 自身</div>
+              <div class="flex justify-center gap-4 mb-2">
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">壬</div>
+                  <div class="text-[10px]" style="color: var(--color-gold);">天干 · 阳水</div>
+                </div>
+                <div class="w-px" style="background: var(--color-gold);"></div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">午</div>
+                  <div class="text-[10px]" style="color: var(--color-gold);">地支 · 阳火</div>
+                </div>
+              </div>
+              <div class="text-xs" style="color: var(--color-gold);">纳音木 · 马</div>
+            </div>
+            <!-- 时柱 -->
+            <div class="text-center p-4 rounded-lg" style="background: linear-gradient(180deg, rgba(184,150,15,0.08) 0%, transparent 100%); border: 1px solid rgba(184,150,15,0.15);">
+              <div class="text-xs mb-2" style="color: var(--color-text-tertiary);">时柱 · 子女</div>
+              <div class="flex justify-center gap-4 mb-2">
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">庚</div>
+                  <div class="text-[10px]" style="color: var(--color-text-tertiary);">天干 · 阳金</div>
+                </div>
+                <div class="w-px" style="background: var(--color-border);"></div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold" style="color: var(--color-gold);">子</div>
+                  <div class="text-[10px]" style="color: var(--color-text-tertiary);">地支 · 阳水</div>
+                </div>
+              </div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">纳音金 · 鼠</div>
+            </div>
+          </div>
+          <!-- 藏干信息 -->
+          <div class="mt-6 p-4 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border);">
+            <h3 class="text-sm font-medium mb-3" style="color: var(--color-text-secondary);">地支藏干</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="flex items-center gap-2"><span class="text-sm" style="color: var(--color-gold);">子</span><span class="text-xs" style="color: var(--color-text-tertiary);">藏癸</span></div>
+              <div class="flex items-center gap-2"><span class="text-sm" style="color: var(--color-gold);">寅</span><span class="text-xs" style="color: var(--color-text-tertiary);">藏甲丙戊</span></div>
+              <div class="flex items-center gap-2"><span class="text-sm" style="color: var(--color-gold);">午</span><span class="text-xs" style="color: var(--color-text-tertiary);">藏丁己</span></div>
+              <div class="flex items-center gap-2"><span class="text-sm" style="color: var(--color-gold);">子</span><span class="text-xs" style="color: var(--color-text-tertiary);">藏癸</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 五行分析 -->
+        <section class="mb-8 p-6 md:p-8 rounded-xl shadow-sm" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+          <h2 class="text-lg font-bold flex items-center gap-2 mb-6" style="color: var(--color-text);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            五行力量分布
+          </h2>
+          <div class="grid md:grid-cols-5 gap-4">
+            <div class="text-center p-3 rounded-lg" style="background: rgba(184,150,15,0.08);">
+              <div class="text-2xl mb-1" style="color: var(--color-gold-dark);">金</div>
+              <div class="h-2 rounded-full mb-2" style="background: var(--color-border);"><div class="h-full rounded-full" style="width: 75%; background: linear-gradient(90deg, var(--color-gold), var(--color-gold-dark));"></div></div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">强 75%</div>
+            </div>
+            <div class="text-center p-3 rounded-lg" style="background: rgba(34,139,34,0.08);">
+              <div class="text-2xl mb-1" style="color: #228b22;">木</div>
+              <div class="h-2 rounded-full mb-2" style="background: var(--color-border);"><div class="h-full rounded-full" style="width: 55%; background: linear-gradient(90deg, #32cd32, #228b22);"></div></div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">中 55%</div>
+            </div>
+            <div class="text-center p-3 rounded-lg" style="background: var(--color-primary-bg); border: 1px solid var(--color-primary-lighter);">
+              <div class="text-2xl mb-1" style="color: var(--color-primary);">水</div>
+              <div class="h-2 rounded-full mb-2" style="background: var(--color-border);"><div class="h-full rounded-full" style="width: 85%; background: linear-gradient(90deg, var(--color-primary-lighter), var(--color-primary));"></div></div>
+              <div class="text-xs" style="color: var(--color-primary); font-weight: 600;">旺 85%</div>
+            </div>
+            <div class="text-center p-3 rounded-lg" style="background: rgba(220,20,60,0.06);">
+              <div class="text-2xl mb-1" style="color: #dc143c;">火</div>
+              <div class="h-2 rounded-full mb-2" style="background: var(--color-border);"><div class="h-full rounded-full" style="width: 25%; background: linear-gradient(90deg, #ff6b6b, #dc143c);"></div></div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">弱 25%</div>
+            </div>
+            <div class="text-center p-3 rounded-lg" style="background: rgba(139,90,43,0.06);">
+              <div class="text-2xl mb-1" style="color: #8b5a2b;">土</div>
+              <div class="h-2 rounded-full mb-2" style="background: var(--color-border);"><div class="h-full rounded-full" style="width: 20%; background: linear-gradient(90deg, #cd853f, #8b5a2b);"></div></div>
+              <div class="text-xs" style="color: var(--color-text-secondary);">弱 20%</div>
+            </div>
+          </div>
+          <div class="mt-4 p-3 rounded-lg text-sm" style="background: var(--color-bg-inset); color: var(--color-text-secondary);">
+            <span style="color: var(--color-primary);">命理分析：</span>日主壬水得令，水势旺盛。午月火旺，水火相济成格。命局中金水为喜用，木火土为忌神。宜补水金，忌火土。
+          </div>
+        </section>
+
+        <!-- 详细分析Tab -->
+        <section class="mb-8 p-6 md:p-8 rounded-xl shadow-sm" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+          <h2 class="text-lg font-bold flex items-center gap-2 mb-4" style="color: var(--color-text);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            详细分析报告
+          </h2>
+          <div class="flex flex-wrap gap-2 mb-6 border-b pb-4" style="border-color: var(--color-border-light);">
+            <button class="px-4 py-2 rounded-lg text-sm font-medium" style="background: var(--color-primary); color: #fff;">性格特征</button>
+            <button class="px-4 py-2 rounded-lg text-sm" style="color: var(--color-text-tertiary);">事业财运</button>
+            <button class="px-4 py-2 rounded-lg text-sm" style="color: var(--color-text-tertiary);">感情婚姻</button>
+            <button class="px-4 py-2 rounded-lg text-sm" style="color: var(--color-text-tertiary);">健康养生</button>
+            <button class="px-4 py-2 rounded-lg text-sm" style="color: var(--color-text-tertiary);">大运流年</button>
+          </div>
+          <div class="space-y-4">
+            <p class="text-sm leading-relaxed" style="color: var(--color-text);">
+              壬水日主之人，性格沉稳内敛，思维敏捷如流水般灵动。您天生具有极强的洞察力和分析能力，善于在复杂局势中找到关键脉络。水火既济的格局赋予您独特的平衡感，既有柔性的包容力，又有果断的决断力。
+            </p>
+            <p class="text-sm leading-relaxed" style="color: var(--color-text);">
+              甲木偏印透出，说明您富有创造力和独立思考的能力，不轻易随波逐流。庚金正财在时柱，暗示您在中晚年时期财运渐入佳境，善于理财规划。命带驿马，适合外出发展或出差频繁的工作。
+            </p>
+          </div>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15 8.5L22 9.5L17 14.5L18 22L12 18.5L6 22L7 14.5L2 9.5L9 8.5L12 2Z"/></svg>智慧</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>果断</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>适应力强</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--color-primary-bg); color: var(--color-primary);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>领导力</span>
+          </div>
+        </section>
+
+        <!-- AI深度解读 -->
+        <section class="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden shadow-md" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);">
+          <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full" style="background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);"></div>
+            <svg class="absolute -top-5 -right-5 w-32 h-32 opacity-10" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35" stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none"/><circle cx="40" cy="40" r="25" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" fill="none"/></svg>
+          </div>
+          <div class="relative">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(255,255,255,0.15);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
+              <h2 class="text-lg font-bold" style="color: #fff;">AI 深度解读</h2>
+              <span class="ml-auto text-[10px] px-2 py-0.5 rounded" style="background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);">Powered by AI</span>
+            </div>
+            <div class="h-px mb-6" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);"></div>
+            <div class="space-y-4 mb-6">
+              <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.95);">
+                根据您的八字命盘分析，壬水日主生于午月，火势旺盛。您的命格显示出<strong style="color: #fff;">水火既济</strong>的特殊格局，这意味着您在事业和人际关系中拥有独特的平衡能力。
+              </p>
+              <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.85);">
+                今年甲辰年，偏印坐库，利于学习深造和技能提升。事业方面，甲辰年与您的日柱形成天克地冲之象，虽看似动荡，实则暗藏转机。建议在上半年保守行事，下半年可把握机遇。
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex-1 flex items-center px-4 py-3 rounded-lg" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);">
+                <input type="text" placeholder="继续追问命理..." class="bg-transparent outline-none text-sm flex-1" style="color: #fff; font-family: var(--font-body);">
+              </div>
+              <button class="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--color-gold); color: var(--color-primary-dark);"><i data-lucide="send" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- 固定底部操作栏 -->
+      <div class="fixed bottom-0 left-0 right-0 z-40" style="background: var(--color-bg-elevated); border-top: 1px solid var(--color-border);">
+        <div class="mx-auto flex items-center justify-center gap-4 md:gap-8 px-6 py-3" style="max-width: var(--max-width);">
+          <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors" style="color: var(--color-text-secondary);"><i data-lucide="heart" class="w-5 h-5"></i><span class="text-xs">收藏</span></button>
+          <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors" style="color: var(--color-text-secondary);"><i data-lucide="share-2" class="w-5 h-5"></i><span class="text-xs">分享</span></button>
+          <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors" style="color: var(--color-text-secondary);"><i data-lucide="file-text" class="w-5 h-5"></i><span class="text-xs">报告</span></button>
+          <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors" style="color: var(--color-text-secondary);"><i data-lucide="refresh-cw" class="w-5 h-5"></i><span class="text-xs">重测</span></button>
+        </div>
+      </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

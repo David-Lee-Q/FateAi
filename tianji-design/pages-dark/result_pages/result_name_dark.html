@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姓名测算解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-name: #0ea5e9;
+            --color-wuxing: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .name-display {
+            position: relative;
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 0.5rem;
+        }
+        .char-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 12px;
+            margin: 0 0.25rem;
+        }
+        .char-stroke {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-name), var(--color-wuxing));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+        .wuxing-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+        .wuxing-card {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        .score-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        .score-ring svg {
+            transform: rotate(-90deg);
+        }
+        .score-ring circle {
+            fill: none;
+            stroke-width: 8;
+        }
+        .score-bg {
+            stroke: rgba(14, 165, 233, 0.2);
+        }
+        .score-fill {
+            stroke: url(#scoreGradient);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+        .glow-text {
+            text-shadow: 0 0 20px var(--color-name);
+        }
+        .radical-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+        }
+        .radical-item {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">姓名测算</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-sky-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 姓名测算头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-sky-900/40 via-slate-900/50 to-emerald-900/40 rounded-2xl p-6 border border-sky-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-user-pen text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white glow-text">姓名测算</h1>
+                    <p class="text-sky-300">三才五格 · 五行配置</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-sky-500/20 text-sky-300 rounded-full text-sm border border-sky-500/40">
+                    <i class="fas fa-pen mr-1"></i>姓名：李明轩
+                </span>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-calendar mr-1"></i>天格：火（15）
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-check-circle mr-1"></i>吉凶：吉
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 姓名展示 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-font text-sky-400"></i>
+                姓名解析
+            </h2>
+
+            <div class="flex flex-col items-center mb-6">
+                <p class="text-gray-400 text-sm mb-4">姓氏 + 名字</p>
+                <div class="name-display">
+                    <!-- 李 -->
+                    <div class="char-box">
+                        <span class="text-white">李</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="char-stroke">7</div>
+                            <span class="wuxing-badge bg-red-500/20 text-red-400">火</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">木</p>
+                    </div>
+                    <!-- 明 -->
+                    <div class="char-box">
+                        <span class="text-white">明</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="char-stroke">8</div>
+                            <span class="wuxing-badge bg-yellow-500/20 text-yellow-400">土</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">日</p>
+                    </div>
+                    <!-- 轩 -->
+                    <div class="char-box">
+                        <span class="text-white">轩</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="char-stroke">10</div>
+                            <span class="wuxing-badge bg-gray-500/20 text-gray-400">土</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">车</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 五格数据表 -->
+            <div class="bg-slate-900/50 rounded-xl p-4 overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-slate-700">
+                            <th class="py-2 px-3 text-left">格</th>
+                            <th class="py-2 px-3 text-left">数理</th>
+                            <th class="py-2 px-3 text-left">五行</th>
+                            <th class="py-2 px-3 text-left">卦义</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        <tr class="border-b border-slate-800">
+                            <td class="py-2 px-3">天格</td>
+                            <td class="py-2 px-3 text-sky-400 font-medium">7</td>
+                            <td class="py-2 px-3"><span class="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-xs">金</span></td>
+                            <td class="py-2 px-3">刚毅果断</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-2 px-3">人格</td>
+                            <td class="py-2 px-3 text-sky-400 font-medium">15</td>
+                            <td class="py-2 px-3"><span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs">土</span></td>
+                            <td class="py-2 px-3">福寿双全</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-2 px-3">地格</td>
+                            <td class="py-2 px-3 text-sky-400 font-medium">18</td>
+                            <td class="py-2 px-3"><span class="px-2 py-0.5 bg-gray-500/20 text-gray-400 rounded text-xs">金</span></td>
+                            <td class="py-2 px-3">有志竟成</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-2 px-3">外格</td>
+                            <td class="py-2 px-3 text-sky-400 font-medium">12</td>
+                            <td class="py-2 px-3"><span class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs">木</span></td>
+                            <td class="py-2 px-3">意志薄弱</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-3">总格</td>
+                            <td class="py-2 px-3 text-sky-400 font-medium">25</td>
+                            <td class="py-2 px-3"><span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs">土</span></td>
+                            <td class="py-2 px-3">英杰才人</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 三才配置 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-triangle text-sky-400"></i>
+                三才配置
+            </h2>
+
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <!-- 天格 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center mb-2">
+                        <span class="text-white font-bold text-lg">金</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">天格</p>
+                    <p class="text-white text-sm">7数</p>
+                </div>
+
+                <!-- 人格 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center mb-2">
+                        <span class="text-white font-bold text-lg">土</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">人格</p>
+                    <p class="text-white text-sm">15数</p>
+                </div>
+
+                <!-- 地格 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-500 to-slate-600 flex items-center justify-center mb-2">
+                        <span class="text-white font-bold text-lg">金</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">地格</p>
+                    <p class="text-white text-sm">18数</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="px-4 py-2 bg-sky-500/20 border border-sky-500/40 rounded-lg">
+                    <span class="text-sky-400 font-semibold">土金金</span>
+                </div>
+                <i class="fas fa-arrow-right text-gray-500"></i>
+                <div class="px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-lg">
+                    <span class="text-emerald-400 font-semibold">相生</span>
+                </div>
+            </div>
+
+            <div class="wuxing-card rounded-xl p-5">
+                <h3 class="text-sky-400 font-semibold mb-3">三才寓意</h3>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    土金金配置，土生金，寓意得上天庇佑，贵人扶持。土主信，金主义，此配置之人重信守诺，有义气，朋友缘佳。土生金旺相，有财运，能得意外之财或他人相助而成事。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 五行分析 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-yin-yang text-emerald-400"></i>
+                五行配置分析
+            </h2>
+
+            <div class="grid md:grid-cols-5 gap-4 mb-6">
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-2">
+                        <span class="text-2xl">木</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">木</p>
+                    <p class="text-white font-medium">1</p>
+                    <div class="mt-2 w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-red-500 rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-2">
+                        <span class="text-2xl">火</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">火</p>
+                    <p class="text-white font-medium">1</p>
+                    <div class="mt-2 w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-red-500 rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center border-2 border-sky-500">
+                    <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-2">
+                        <span class="text-2xl">土</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">土</p>
+                    <p class="text-sky-400 font-bold">2</p>
+                    <div class="mt-2 w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-yellow-500 rounded-full" style="width: 40%"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-gray-500/20 flex items-center justify-center mx-auto mb-2">
+                        <span class="text-2xl">金</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">金</p>
+                    <p class="text-white font-medium">2</p>
+                    <div class="mt-2 w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gray-500 rounded-full" style="width: 40%"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-2">
+                        <span class="text-2xl">水</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">水</p>
+                    <p class="text-white font-medium">0</p>
+                    <div class="mt-2 w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-green-500 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wuxing-card rounded-xl p-5">
+                <h3 class="text-sky-400 font-semibold mb-3">五行解读</h3>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    姓名「李明轩」五行配置为「木火土金」，缺「水」。土金旺盛，木火辅助，整体五行较为平衡。土主信、金主义、木仁、火礼，此名主人品端正，重情重义。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 综合评分 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-sky-900/30 to-slate-900/50 rounded-2xl p-6 border border-sky-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-star text-amber-400"></i>
+                综合评分
+            </h2>
+
+            <div class="grid md:grid-cols-4 gap-4">
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="score-ring mx-auto mb-2">
+                        <svg width="120" height="120">
+                            <defs>
+                                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#0ea5e9"/>
+                                    <stop offset="100%" style="stop-color:#10b981"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="score-bg" cx="60" cy="60" r="50"/>
+                            <circle class="score-fill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="47"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-white">85</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs">综合评分</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-heart text-emerald-400 text-xl"></i>
+                    </div>
+                    <p class="text-white font-medium mb-1">感情姻缘</p>
+                    <p class="text-emerald-400 text-lg font-bold">88分</p>
+                    <p class="text-gray-500 text-xs">姻缘美满</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-sky-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-briefcase text-sky-400 text-xl"></i>
+                    </div>
+                    <p class="text-white font-medium mb-1">事业发展</p>
+                    <p class="text-sky-400 text-lg font-bold">82分</p>
+                    <p class="text-gray-500 text-xs">贵人相助</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-coins text-amber-400 text-xl"></i>
+                    </div>
+                    <p class="text-white font-medium mb-1">财运指数</p>
+                    <p class="text-amber-400 text-lg font-bold">80分</p>
+                    <p class="text-gray-500 text-xs">财运平稳</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-sky-900/30 to-slate-900/60 rounded-2xl p-6 border border-sky-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于姓名学的个性化分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    「李明轩」是一个上佳的姓名配置，从三才五格到五行配置都呈现出吉祥的格局。
+                    <br><br>
+                    <span class="text-sky-400 font-medium">姓名寓意：</span>「明」者，日月并照，光明磊落；「轩」者，气宇轩昂，有车有势。此名主人品光明，志向高远，有领导之才。
+                    <br><br>
+                    <span class="text-sky-400 font-medium">三才分析：</span>土金金配置，得土之信义，又有金之果断。人格15数为「福寿双全」之数，预示一生福泽深厚，平安顺遂。地格18数为「有志竟成」之数，暗示青年时期虽有小挫折，但终能成就大事。
+                    <br><br>
+                    <span class="text-emerald-400 font-medium">使用建议：</span>此名五行土金旺盛，对喜用土金的命理特别有利。若命理缺木或水，使用此名需谨慎。建议在生活中适当接触水元素（蓝色、黑色物品）或木元素（绿植、书籍）以平衡五行。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-sky-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

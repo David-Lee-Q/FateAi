@@ -1,0 +1,1539 @@
+{
+  "data": [
+    {
+      "id": "page-home",
+      "title": "首页（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/home_dark.html"
+      }
+    },
+    {
+      "id": "page-home-light",
+      "title": "首页（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/home_light.html"
+      }
+    },
+    {
+      "id": "page-eastern",
+      "title": "东方命理（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 150,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/eastern_dark.html"
+      }
+    },
+    {
+      "id": "page-eastern-light",
+      "title": "东方命理（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 150,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/eastern_light.html"
+      }
+    },
+    {
+      "id": "page-bazi",
+      "title": "八字排盘（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 300,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/bazi_dark.html"
+      }
+    },
+    {
+      "id": "page-bazi-light",
+      "title": "八字排盘（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 300,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/bazi_light.html"
+      }
+    },
+    {
+      "id": "page-result-bazi",
+      "title": "八字结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 450,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_bazi_dark.html"
+      }
+    },
+    {
+      "id": "page-result-bazi-light",
+      "title": "八字结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 450,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_bazi_light.html"
+      }
+    },
+    {
+      "id": "page-ziwei",
+      "title": "紫微斗数（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 600,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/ziwei_dark.html"
+      }
+    },
+    {
+      "id": "page-ziwei-light",
+      "title": "紫微斗数（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 600,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/ziwei_light.html"
+      }
+    },
+    {
+      "id": "page-result-ziwei",
+      "title": "紫微结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 750,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_ziwei_dark.html"
+      }
+    },
+    {
+      "id": "page-result-ziwei-light",
+      "title": "紫微结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 750,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_ziwei_light.html"
+      }
+    },
+    {
+      "id": "page-liuyao",
+      "title": "六爻卦象（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 900,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/liuyao_dark.html"
+      }
+    },
+    {
+      "id": "page-liuyao-light",
+      "title": "六爻卦象（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 900,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/liuyao_light.html"
+      }
+    },
+    {
+      "id": "page-result-liuyao",
+      "title": "六爻结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1050,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_liuyao_dark.html"
+      }
+    },
+    {
+      "id": "page-result-liuyao-light",
+      "title": "六爻结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1050,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_liuyao_light.html"
+      }
+    },
+    {
+      "id": "page-qimen",
+      "title": "奇门遁甲（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1200,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/qimen_dark.html"
+      }
+    },
+    {
+      "id": "page-qimen-light",
+      "title": "奇门遁甲（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1200,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/qimen_light.html"
+      }
+    },
+    {
+      "id": "page-result-qimen",
+      "title": "奇门结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1350,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_qimen_dark.html"
+      }
+    },
+    {
+      "id": "page-result-qimen-light",
+      "title": "奇门结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1350,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_qimen_light.html"
+      }
+    },
+    {
+      "id": "page-meihua",
+      "title": "梅花易数（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1500,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/meihua_dark.html"
+      }
+    },
+    {
+      "id": "page-meihua-light",
+      "title": "梅花易数（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1500,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/meihua_light.html"
+      }
+    },
+    {
+      "id": "page-result-meihua",
+      "title": "梅花结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1650,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_meihua_dark.html"
+      }
+    },
+    {
+      "id": "page-result-meihua-light",
+      "title": "梅花结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1650,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_meihua_light.html"
+      }
+    },
+    {
+      "id": "page-fengshui",
+      "title": "风水罗盘（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1800,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/fengshui_dark.html"
+      }
+    },
+    {
+      "id": "page-fengshui-light",
+      "title": "风水罗盘（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1800,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/fengshui_light.html"
+      }
+    },
+    {
+      "id": "page-result-fengshui",
+      "title": "风水结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1950,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_fengshui_dark.html"
+      }
+    },
+    {
+      "id": "page-result-fengshui-light",
+      "title": "风水结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 1950,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_fengshui_light.html"
+      }
+    },
+    {
+      "id": "page-tieban",
+      "title": "铁板神数（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 0,
+        "y": 2100,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/tieban_dark.html"
+      }
+    },
+    {
+      "id": "page-tieban-light",
+      "title": "铁板神数（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 2100,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/tieban_light.html"
+      }
+    },
+    {
+      "id": "page-result-tieban",
+      "title": "铁板结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 0,
+        "y": 2250,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_tieban_dark.html"
+      }
+    },
+    {
+      "id": "page-result-tieban-light",
+      "title": "铁板结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 2250,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_tieban_light.html"
+      }
+    },
+    {
+      "id": "page-daliuren",
+      "title": "大六壬（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 0,
+        "y": 2400,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/daliuren_dark.html"
+      }
+    },
+    {
+      "id": "page-daliuren-light",
+      "title": "大六壬（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 2400,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/daliuren_light.html"
+      }
+    },
+    {
+      "id": "page-result-daliuren",
+      "title": "大六壬结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 0,
+        "y": 2550,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_daliuren_dark.html"
+      }
+    },
+    {
+      "id": "page-result-daliuren-light",
+      "title": "大六壬结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783770600000,
+      "canvasData": {
+        "x": 1400,
+        "y": 2550,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_daliuren_light.html"
+      }
+    },
+    {
+      "id": "page-western",
+      "title": "西方占卜（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 0,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/western_dark.html"
+      }
+    },
+    {
+      "id": "page-western-light",
+      "title": "西方占卜（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 0,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/western_light.html"
+      }
+    },
+    {
+      "id": "page-zodiac",
+      "title": "星座运势（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 150,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/zodiac_dark.html"
+      }
+    },
+    {
+      "id": "page-zodiac-light",
+      "title": "星座运势（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 150,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/zodiac_light.html"
+      }
+    },
+    {
+      "id": "page-result-xingzuo",
+      "title": "星座结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 300,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_xingzuo_dark.html"
+      }
+    },
+    {
+      "id": "page-result-xingzuo-light",
+      "title": "星座结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 300,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_xingzuo_light.html"
+      }
+    },
+    {
+      "id": "page-tarot",
+      "title": "塔罗牌（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 450,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/tarot_dark.html"
+      }
+    },
+    {
+      "id": "page-tarot-light",
+      "title": "塔罗牌（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 450,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/tarot_light.html"
+      }
+    },
+    {
+      "id": "page-result-tarot",
+      "title": "塔罗结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 600,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_tarot_dark.html"
+      }
+    },
+    {
+      "id": "page-result-tarot-light",
+      "title": "塔罗结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 600,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_tarot_light.html"
+      }
+    },
+    {
+      "id": "page-astrodice",
+      "title": "占星骰子（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 750,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/astrodice_dark.html"
+      }
+    },
+    {
+      "id": "page-astrodice-light",
+      "title": "占星骰子（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 750,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/astrodice_light.html"
+      }
+    },
+    {
+      "id": "page-result-astrology",
+      "title": "占星结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 300,
+        "y": 900,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_astrology_dark.html"
+      }
+    },
+    {
+      "id": "page-result-astrology-light",
+      "title": "占星结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 1700,
+        "y": 900,
+        "group": 3
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_astrology_light.html"
+      }
+    },
+    {
+      "id": "page-folk",
+      "title": "民俗趣味（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 0,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/folk_dark.html"
+      }
+    },
+    {
+      "id": "page-folk-light",
+      "title": "民俗趣味（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 0,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/folk_light.html"
+      }
+    },
+    {
+      "id": "page-moonphase",
+      "title": "月相能量（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 150,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/moonphase_dark.html"
+      }
+    },
+    {
+      "id": "page-moonphase-light",
+      "title": "月相能量（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 150,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/moonphase_light.html"
+      }
+    },
+    {
+      "id": "page-result-moon",
+      "title": "月相结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 300,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_moon_dark.html"
+      }
+    },
+    {
+      "id": "page-result-moon-light",
+      "title": "月相结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 300,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_moon_light.html"
+      }
+    },
+    {
+      "id": "page-rune",
+      "title": "符文占卜（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 450,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/rune_dark.html"
+      }
+    },
+    {
+      "id": "page-rune-light",
+      "title": "符文占卜（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 450,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/rune_light.html"
+      }
+    },
+    {
+      "id": "page-result-rune",
+      "title": "符文结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 600,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_rune_dark.html"
+      }
+    },
+    {
+      "id": "page-result-rune-light",
+      "title": "符文结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 600,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_rune_light.html"
+      }
+    },
+    {
+      "id": "page-drawlot",
+      "title": "签诗抽签（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 750,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/drawlot_dark.html"
+      }
+    },
+    {
+      "id": "page-drawlot-light",
+      "title": "签诗抽签（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 750,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/drawlot_light.html"
+      }
+    },
+    {
+      "id": "page-result-sign",
+      "title": "抽签结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 900,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_sign_dark.html"
+      }
+    },
+    {
+      "id": "page-dream",
+      "title": "周公解梦（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1050,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/dream_dark.html"
+      }
+    },
+    {
+      "id": "page-dream-light",
+      "title": "周公解梦（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 1050,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/dream_light.html"
+      }
+    },
+    {
+      "id": "page-result-dream",
+      "title": "解梦结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1200,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_dream_dark.html"
+      }
+    },
+    {
+      "id": "page-palm",
+      "title": "手相算命（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1350,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/palm_dark.html"
+      }
+    },
+    {
+      "id": "page-palm-light",
+      "title": "手相算命（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 1350,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/palm_light.html"
+      }
+    },
+    {
+      "id": "page-result-palm",
+      "title": "手相结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1500,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_palm_dark.html"
+      }
+    },
+    {
+      "id": "page-nametest",
+      "title": "姓名测算（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1650,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/nametest_dark.html"
+      }
+    },
+    {
+      "id": "page-nametest-light",
+      "title": "姓名测算（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 1650,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/nametest_light.html"
+      }
+    },
+    {
+      "id": "page-result-name",
+      "title": "姓名结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1800,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_name_dark.html"
+      }
+    },
+    {
+      "id": "page-numerology",
+      "title": "数字能量（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 1950,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/numerology_dark.html"
+      }
+    },
+    {
+      "id": "page-numerology-light",
+      "title": "数字能量（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 1950,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/numerology_light.html"
+      }
+    },
+    {
+      "id": "page-result-number",
+      "title": "数字结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 2100,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_number_dark.html"
+      }
+    },
+    {
+      "id": "page-result-number-light",
+      "title": "数字结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 2100,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_number_light.html"
+      }
+    },
+    {
+      "id": "page-shengxiao",
+      "title": "生肖运势（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 2250,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/shengxiao_dark.html"
+      }
+    },
+    {
+      "id": "page-shengxiao-light",
+      "title": "生肖运势（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 2250,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/shengxiao_light.html"
+      }
+    },
+    {
+      "id": "page-result-zodiac",
+      "title": "生肖结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 600,
+        "y": 2400,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_pages/result_zodiac_dark.html"
+      }
+    },
+    {
+      "id": "page-result-zodiac-light",
+      "title": "生肖结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2000,
+        "y": 2400,
+        "group": 4
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_pages/result_zodiac_light.html"
+      }
+    },
+    {
+      "id": "page-aiinsight",
+      "title": "AI 洞察（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 0,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/aiinsight_dark.html"
+      }
+    },
+    {
+      "id": "page-aiinsight-light",
+      "title": "AI 洞察（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 0,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/aiinsight_light.html"
+      }
+    },
+    {
+      "id": "page-advice",
+      "title": "个性化建议（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 150,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/advice_dark.html"
+      }
+    },
+    {
+      "id": "page-advice-light",
+      "title": "个性化建议（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 150,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/advice_light.html"
+      }
+    },
+    {
+      "id": "page-report",
+      "title": "综合运势报告（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 300,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/report_dark.html"
+      }
+    },
+    {
+      "id": "page-report-light",
+      "title": "综合运势报告（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 300,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/report_light.html"
+      }
+    },
+    {
+      "id": "page-almanac",
+      "title": "黄历宜忌（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 450,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/almanac_dark.html"
+      }
+    },
+    {
+      "id": "page-almanac-light",
+      "title": "黄历宜忌（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 450,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/almanac_light.html"
+      }
+    },
+    {
+      "id": "page-trend",
+      "title": "趋势追踪（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 600,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/trend_dark.html"
+      }
+    },
+    {
+      "id": "page-trend-light",
+      "title": "趋势追踪（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 600,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/trend_light.html"
+      }
+    },
+    {
+      "id": "page-compare",
+      "title": "多维对比（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 750,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/compare_dark.html"
+      }
+    },
+    {
+      "id": "page-compare-light",
+      "title": "多维对比（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 750,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/compare_light.html"
+      }
+    },
+    {
+      "id": "page-calendar",
+      "title": "运势日历（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 900,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/calendar_dark.html"
+      }
+    },
+    {
+      "id": "page-calendar-light",
+      "title": "运势日历（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 900,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/calendar_light.html"
+      }
+    },
+    {
+      "id": "page-result",
+      "title": "通用结果（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 1050,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/result_dark.html"
+      }
+    },
+    {
+      "id": "page-result-light",
+      "title": "通用结果（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 1050,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/result_light.html"
+      }
+    },
+    {
+      "id": "page-profile",
+      "title": "个人中心（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 1200,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/profile_dark.html"
+      }
+    },
+    {
+      "id": "page-profile-light",
+      "title": "个人中心（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 1200,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/profile_light.html"
+      }
+    },
+    {
+      "id": "page-history",
+      "title": "历史记录（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 1350,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/history_dark.html"
+      }
+    },
+    {
+      "id": "page-history-light",
+      "title": "历史记录（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 1350,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/history_light.html"
+      }
+    },
+    {
+      "id": "page-search",
+      "title": "搜索（深色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 900,
+        "y": 1500,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-dark/search_dark.html"
+      }
+    },
+    {
+      "id": "page-search-light",
+      "title": "搜索（浅色）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1752189600000,
+      "canvasData": {
+        "x": 2300,
+        "y": 1500,
+        "group": 5
+      },
+      "devMetadata": {
+        "htmlSrc": "pages-light/search_light.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "viewMode": "canvas"
+  }
+}

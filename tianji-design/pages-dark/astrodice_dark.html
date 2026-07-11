@@ -1,0 +1,640 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>占星骰子 — 天机</title>
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 星星闪烁动画 */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    .star-twinkle {
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    /* 骰子浮动动画 */
+    @keyframes dice-float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .dice-float-1 { animation: dice-float 3.5s ease-in-out infinite; }
+    .dice-float-2 { animation: dice-float 3.5s ease-in-out infinite 0.5s; }
+    .dice-float-3 { animation: dice-float 3.5s ease-in-out infinite 1s; }
+    /* 骰子光晕脉冲 */
+    @keyframes dice-glow-pulse {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(200, 168, 78, 0.2)); }
+      50% { filter: drop-shadow(0 0 20px rgba(200, 168, 78, 0.45)); }
+    }
+    .dice-glow { animation: dice-glow-pulse 3s ease-in-out infinite; }
+    /* 按钮金色光效 */
+    @keyframes btn-gold-shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .btn-gold-shimmer {
+      background-size: 200% auto;
+      background-image: linear-gradient(90deg, var(--color-gold) 0%, var(--color-gold-light) 50%, var(--color-gold) 100%);
+      animation: btn-gold-shimmer 3s linear infinite;
+    }
+    /* 解读区渐入 */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.6s ease-out forwards; }
+    /* 推荐卡片悬停 */
+    .recommend-card {
+      transition: all var(--transition-base);
+      border: 1px solid var(--color-border-light);
+    }
+    .recommend-card:hover {
+      border-color: var(--color-primary-lighter);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body);">
+
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========== 页面标题区 ========== -->
+        <section class="relative overflow-hidden" style="background: linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%);">
+            <!-- 背景星星装饰 -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full" viewBox="0 0 1280 320" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="80" cy="40" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0s;"/>
+                    <circle cx="200" cy="80" r="1" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.5s;"/>
+                    <circle cx="350" cy="30" r="1.2" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1s;"/>
+                    <circle cx="500" cy="90" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1.5s;"/>
+                    <circle cx="620" cy="50" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.3s;"/>
+                    <circle cx="750" cy="100" r="1" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 2s;"/>
+                    <circle cx="900" cy="35" r="1.3" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.8s;"/>
+                    <circle cx="1050" cy="70" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1.2s;"/>
+                    <circle cx="1180" cy="45" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1.8s;"/>
+                    <circle cx="150" cy="150" r="1" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 2.5s;"/>
+                    <circle cx="420" cy="180" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.7s;"/>
+                    <circle cx="680" cy="160" r="1.2" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 1.3s;"/>
+                    <circle cx="950" cy="200" r="1" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 0.4s;"/>
+                    <circle cx="1100" cy="170" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay: 2.2s;"/>
+                </svg>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20" style="max-width: var(--max-width);">
+                <!-- 面包屑 -->
+                <nav class="flex items-center gap-2 text-sm mb-6" style="color: var(--color-text-tertiary);">
+                    <a href="#" class="transition-colors hover:text-white">首页</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <a href="#" class="transition-colors hover:text-white" style="color: var(--color-gold-light);">西方占卜</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="color: var(--color-gold-light);">占星骰子</span>
+                </nav>
+
+                <!-- 标题 -->
+                <div class="text-center">
+                    <div class="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full" style="background: rgba(200, 168, 78, 0.1); border: 1px solid rgba(200, 168, 78, 0.2);">
+                        <!-- 骰子图标 -->
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-gold)">
+                            <rect x="1" y="1" width="14" height="14" rx="3" fill="none" stroke="var(--color-gold)" stroke-width="1.2"/>
+                            <circle cx="5" cy="5" r="1.2"/>
+                            <circle cx="11" cy="5" r="1.2"/>
+                            <circle cx="8" cy="8" r="1.2"/>
+                            <circle cx="5" cy="11" r="1.2"/>
+                            <circle cx="11" cy="11" r="1.2"/>
+                        </svg>
+                        <span class="text-sm font-medium" style="color: var(--color-gold-light);">精准占卜</span>
+                    </div>
+                    <h1 class="display-font text-4xl sm:text-5xl lg:text-6xl font-bold mb-4" style="color: var(--color-text-inverse); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; line-height: var(--leading-tight); letter-spacing: var(--tracking-tight);">
+                        占星骰子
+                    </h1>
+                    <p class="text-base sm:text-lg max-w-2xl mx-auto" style="color: rgba(255,255,255,0.65); line-height: var(--leading-relaxed);">
+                        三颗骰子，星座 x 行星 x 宫位的精准回答
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 问题输入区 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-2 text-center" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">心中默念你的问题</h2>
+                    <p class="text-sm text-center mb-8" style="color: var(--color-text-tertiary);">越具体的问题，骰子的回答越精准</p>
+                    <div class="rounded-2xl p-6 sm:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+                        <textarea class="w-full resize-none rounded-xl p-4 text-base" rows="4" placeholder="描述你的具体问题，例如：我最近面试的那份工作能拿到offer吗？" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); outline: none; transition: border-color var(--transition-fast);" onfocus="this.style.borderColor='var(--color-gold)'" onblur="this.style.borderColor='var(--color-border)'"></textarea>
+                        <div class="flex flex-wrap items-center gap-2 mt-4">
+                            <span class="text-xs font-medium" style="color: var(--color-text-tertiary);">快捷问题：</span>
+                            <button class="inline-block px-3 py-1 text-sm rounded-full border transition-all whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text-secondary);" onmouseover="this.style.borderColor='var(--color-gold)';this.style.color='var(--color-gold-dark)';this.style.background='rgba(200,168,78,0.06)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)';this.style.background='transparent'">爱情</button>
+                            <button class="inline-block px-3 py-1 text-sm rounded-full border transition-all whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text-secondary);" onmouseover="this.style.borderColor='var(--color-gold)';this.style.color='var(--color-gold-dark)';this.style.background='rgba(200,168,78,0.06)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)';this.style.background='transparent'">事业</button>
+                            <button class="inline-block px-3 py-1 text-sm rounded-full border transition-all whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text-secondary);" onmouseover="this.style.borderColor='var(--color-gold)';this.style.color='var(--color-gold-dark)';this.style.background='rgba(200,168,78,0.06)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)';this.style.background='transparent'">财运</button>
+                            <button class="inline-block px-3 py-1 text-sm rounded-full border transition-all whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text-secondary);" onmouseover="this.style.borderColor='var(--color-gold)';this.style.color='var(--color-gold-dark)';this.style.background='rgba(200,168,78,0.06)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)';this.style.background='transparent'">健康</button>
+                            <button class="inline-block px-3 py-1 text-sm rounded-full border transition-all whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text-secondary);" onmouseover="this.style.borderColor='var(--color-gold)';this.style.color='var(--color-gold-dark)';this.style.background='rgba(200,168,78,0.06)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)';this.style.background='transparent'">学业</button>
+                        </div>
+                    </div>
+
+                    <!-- 掷骰子按钮 -->
+                    <div class="text-center mt-8" data-dom-id="astrodice-roll">
+                        <button class="btn-gold-shimmer inline-flex items-center gap-3 px-10 py-4 rounded-xl text-lg font-bold cursor-pointer transition-all" style="color: var(--color-primary-darker); box-shadow: 0 4px 20px rgba(200, 168, 78, 0.35), 0 0 40px rgba(200, 168, 78, 0.12);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 28px rgba(200,168,78,0.5), 0 0 50px rgba(200,168,78,0.18)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(200,168,78,0.35), 0 0 40px rgba(200,168,78,0.12)'">
+                            <!-- 骰子图标 -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--color-primary-darker)">
+                                <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="var(--color-primary-darker)" stroke-width="2"/>
+                                <circle cx="8" cy="8" r="1.8"/>
+                                <circle cx="16" cy="8" r="1.8"/>
+                                <circle cx="12" cy="12" r="1.8"/>
+                                <circle cx="8" cy="16" r="1.8"/>
+                                <circle cx="16" cy="16" r="1.8"/>
+                            </svg>
+                            掷骰子
+                        </button>
+                        <p class="text-xs mt-3" style="color: var(--color-text-tertiary);">点击按钮，让宇宙为你揭示答案</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 骰子展示区 ========== -->
+        <section class="relative py-14 sm:py-20 overflow-hidden" style="background: linear-gradient(180deg, #0a0f2e 0%, var(--color-primary-darker) 50%, #0a0f2e 100%);">
+            <!-- 背景装饰：星座圆环 -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full opacity-15" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="640" cy="280" r="260" fill="none" stroke="var(--color-gold)" stroke-width="0.5" stroke-dasharray="6 10"/>
+                    <circle cx="640" cy="280" r="200" fill="none" stroke="var(--color-gold)" stroke-width="0.5" stroke-dasharray="4 8"/>
+                    <circle cx="640" cy="280" r="140" fill="none" stroke="var(--color-gold)" stroke-width="0.4" stroke-dasharray="3 6"/>
+                    <!-- 星座连线 -->
+                    <line x1="400" y1="200" x2="520" y2="180" stroke="var(--color-gold)" stroke-width="0.3"/>
+                    <line x1="520" y1="180" x2="560" y2="250" stroke="var(--color-gold)" stroke-width="0.3"/>
+                    <line x1="760" y1="220" x2="830" y2="300" stroke="var(--color-gold)" stroke-width="0.3"/>
+                    <line x1="830" y1="300" x2="780" y2="370" stroke="var(--color-gold)" stroke-width="0.3"/>
+                    <circle cx="400" cy="200" r="2" fill="var(--color-gold-light)"/>
+                    <circle cx="520" cy="180" r="2" fill="var(--color-gold-light)"/>
+                    <circle cx="560" cy="250" r="2" fill="var(--color-gold-light)"/>
+                    <circle cx="760" cy="220" r="2" fill="var(--color-gold-light)"/>
+                    <circle cx="830" cy="300" r="2" fill="var(--color-gold-light)"/>
+                    <circle cx="780" cy="370" r="2" fill="var(--color-gold-light)"/>
+                </svg>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="text-center mb-10 sm:mb-14">
+                    <h2 class="display-font text-2xl sm:text-3xl font-bold mb-2" style="color: var(--color-gold-light);">骰子已落定</h2>
+                    <p class="text-sm" style="color: rgba(255,255,255,0.5);">星座 / 行星 / 宫位</p>
+                </div>
+
+                <!-- 三颗骰子 -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-16">
+
+                    <!-- 骰子1: 星座（红色） -->
+                    <div class="text-center dice-float-1">
+                        <span class="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4" style="background: rgba(220, 80, 80, 0.15); color: #f0a0a0;">星座骰</span>
+                        <div class="dice-glow mx-auto" style="width: 140px; height: 140px;">
+                            <!-- 红色骰子 CSS 3D 效果 -->
+                            <div class="relative w-full h-full" style="perspective: 600px;">
+                                <div class="absolute inset-0 rounded-2xl" style="background: linear-gradient(145deg, #c0392b 0%, #962d22 40%, #7a2519 100%); box-shadow: inset 0 2px 6px rgba(255,255,255,0.15), inset 0 -2px 6px rgba(0,0,0,0.2), 0 8px 32px rgba(150, 45, 34, 0.4); border: 2px solid rgba(255,200,180,0.2);">
+                                    <!-- 骰子面圆点装饰 -->
+                                    <div class="absolute top-3 left-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute bottom-3 left-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute bottom-3 right-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <!-- 中心星座符号 -->
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span style="font-size: 48px; line-height: 1; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">&#x2648;</span>
+                                        <span class="text-sm font-semibold mt-1" style="color: rgba(255,255,255,0.9);">白羊座</span>
+                                        <span class="text-xs" style="color: rgba(255,255,255,0.55);">Aries</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-4 font-medium" style="color: rgba(255,255,255,0.7); max-width: 140px;">行动力与开创</p>
+                    </div>
+
+                    <!-- 骰子2: 行星（蓝色） -->
+                    <div class="text-center dice-float-2">
+                        <span class="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4" style="background: rgba(74, 144, 217, 0.15); color: #a0ccf0;">行星骰</span>
+                        <div class="dice-glow mx-auto" style="width: 140px; height: 140px;">
+                            <!-- 蓝色骰子 CSS 3D 效果 -->
+                            <div class="relative w-full h-full" style="perspective: 600px;">
+                                <div class="absolute inset-0 rounded-2xl" style="background: linear-gradient(145deg, #2e86c1 0%, #2471a3 40%, #1a5276 100%); box-shadow: inset 0 2px 6px rgba(255,255,255,0.15), inset 0 -2px 6px rgba(0,0,0,0.2), 0 8px 32px rgba(36, 113, 163, 0.4); border: 2px solid rgba(180,220,255,0.2);">
+                                    <!-- 骰子面圆点装饰 -->
+                                    <div class="absolute top-3 left-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute bottom-3 left-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute bottom-3 right-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <!-- 中心行星符号 -->
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span style="font-size: 48px; line-height: 1; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">&#x2609;</span>
+                                        <span class="text-sm font-semibold mt-1" style="color: rgba(255,255,255,0.9);">太阳</span>
+                                        <span class="text-xs" style="color: rgba(255,255,255,0.55);">Sun</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-4 font-medium" style="color: rgba(255,255,255,0.7); max-width: 140px;">自我意志与光芒</p>
+                    </div>
+
+                    <!-- 骰子3: 宫位（绿色） -->
+                    <div class="text-center dice-float-3">
+                        <span class="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4" style="background: rgba(46, 139, 87, 0.15); color: #a0e0c0;">宫位骰</span>
+                        <div class="dice-glow mx-auto" style="width: 140px; height: 140px;">
+                            <!-- 绿色骰子 CSS 3D 效果 -->
+                            <div class="relative w-full h-full" style="perspective: 600px;">
+                                <div class="absolute inset-0 rounded-2xl" style="background: linear-gradient(145deg, #27ae60 0%, #1e8449 40%, #196f3d 100%); box-shadow: inset 0 2px 6px rgba(255,255,255,0.15), inset 0 -2px 6px rgba(0,0,0,0.2), 0 8px 32px rgba(30, 132, 73, 0.4); border: 2px solid rgba(180,255,200,0.2);">
+                                    <!-- 骰子面圆点装饰 -->
+                                    <div class="absolute top-3 left-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute bottom-3 left-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <div class="absolute bottom-3 right-3 w-2.5 h-2.5 rounded-full" style="background: rgba(255,255,255,0.2);"></div>
+                                    <!-- 中心宫位数字 -->
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="display-font font-bold" style="font-size: 52px; line-height: 1; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">10</span>
+                                        <span class="text-sm font-semibold mt-1" style="color: rgba(255,255,255,0.9);">第 10 宫</span>
+                                        <span class="text-xs" style="color: rgba(255,255,255,0.55);">事业宫</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mt-4 font-medium" style="color: rgba(255,255,255,0.7); max-width: 140px;">社会地位与成就</p>
+                    </div>
+                </div>
+
+                <!-- 组合标签 -->
+                <div class="flex items-center justify-center gap-3 mt-10 sm:mt-14">
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium" style="background: rgba(192, 57, 43, 0.15); color: #f0a0a0; border: 1px solid rgba(192, 57, 43, 0.2);">
+                        <span>&#x2648;</span> 白羊座
+                    </span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="var(--color-gold-light)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium" style="background: rgba(46, 134, 193, 0.15); color: #a0ccf0; border: 1px solid rgba(46, 134, 193, 0.2);">
+                        <span>&#x2609;</span> 太阳
+                    </span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7 5l6 5-6 5" stroke="var(--color-gold-light)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium" style="background: rgba(39, 174, 96, 0.15); color: #a0e0c0; border: 1px solid rgba(39, 174, 96, 0.2);">
+                        <span style="font-family: var(--font-display); font-weight: 700;">10</span> 宫
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 组合解读区 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-2" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">组合解读</h2>
+                        <p class="text-sm" style="color: var(--color-text-tertiary);">AI 基于占星骰子的三重组合，为你解读问题</p>
+                    </div>
+
+                    <!-- 解读卡片 -->
+                    <div class="rounded-2xl overflow-hidden" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-lg); border: 1px solid var(--color-border-light);">
+                        <!-- 组合含义 -->
+                        <div class="p-6 sm:p-8" style="border-bottom: 1px solid var(--color-border-light);">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style="background: var(--color-primary-bg-strong);">
+                                    <i data-lucide="sparkles" class="w-5 h-5" style="color: var(--color-primary);"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">白羊座 + 太阳 + 第 10 宫</h3>
+                                    <p class="text-xs" style="color: var(--color-text-tertiary);">三骰组合核心含义</p>
+                                </div>
+                            </div>
+                            <div class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+                                <p class="mb-3">这个组合显示出强烈的<strong style="color: var(--color-text);">事业进取信号</strong>。白羊座赋予行动力与勇气，太阳代表核心自我与意志力，而第 10 宫正是事业与社会地位的象征。</p>
+                                <p>三者的结合表明，在事业领域你正迎来一个<strong style="color: var(--color-text);">展现自我实力</strong>的关键时机。这是一个适合主动出击、争取晋升或启动重要项目的时期。你的个人魅力与领导能力将在公众面前得到认可。</p>
+                            </div>
+                        </div>
+
+                        <!-- AI 针对问题的回答 -->
+                        <div class="p-6 sm:p-8" style="background: var(--color-bg);">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(200, 168, 78, 0.1);">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="var(--color-gold)">
+                                        <path d="M10 2a8 8 0 110 16 8 8 0 010-16zm0 3a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4zm-2 4.8a.8.8 0 11.4 1.5l.6.3v1.5a.8.8 0 001.6 0v-1.8c0-.5-.3-.9-.7-1.1l-1.3-.6a2.4 2.4 0 112-3.2.8.8 0 001.5.4 4 4 0 00-3.5 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-base font-semibold truncate" style="color: var(--color-text);">AI 解答</h3>
+                                    <p class="text-xs" style="color: var(--color-text-tertiary);">基于你的问题与骰子组合的个性化分析</p>
+                                </div>
+                                <span class="shrink-0 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md" style="background: rgba(200, 168, 78, 0.1); color: var(--color-gold-dark);">
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="var(--color-gold)"><circle cx="6" cy="6" r="2"/></svg>
+                                    天机 AI
+                                </span>
+                            </div>
+                            <div class="text-sm leading-relaxed space-y-3" style="color: var(--color-text-secondary);">
+                                <p>根据你的问题与占星骰子的组合结果，<strong style="color: var(--color-text);">答案是肯定的</strong>。白羊座的能量配合太阳落在第 10 宫，预示着你在事业上将获得重要的认可。</p>
+                                <p>具体而言：</p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong style="color: var(--color-text);">短期</strong>（2-4 周内）：你可能会收到一个与个人能力直接相关的机会，需要果断把握。</li>
+                                    <li><strong style="color: var(--color-text);">中期</strong>（1-3 个月）：这个机会将带来职业定位上的提升，可能涉及更高的曝光度或管理职责。</li>
+                                    <li><strong style="color: var(--color-text);">关键建议</strong>：白羊座的能量要求你主动行动，不要等待机会自行到来。太阳在第 10 宫意味着你的个人品牌与公众形象将成为成功的关键因素。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 追问输入框 + 重新掷骰 -->
+                    <div class="mt-8 rounded-2xl p-6 sm:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="flex-1 min-w-0">
+                                <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">继续追问</label>
+                                <input type="text" class="w-full rounded-xl px-4 py-3 text-sm" placeholder="针对这个结果还有疑问？输入你的追问..." style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); outline: none; transition: border-color var(--transition-fast);" onfocus="this.style.borderColor='var(--color-gold)'" onblur="this.style.borderColor='var(--color-border)'">
+                            </div>
+                            <div class="flex items-end gap-3">
+                                <button class="shrink-0 px-6 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap" style="background: var(--color-primary); color: var(--color-text-inverse);" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">
+                                    <i data-lucide="message-circle" class="w-4 h-4 inline-block mr-1" style="vertical-align: -2px;"></i>
+                                    追问
+                                </button>
+                                <button class="shrink-0 px-6 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap" style="background: rgba(200, 168, 78, 0.1); color: var(--color-gold-dark); border: 1px solid rgba(200, 168, 78, 0.3);" onmouseover="this.style.background='rgba(200, 168, 78, 0.18)'" onmouseout="this.style.background='rgba(200, 168, 78, 0.1)'">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4 inline-block mr-1" style="vertical-align: -2px;"></i>
+                                    重新掷骰
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 相关推荐 ========== -->
+        <section class="py-12 sm:py-16" style="background: var(--color-bg-inset);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="text-center mb-8 sm:mb-10">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-2" style="color: var(--color-text); font-family: var(--font-display); letter-spacing: var(--tracking-tight);">探索更多占卜</h2>
+                    <p class="text-sm" style="color: var(--color-text-tertiary);">天机为你提供多种精准占卜方式</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- 推荐 1: 塔罗牌占卜 -->
+                    <a href="#" class="recommend-card block rounded-2xl p-6" style="background: var(--color-bg-elevated);">
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><circle cx="12" cy="16" r="2"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-semibold truncate mb-1" style="color: var(--color-text);">塔罗牌占卜</h3>
+                                <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">78 张塔罗牌的古老智慧，AI 帮你解读命运的启示与指引</p>
+                                <span class="inline-flex items-center gap-1 text-xs font-medium mt-2" style="color: var(--color-primary);">
+                                    了解更多
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 推荐 2: 星座运势 -->
+                    <a href="#" class="recommend-card block rounded-2xl p-6" style="background: var(--color-bg-elevated);">
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(200, 168, 78, 0.1); color: var(--color-gold);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-semibold truncate mb-1" style="color: var(--color-text);">星座运势</h3>
+                                <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">十二星座每日/每周/每月运势，爱情、事业、财运全面覆盖</p>
+                                <span class="inline-flex items-center gap-1 text-xs font-medium mt-2" style="color: var(--color-gold-dark);">
+                                    了解更多
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 推荐 3: 符文占卜 -->
+                    <a href="#" class="recommend-card block rounded-2xl p-6" style="background: var(--color-bg-elevated);">
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3v18"/><path d="M6 3h8l4 4-4 4H6"/><path d="M6 21h8l4-4-4-4H6"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-semibold truncate mb-1" style="color: var(--color-text);">符文占卜</h3>
+                                <p class="text-xs line-clamp-2" style="color: var(--color-text-tertiary);">古老北欧符文的神秘力量，透过 Rune 聆听远古的智慧</p>
+                                <span class="inline-flex items-center gap-1 text-xs font-medium mt-2" style="color: var(--color-primary);">
+                                    了解更多
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="py-8" style="background: var(--color-primary-darker); border-top: 1px solid rgba(200, 168, 78, 0.1);">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 text-center" style="max-width: var(--max-width);">
+            <p class="text-xs" style="color: rgba(255,255,255,0.35);">占星骰子仅供娱乐与参考，不构成任何决策建议。请理性对待占卜结果。</p>
+            <p class="text-xs mt-2" style="color: rgba(255,255,255,0.25);">TIANJI &copy; 2026 All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

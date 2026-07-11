@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大六壬 — 天机</title>
+    <style id="theme-vars">
+/* ============================================
+   Tianji — Daliuren (大六壬) Input Page
+   Theme: Gold Primary #f59e0b
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #f59e0b;
+  --color-primary-light: #fbbf24;
+  --color-primary-lighter: #fcd34d;
+  --color-primary-lightest: #fef3c7;
+  --color-primary-dark: #d97706;
+  --color-primary-darker: #b45309;
+  --color-primary-bg: rgba(245, 158, 11, 0.06);
+  --color-primary-bg-strong: rgba(245, 158, 11, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #f59e0b;
+  --color-gold-light: #fbbf24;
+  --color-gold-dark: #d97706;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.2);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+.nav-glass {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.08) 0%,
+    rgba(245, 158, 11, 0.04) 40%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(245, 158, 11, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.nav-link {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+.nav-link:hover { color: var(--color-gold-light); }
+.mobile-menu-btn { display: none; }
+@media (max-width: 768px) {
+  .mobile-menu-btn { display: flex; }
+  .hidden.md\:flex { display: none !important; }
+}
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen" style="background: var(--color-bg); color: var(--color-text);">
+
+      <!-- ====== 顶部导航栏 ====== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link" style="color: var(--color-gold-light);">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+      <!-- ====== 主视觉区 - 大六壬主题介绍 ====== -->
+      <section class="relative overflow-hidden">
+        <!-- 金色渐变背景 -->
+        <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(180,83,9,0.08) 50%, rgba(0,75,170,0.06) 100%);"></div>
+        <!-- 装饰性背景元素 -->
+        <div class="absolute top-20 left-10 w-64 h-64 rounded-full" style="background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%); filter: blur(40px);"></div>
+        <div class="absolute bottom-10 right-20 w-80 h-80 rounded-full" style="background: radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 70%); filter: blur(60px);"></div>
+        
+        <div class="relative mx-auto px-4 lg:px-8 pt-8 pb-12" style="max-width: var(--max-width);">
+          <!-- 面包屑 -->
+          <nav class="flex items-center gap-1.5 text-sm mb-6" style="color: var(--color-text-tertiary);">
+            <a href="#" class="transition-colors hover:text-[var(--color-gold)]">首页</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <a href="#" class="transition-colors hover:text-[var(--color-gold)]">东方命理</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span style="color: var(--color-text);">大六壬</span>
+          </nav>
+
+          <!-- 标题与介绍 -->
+          <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-8">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: #fff;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  三式之首
+                </span>
+                <span class="text-xs px-2 py-1 rounded" style="background: var(--color-primary-bg); color: var(--color-gold);">太乙 · 奇门 · 六壬</span>
+              </div>
+              <h1 class="display-font" style="font-size: clamp(32px, 5vw, 56px); line-height: var(--leading-tight); letter-spacing: var(--tracking-tight); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">大六壬</h1>
+              <p class="mt-4 text-base lg:text-lg" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed); max-width: 600px;">
+                三式之首，以月将加时起课，天地人三盘运作，课体十二科目。洞悉事物发展变化的玄机，预知吉凶祸福的微妙征兆。
+              </p>
+              <!-- 核心特点标签 -->
+              <div class="flex flex-wrap gap-2 mt-6">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium" style="background: rgba(245,158,11,0.1); color: var(--color-gold-light); border: 1px solid rgba(245,158,11,0.2);">
+                  <i data-lucide="crown" class="w-3 h-3"></i>
+                  三式之首
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium" style="background: rgba(245,158,11,0.1); color: var(--color-gold-light); border: 1px solid rgba(245,158,11,0.2);">
+                  <i data-lucide="sun" class="w-3 h-3"></i>
+                  月将加时
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium" style="background: rgba(245,158,11,0.1); color: var(--color-gold-light); border: 1px solid rgba(245,158,11,0.2);">
+                  <i data-lucide="globe" class="w-3 h-3"></i>
+                  天地人三盘
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium" style="background: rgba(245,158,11,0.1); color: var(--color-gold-light); border: 1px solid rgba(245,158,11,0.2);">
+                  <i data-lucide="list" class="w-3 h-3"></i>
+                  十二科目
+                </span>
+              </div>
+            </div>
+            
+            <!-- 大六壬十二神将展示 -->
+            <div class="hidden xl:flex items-center justify-center shrink-0" style="width: 200px; height: 200px;">
+              <div class="relative" style="width: 180px; height: 180px;">
+                <!-- 外圈 - 十二地支 -->
+                <svg viewBox="0 0 200 200" class="absolute inset-0 w-full h-full">
+                  <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+                  <circle cx="100" cy="100" r="65" fill="none" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
+                  <!-- 地支标记 -->
+                  <g fill="var(--color-gold-light)" font-family="Noto Serif SC" font-size="12" text-anchor="middle">
+                    <text x="100" y="22">子</text>
+                    <text x="143" y="35">丑</text>
+                    <text x="170" y="65">寅</text>
+                    <text x="178" y="108">卯</text>
+                    <text x="165" y="148">辰</text>
+                    <text x="135" y="178">巳</text>
+                    <text x="100" y="188">午</text>
+                    <text x="57" y="178">未</text>
+                    <text x="30" y="148">申</text>
+                    <text x="22" y="108">酉</text>
+                    <text x="35" y="65">戌</text>
+                    <text x="65" y="35">亥</text>
+                  </g>
+                </svg>
+                <!-- 内圈太极 -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div style="width: 50px; height: 50px; border-radius: 50%; background: conic-gradient(var(--color-primary) 0deg 180deg, var(--color-primary-dark) 180deg 360deg);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== 主体内容：表单 + 说明 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+
+          <!-- 左侧：输入表单 (占3列 = 60%) -->
+          <div class="lg:col-span-3">
+            <div class="rounded-xl p-6 lg:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+              <h2 class="body-font text-lg font-semibold mb-6 flex items-center gap-2" style="color: var(--color-text);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                输入占卜信息
+              </h2>
+
+              <!-- 历法切换 -->
+              <div class="flex items-center gap-3 mb-6">
+                <span class="text-sm body-font" style="color: var(--color-text-secondary);">历法</span>
+                <div class="flex items-center rounded-lg overflow-hidden" style="border: 1px solid var(--color-border);">
+                  <button class="px-4 py-1.5 text-sm body-font font-medium transition-colors" style="background: var(--color-primary); color: var(--color-text-inverse);" data-dom-id="calendar-solar">阳历</button>
+                  <button class="px-4 py-1.5 text-sm body-font transition-colors hover:bg-[var(--color-primary-bg)]" style="color: var(--color-text-secondary);" data-dom-id="calendar-lunar">农历</button>
+                </div>
+              </div>
+
+              <form onsubmit="return false;" class="space-y-5">
+                <!-- 占卜日期 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">占卜日期</label>
+                  <input type="date" value="2026-07-11" class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-gold-light);" data-dom-id="divine-date">
+                </div>
+
+                <!-- 占卜时辰 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">占卜时辰</label>
+                  <select class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2 appearance-none" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-gold-light); background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235a6178%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center;" data-dom-id="divine-hour">
+                    <option value="0">子时 23:00 - 01:00</option>
+                    <option value="1">丑时 01:00 - 03:00</option>
+                    <option value="2">寅时 03:00 - 05:00</option>
+                    <option value="3">卯时 05:00 - 07:00</option>
+                    <option value="4">辰时 07:00 - 09:00</option>
+                    <option value="5">巳时 09:00 - 11:00</option>
+                    <option value="6" selected>午时 11:00 - 13:00</option>
+                    <option value="7">未时 13:00 - 15:00</option>
+                    <option value="8">申时 15:00 - 17:00</option>
+                    <option value="9">酉时 17:00 - 19:00</option>
+                    <option value="10">戌时 19:00 - 21:00</option>
+                    <option value="11">亥时 21:00 - 23:00</option>
+                  </select>
+                </div>
+
+                <!-- 起课方式 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">起课方式</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all" style="background: var(--color-bg-inset); border: 2px solid var(--color-primary);">
+                      <input type="radio" name="divine-method" value="time" checked class="w-4 h-4 accent-[var(--color-primary)]">
+                      <div>
+                        <div class="text-sm body-font font-medium" style="color: var(--color-text);">时辰起课</div>
+                        <div class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">根据占卜时辰起课</div>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all" style="background: var(--color-bg-inset); border: 1px solid var(--color-border);">
+                      <input type="radio" name="divine-method" value="question" class="w-4 h-4 accent-[var(--color-primary)]">
+                      <div>
+                        <div class="text-sm body-font font-medium" style="color: var(--color-text);">问题起课</div>
+                        <div class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">根据所问之事起课</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 占卜类型 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">占卜类型</label>
+                  <select class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2 appearance-none" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-gold-light); background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235a6178%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center;" data-dom-id="divine-type">
+                    <option value="">请选择占卜事项</option>
+                    <option value="affairs">事业仕途</option>
+                    <option value="wealth">求财贸易</option>
+                    <option value="exam">科举考试</option>
+                    <option value="travel">出行远行</option>
+                    <option value="relationship">婚姻感情</option>
+                    <option value="health">疾病健康</option>
+                    <option value="official">官讼争斗</option>
+                    <option value="general">综合占测</option>
+                  </select>
+                </div>
+
+                <!-- 占测问题 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">占测问题 <span style="color: var(--color-text-tertiary); font-weight: 400;">(可选)</span></label>
+                  <textarea rows="3" placeholder="请简要描述您想占测的事情..." class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2 resize-none" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-gold-light);" data-dom-id="divine-question"></textarea>
+                </div>
+
+                <!-- 高级选项 -->
+                <div>
+                  <button class="flex items-center gap-2 text-sm body-font font-medium transition-colors" style="color: var(--color-gold);" data-dom-id="toggle-advanced">
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                    高级选项
+                  </button>
+                  <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4" style="display: none;" data-dom-id="advanced-options">
+                    <div>
+                      <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">占卜地点</label>
+                      <input type="text" placeholder="如：北京、上海" class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-gold-light);" data-dom-id="divine-location">
+                    </div>
+                    <div>
+                      <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">月将</label>
+                      <select class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2 appearance-none" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-gold-light); background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235a6178%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center;">
+                        <option value="">自动</option>
+                        <option value="zi">子-神后</option>
+                        <option value="chou">丑-大吉</option>
+                        <option value="yin">寅-功曹</option>
+                        <option value="mao">卯-太冲</option>
+                        <option value="chen">辰-天罡</option>
+                        <option value="si">巳-太乙</option>
+                        <option value="wu">午-胜光</option>
+                        <option value="wei">未-小吉</option>
+                        <option value="shen">申-传送</option>
+                        <option value="you">酉-从魁</option>
+                        <option value="xu">戌-河魁</option>
+                        <option value="hai">亥-登明</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="pt-2">
+                  <button type="submit" class="w-full py-3.5 rounded-lg text-base body-font font-semibold transition-all flex items-center justify-center gap-2" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: var(--color-text-inverse); box-shadow: 0 4px 16px rgba(245,158,11,0.3);" data-dom-id="daliuren-submit">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    开始起课
+                  </button>
+                </div>
+              </form>
+
+              <!-- 提示文字 -->
+              <p class="mt-4 text-xs body-font text-center" style="color: var(--color-text-tertiary);">占测时辰越精确，起课结果越准确</p>
+            </div>
+          </div>
+
+          <!-- 右侧：说明区块 (占2列 = 40%) -->
+          <div class="lg:col-span-2">
+            <!-- 大六壬介绍 -->
+            <div class="rounded-xl p-6 mb-6" style="background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(180,83,9,0.05) 100%); border: 1px solid rgba(245,158,11,0.15);">
+              <h3 class="body-font text-base font-semibold mb-4 flex items-center gap-2" style="color: var(--color-gold);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                何为大六壬
+              </h3>
+              <div class="space-y-3 text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">
+                <p>大六壬是中国古代三大预测学之首，与太乙神数、奇门遁甲并称"三式"，以预测准确、体系完备著称。</p>
+                <p>其核心理论以月将加临地盘之时辰为起课根本，配合天盘、人盘运转，推演事物发展变化的吉凶趋向。</p>
+              </div>
+            </div>
+
+            <!-- 核心要素 -->
+            <div class="rounded-xl p-6 mb-6" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+              <h3 class="body-font text-base font-semibold mb-4" style="color: var(--color-text);">核心要素</h3>
+              <div class="space-y-4">
+                <!-- 月将 -->
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(245,158,11,0.1);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm body-font font-medium" style="color: var(--color-text);">月将</div>
+                    <div class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">太阳躔度之位置，每月过中气后换将</div>
+                  </div>
+                </div>
+                <!-- 时辰 -->
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(245,158,11,0.1);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm body-font font-medium" style="color: var(--color-text);">时辰</div>
+                    <div class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">占卜当下的十二时辰为起课基础</div>
+                  </div>
+                </div>
+                <!-- 四课 -->
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(245,158,11,0.1);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm body-font font-medium" style="color: var(--color-text);">四课</div>
+                    <div class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">日干日支、月干月支的四种课象</div>
+                  </div>
+                </div>
+                <!-- 三传 -->
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(245,158,11,0.1);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm body-font font-medium" style="color: var(--color-text);">三传</div>
+                    <div class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">初传、中传、末传，代表事态发展三阶段</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 十二神将速览 -->
+            <div class="rounded-xl p-6" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+              <h3 class="body-font text-base font-semibold mb-4" style="color: var(--color-text);">十二神将</h3>
+              <div class="grid grid-cols-4 gap-2">
+                <div class="text-center p-2 rounded-lg" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.15);">
+                  <div class="text-sm font-medium" style="color: #f87171;">青龙</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.15);">
+                  <div class="text-sm font-medium" style="color: #fb923c;">螣蛇</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.15);">
+                  <div class="text-sm font-medium" style="color: #eab308;">朱雀</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.15);">
+                  <div class="text-sm font-medium" style="color: #4ade80;">六合</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.15);">
+                  <div class="text-sm font-medium" style="color: #60a5fa;">勾陈</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.15);">
+                  <div class="text-sm font-medium" style="color: #a855f7;">青龙</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.15);">
+                  <div class="text-sm font-medium" style="color: #2dd4bf;">天空</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.15);">
+                  <div class="text-sm font-medium" style="color: #22d3ee;">白虎</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.15);">
+                  <div class="text-sm font-medium" style="color: #818cf8;">玄武</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.15);">
+                  <div class="text-sm font-medium" style="color: #f472b6;">太阴</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.15);">
+                  <div class="text-sm font-medium" style="color: #fbbf24;">太常</div>
+                </div>
+                <div class="text-center p-2 rounded-lg" style="background: rgba(200,168,78,0.1); border: 1px solid rgba(200,168,78,0.2);">
+                  <div class="text-sm font-medium" style="color: var(--color-gold);">玄武</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====== 相关推荐 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <h2 class="body-font text-lg font-semibold mb-5" style="color: var(--color-text);">相关推荐</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <!-- 太乙神数 -->
+          <a href="#" class="flex items-center gap-4 p-4 rounded-xl transition-colors group" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg-strong);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm body-font font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors" style="color: var(--color-text);">太乙神数</h3>
+              <p class="text-xs body-font truncate mt-0.5" style="color: var(--color-text-tertiary);">三式之一，推演国家运势与天象变化</p>
+            </div>
+          </a>
+          <!-- 奇门遁甲 -->
+          <a href="#" class="flex items-center gap-4 p-4 rounded-xl transition-colors group" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg-strong);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm body-font font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors" style="color: var(--color-text);">奇门遁甲</h3>
+              <p class="text-xs body-font truncate mt-0.5" style="color: var(--color-text-tertiary);">排兵布阵，趋吉避凶的帝王之术</p>
+            </div>
+          </a>
+          <!-- 梅花易数 -->
+          <a href="#" class="flex items-center gap-4 p-4 rounded-xl transition-colors group" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg-strong);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm body-font font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors" style="color: var(--color-text);">梅花易数</h3>
+              <p class="text-xs body-font truncate mt-0.5" style="color: var(--color-text-tertiary);">心易相通，以数起卦洞悉万物变化</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ====== 免责声明 ====== -->
+      <footer class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <div class="p-4 rounded-lg text-xs body-font leading-relaxed" style="background: var(--color-bg-inset); color: var(--color-text-tertiary); border: 1px solid var(--color-border-light);">
+          <p class="mb-1"><strong style="color: var(--color-text-secondary);">免责声明：</strong>本工具仅供娱乐参考，基于传统命理理论与 AI 算法生成结果，不代表任何科学论断或专业建议。请理性看待占卜结果，切勿将其作为重要决策的唯一依据。</p>
+          <p>天机 AI — 探索东方智慧的无限可能</p>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

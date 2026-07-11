@@ -1,0 +1,741 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风水罗盘 — 天机</title>
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 罗盘方位区块基础样式 */
+    .compass-sector {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: default;
+      transition: filter var(--transition-fast);
+    }
+    .compass-sector:hover {
+      filter: brightness(1.15);
+    }
+    /* 方位详情卡片 */
+    .direction-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      transition: box-shadow var(--transition-base);
+    }
+    .direction-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen" style="background: var(--color-bg); color: var(--color-text);">
+
+      <!-- ====== 顶部导航栏 ====== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+      <!-- ====== 面包屑 + 页面标题 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pt-8 pb-6" style="max-width: var(--max-width);">
+        <!-- 面包屑 -->
+        <nav class="flex items-center gap-1.5 text-sm mb-6" style="color: var(--color-text-tertiary);">
+          <a href="#" class="transition-colors hover:text-[var(--color-primary)]">首页</a>
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <a href="#" class="transition-colors hover:text-[var(--color-primary)]">东方命理</a>
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <span style="color: var(--color-text);">风水罗盘</span>
+        </nav>
+        <!-- 标题行 -->
+        <div class="flex items-center gap-4">
+          <div class="min-w-0 flex-1">
+            <h1 class="display-font truncate" style="font-size: clamp(28px, 3.5vw, 48px); line-height: var(--leading-tight); letter-spacing: var(--tracking-tight); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">风水罗盘</h1>
+            <p class="mt-3 text-base lg:text-lg line-clamp-2" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">九宫飞星与八宅明镜，分析空间吉凶方位</p>
+          </div>
+          <!-- 风水罗盘 CSS 图形 -->
+          <div class="hidden sm:flex items-center justify-center shrink-0" style="width: 64px; height: 64px;" aria-hidden="true">
+            <div style="width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--color-gold); position: relative; background: var(--color-primary-darker);">
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold);"></div>
+              <div style="position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 2px; height: 8px; background: var(--color-gold);"></div>
+              <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 2px; height: 8px; background: var(--color-gold);"></div>
+              <div style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 8px; height: 2px; background: var(--color-gold);"></div>
+              <div style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 8px; height: 2px; background: var(--color-gold);"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== 分析类型 Tab 选择 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-6" style="max-width: var(--max-width);">
+        <div class="flex items-center gap-1 p-1 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light); display: inline-flex;">
+          <button class="px-5 py-2 rounded-md text-sm body-font font-medium whitespace-nowrap transition-colors" style="background: var(--color-bg-elevated); color: var(--color-primary); box-shadow: var(--shadow-sm);" data-dom-id="tab-bazhai">八宅方位</button>
+          <button class="px-5 py-2 rounded-md text-sm body-font whitespace-nowrap transition-colors hover:bg-[var(--color-bg-elevated)]" style="color: var(--color-text-secondary);" data-dom-id="tab-jiugong">九宫飞星</button>
+          <button class="px-5 py-2 rounded-md text-sm body-font whitespace-nowrap transition-colors hover:bg-[var(--color-bg-elevated)]" style="color: var(--color-text-secondary);" data-dom-id="tab-xuankong">玄空大卦</button>
+        </div>
+      </section>
+
+      <!-- ====== 主体内容：表单 + 罗盘 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+
+          <!-- 左侧：输入表单 (占2列) -->
+          <div class="lg:col-span-2">
+            <div class="rounded-xl p-6 lg:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+              <h2 class="body-font text-lg font-semibold mb-6" style="color: var(--color-text);">输入分析信息</h2>
+
+              <form onsubmit="return false;" class="space-y-5">
+                <!-- 户主出生年份 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">户主出生年份</label>
+                  <input type="number" value="1985" min="1924" max="2024" placeholder="例如 1985" class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-primary-lightest);" data-dom-id="birth-year">
+                </div>
+
+                <!-- 建筑朝向 -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">建筑朝向（坐山朝向）</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border" style="background: var(--color-primary); border-color: var(--color-primary); color: var(--color-text-inverse);">
+                      <input type="radio" name="direction" value="south" checked class="sr-only">
+                      <span class="text-sm body-font font-medium">南</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="north" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">北</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="east" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">东</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="west" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">西</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="southeast" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">东南</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="southwest" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">西南</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="northeast" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">东北</span>
+                    </label>
+                    <label class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors border hover:bg-[var(--color-primary-bg)]" style="border-color: var(--color-border);">
+                      <input type="radio" name="direction" value="northwest" class="sr-only">
+                      <span class="text-sm body-font" style="color: var(--color-text-secondary);">西北</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 楼层（可选） -->
+                <div>
+                  <label class="block text-sm body-font font-medium mb-1.5" style="color: var(--color-text);">
+                    楼层
+                    <span class="font-normal" style="color: var(--color-text-tertiary);">（可选）</span>
+                  </label>
+                  <input type="number" value="6" min="1" max="200" placeholder="例如 6" class="w-full px-4 py-2.5 rounded-lg text-sm body-font outline-none transition-colors focus:ring-2" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); --tw-ring-color: var(--color-primary-lightest);" data-dom-id="floor-number">
+                  <p class="mt-1.5 text-xs body-font" style="color: var(--color-text-tertiary);">用于玄空飞星楼层气场分析</p>
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="pt-2">
+                  <button type="submit" class="w-full py-3 rounded-lg text-base body-font font-semibold transition-colors" style="background: var(--color-primary); color: var(--color-text-inverse);" data-dom-id="fengshui-submit">
+                    开始分析
+                  </button>
+                </div>
+              </form>
+
+              <p class="mt-4 text-xs body-font text-center" style="color: var(--color-text-tertiary);">基于八宅明镜理论，分析户型最佳布局方位</p>
+            </div>
+          </div>
+
+          <!-- 右侧：罗盘可视化 (占3列) -->
+          <div class="lg:col-span-3">
+            <div class="rounded-xl p-6 lg:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h2 class="body-font text-lg font-semibold" style="color: var(--color-text);">八宅方位罗盘</h2>
+                  <p class="text-sm body-font mt-1" style="color: var(--color-text-tertiary);">1985年 乙丑 坎宅（坐北朝南）</p>
+                </div>
+                <!-- 图例 -->
+                <div class="hidden sm:flex items-center gap-4 shrink-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-full" style="background: var(--state-success);"></span>
+                    <span class="text-xs body-font" style="color: var(--color-text-secondary);">吉方</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-full" style="background: var(--state-error);"></span>
+                    <span class="text-xs body-font" style="color: var(--color-text-secondary);">凶方</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SVG 风水罗盘 -->
+              <div class="flex items-center justify-center">
+                <svg viewBox="0 0 400 400" width="100%" style="max-width: 400px;" aria-label="风水八方位罗盘图">
+                  <defs>
+                    <!-- 四吉方绿色渐变 -->
+                    <radialGradient id="grad-ji" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" style="stop-color: #1a8a5c; stop-opacity: 0.15;" />
+                      <stop offset="100%" style="stop-color: #1a8a5c; stop-opacity: 0.05;" />
+                    </radialGradient>
+                    <!-- 四凶方红色渐变 -->
+                    <radialGradient id="grad-xiong" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" style="stop-color: #c43a3a; stop-opacity: 0.15;" />
+                      <stop offset="100%" style="stop-color: #c43a3a; stop-opacity: 0.05;" />
+                    </radialGradient>
+                    <!-- 中心金色渐变 -->
+                    <radialGradient id="grad-center" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" style="stop-color: #c8a84e; stop-opacity: 0.2;" />
+                      <stop offset="100%" style="stop-color: #c8a84e; stop-opacity: 0.05;" />
+                    </radialGradient>
+                  </defs>
+
+                  <!-- 外圈装饰环 -->
+                  <circle cx="200" cy="200" r="195" fill="none" stroke="#c8a84e" stroke-width="1.5" stroke-opacity="0.4" />
+                  <circle cx="200" cy="200" r="190" fill="none" stroke="#c8a84e" stroke-width="0.5" stroke-opacity="0.25" />
+
+                  <!-- 八方位扇形（使用 path 扇形） -->
+                  <!-- 北（坎）- 伏位（吉） -->
+                  <path d="M200,200 L200,30 A170,170 0 0,0 122.8,52.2 Z" fill="url(#grad-ji)" stroke="#1a8a5c" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 东北（艮）- 六煞（凶） -->
+                  <path d="M200,200 L122.8,52.2 A170,170 0 0,0 52.2,122.8 Z" fill="url(#grad-xiong)" stroke="#c43a3a" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 东（震）- 天医（吉） -->
+                  <path d="M200,200 L52.2,122.8 A170,170 0 0,0 30,200 Z" fill="url(#grad-ji)" stroke="#1a8a5c" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 东南（巽）- 祸害（凶） -->
+                  <path d="M200,200 L30,200 A170,170 0 0,0 52.2,277.2 Z" fill="url(#grad-xiong)" stroke="#c43a3a" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 南（离）- 延年（吉） -->
+                  <path d="M200,200 L52.2,277.2 A170,170 0 0,0 122.8,347.8 Z" fill="url(#grad-ji)" stroke="#1a8a5c" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 西南（坤）- 绝命（凶） -->
+                  <path d="M200,200 L122.8,347.8 A170,170 0 0,0 200,370 Z" fill="url(#grad-xiong)" stroke="#c43a3a" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 西（兑）- 生氣（吉） -->
+                  <path d="M200,200 L200,370 A170,170 0 0,0 277.2,347.8 Z" fill="url(#grad-ji)" stroke="#1a8a5c" stroke-width="0.5" stroke-opacity="0.3"/>
+                  <!-- 西北（乾）- 五鬼（凶） -->
+                  <path d="M200,200 L277.2,347.8 A170,170 0 0,0 347.8,277.2 Z" fill="url(#grad-xiong)" stroke="#c43a3a" stroke-width="0.5" stroke-opacity="0.3"/>
+
+                  <!-- 方位分隔线 -->
+                  <line x1="200" y1="200" x2="200" y2="30" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="122.8" y2="52.2" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="52.2" y2="122.8" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="30" y2="200" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="52.2" y2="277.2" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="122.8" y2="347.8" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="200" y2="370" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+                  <line x1="200" y1="200" x2="277.2" y2="347.8" stroke="#004baa" stroke-width="0.8" stroke-opacity="0.2"/>
+
+                  <!-- 中心圆 -->
+                  <circle cx="200" cy="200" r="60" fill="url(#grad-center)" stroke="#c8a84e" stroke-width="1.5" stroke-opacity="0.5"/>
+                  <circle cx="200" cy="200" r="45" fill="none" stroke="#c8a84e" stroke-width="0.5" stroke-opacity="0.3"/>
+
+                  <!-- 方位文字标注 -->
+                  <!-- 北（上） -->
+                  <text x="200" y="95" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="14" font-weight="600" fill="#1a8a5c">北</text>
+                  <text x="200" y="112" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#1a8a5c" opacity="0.8">伏位</text>
+                  <!-- 东北 -->
+                  <text x="112" y="112" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="13" font-weight="600" fill="#c43a3a">东北</text>
+                  <text x="112" y="127" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#c43a3a" opacity="0.8">六煞</text>
+                  <!-- 东 -->
+                  <text x="82" y="204" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="14" font-weight="600" fill="#1a8a5c">东</text>
+                  <text x="82" y="221" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#1a8a5c" opacity="0.8">天医</text>
+                  <!-- 东南 -->
+                  <text x="112" y="300" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="13" font-weight="600" fill="#c43a3a">东南</text>
+                  <text x="112" y="315" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#c43a3a" opacity="0.8">祸害</text>
+                  <!-- 南（下） -->
+                  <text x="200" y="325" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="14" font-weight="600" fill="#1a8a5c">南</text>
+                  <text x="200" y="342" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#1a8a5c" opacity="0.8">延年</text>
+                  <!-- 西南 -->
+                  <text x="288" y="325" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="13" font-weight="600" fill="#c43a3a">西南</text>
+                  <text x="288" y="340" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#c43a3a" opacity="0.8">绝命</text>
+                  <!-- 西 -->
+                  <text x="318" y="204" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="14" font-weight="600" fill="#1a8a5c">西</text>
+                  <text x="318" y="221" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#1a8a5c" opacity="0.8">生氣</text>
+                  <!-- 西北 -->
+                  <text x="288" y="112" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="13" font-weight="600" fill="#c43a3a">西北</text>
+                  <text x="288" y="127" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#c43a3a" opacity="0.8">五鬼</text>
+
+                  <!-- 中心命卦信息 -->
+                  <text x="200" y="192" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" fill="#c8a84e" opacity="0.7">命卦</text>
+                  <text x="200" y="212" text-anchor="middle" font-family="'Noto Serif SC', serif" font-size="18" font-weight="700" fill="#004baa">坎</text>
+                  <text x="200" y="230" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="9" fill="#5a6178">属水 · 东四命</text>
+                </svg>
+              </div>
+
+              <!-- 罗盘下方的快捷信息条 -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+                <div class="text-center p-3 rounded-lg" style="background: var(--color-bg-inset);">
+                  <p class="text-xs body-font" style="color: var(--color-text-tertiary);">命卦</p>
+                  <p class="text-sm body-font font-semibold mt-0.5" style="color: var(--color-primary);">坎命（水）</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: var(--color-bg-inset);">
+                  <p class="text-xs body-font" style="color: var(--color-text-tertiary);">宅卦</p>
+                  <p class="text-sm body-font font-semibold mt-0.5" style="color: var(--color-primary);">坎宅（水）</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: var(--color-bg-inset);">
+                  <p class="text-xs body-font" style="color: var(--color-text-tertiary);">吉方</p>
+                  <p class="text-sm body-font font-semibold mt-0.5" style="color: var(--state-success);">4 个</p>
+                </div>
+                <div class="text-center p-3 rounded-lg" style="background: var(--color-bg-inset);">
+                  <p class="text-xs body-font" style="color: var(--color-text-tertiary);">凶方</p>
+                  <p class="text-sm body-font font-semibold mt-0.5" style="color: var(--state-error);">4 个</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====== 方位详情列表 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <h2 class="body-font text-lg font-semibold mb-5" style="color: var(--color-text);">八方吉凶详解</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <!-- 北 - 伏位（吉） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(26, 138, 92, 0.1); border: 1px solid rgba(26, 138, 92, 0.2);">
+              <span class="text-base font-semibold" style="color: var(--state-success);">北</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">伏位</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(26, 138, 92, 0.1); color: var(--state-success);">吉</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">安定平稳，宜设书房、卧室，利于静心养神</p>
+            </div>
+          </div>
+
+          <!-- 东北 - 六煞（凶） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(196, 58, 58, 0.1); border: 1px solid rgba(196, 58, 58, 0.2);">
+              <span class="text-xs font-semibold" style="color: var(--state-error);">东北</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">六煞</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(196, 58, 58, 0.1); color: var(--state-error);">凶</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">口舌是非之地，忌作主卧室，可设卫生间</p>
+            </div>
+          </div>
+
+          <!-- 东 - 天医（吉） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(26, 138, 92, 0.1); border: 1px solid rgba(26, 138, 92, 0.2);">
+              <span class="text-base font-semibold" style="color: var(--state-success);">东</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">天医</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(26, 138, 92, 0.1); color: var(--state-success);">大吉</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">健康长寿之位，宜设卧室、厨房，旺财添丁</p>
+            </div>
+          </div>
+
+          <!-- 东南 - 祸害（凶） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(196, 58, 58, 0.1); border: 1px solid rgba(196, 58, 58, 0.2);">
+              <span class="text-xs font-semibold" style="color: var(--state-error);">东南</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">祸害</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(196, 58, 58, 0.1); color: var(--state-error);">凶</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">损财招灾之位，宜作储物间、阳台，避开核心活动区</p>
+            </div>
+          </div>
+
+          <!-- 南 - 延年（吉） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(26, 138, 92, 0.1); border: 1px solid rgba(26, 138, 92, 0.2);">
+              <span class="text-base font-semibold" style="color: var(--state-success);">南</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">延年</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(26, 138, 92, 0.1); color: var(--state-success);">吉</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">感情和谐之位，宜设主卧、客厅，促进家庭和睦</p>
+            </div>
+          </div>
+
+          <!-- 西南 - 绝命（凶） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(196, 58, 58, 0.1); border: 1px solid rgba(196, 58, 58, 0.2);">
+              <span class="text-xs font-semibold" style="color: var(--state-error);">西南</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">绝命</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(196, 58, 58, 0.1); color: var(--state-error);">大凶</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">最凶之位，切忌设卧室或厨房，宜作杂物间</p>
+            </div>
+          </div>
+
+          <!-- 西 - 生氣（吉） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(26, 138, 92, 0.1); border: 1px solid rgba(26, 138, 92, 0.2);">
+              <span class="text-base font-semibold" style="color: var(--state-success);">西</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">生氣</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(26, 138, 92, 0.1); color: var(--state-success);">大吉</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">财位旺方，宜设客厅、餐厅，招财纳福</p>
+            </div>
+          </div>
+
+          <!-- 西北 - 五鬼（凶） -->
+          <div class="direction-card">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 44px; height: 44px; background: rgba(196, 58, 58, 0.1); border: 1px solid rgba(196, 58, 58, 0.2);">
+              <span class="text-xs font-semibold" style="color: var(--state-error);">西北</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-sm body-font font-semibold truncate" style="color: var(--color-text);">五鬼</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs body-font whitespace-nowrap" style="background: rgba(196, 58, 58, 0.1); color: var(--state-error);">凶</span>
+              </div>
+              <p class="text-xs body-font line-clamp-2" style="color: var(--color-text-secondary);">盗贼破财之位，忌作财位，可设次卫或储藏室</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====== AI 布局建议 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <div class="rounded-xl p-6 lg:p-8" style="background: var(--color-bg-elevated); box-shadow: var(--shadow-md); border: 1px solid var(--color-border-light);">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));">
+              <i data-lucide="sparkles" class="w-5 h-5" style="color: var(--color-primary-darker);"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h2 class="body-font text-lg font-semibold truncate" style="color: var(--color-text);">AI 布局建议</h2>
+              <p class="text-sm body-font truncate" style="color: var(--color-text-tertiary);">根据八宅明镜理论，为您推荐各功能区最佳方位</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- 主卧室 -->
+            <div class="p-5 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center gap-2.5 mb-3">
+                <i data-lucide="bed-double" class="w-5 h-5 shrink-0" style="color: var(--color-primary);"></i>
+                <span class="text-sm body-font font-semibold" style="color: var(--color-text);">主卧室</span>
+              </div>
+              <p class="text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">推荐设于<strong style="color: var(--state-success);">南方（延年）</strong>或<strong style="color: var(--state-success);">东方（天医）</strong>。延年位主感情和睦，天医位利健康长寿，均适合作为主人休息之所。</p>
+            </div>
+
+            <!-- 客厅 -->
+            <div class="p-5 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center gap-2.5 mb-3">
+                <i data-lucide="sofa" class="w-5 h-5 shrink-0" style="color: var(--color-primary);"></i>
+                <span class="text-sm body-font font-semibold" style="color: var(--color-text);">客厅</span>
+              </div>
+              <p class="text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">推荐设于<strong style="color: var(--state-success);">西方（生氣）</strong>。生氣为第一吉方，财气最旺，客厅为家庭核心活动区，坐落生氣位可招财纳福，家运兴旺。</p>
+            </div>
+
+            <!-- 厨房 -->
+            <div class="p-5 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center gap-2.5 mb-3">
+                <i data-lucide="cooking-pot" class="w-5 h-5 shrink-0" style="color: var(--color-primary);"></i>
+                <span class="text-sm body-font font-semibold" style="color: var(--color-text);">厨房</span>
+              </div>
+              <p class="text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">推荐设于<strong style="color: var(--state-success);">东方（天医）</strong>或<strong style="color: var(--state-success);">南方（延年）</strong>。天医位属木，与火性厨房相生；避开绝命、五鬼等凶方。</p>
+            </div>
+
+            <!-- 书房/办公室 -->
+            <div class="p-5 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center gap-2.5 mb-3">
+                <i data-lucide="book-open" class="w-5 h-5 shrink-0" style="color: var(--color-primary);"></i>
+                <span class="text-sm body-font font-semibold" style="color: var(--color-text);">书房 / 办公室</span>
+              </div>
+              <p class="text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">推荐设于<strong style="color: var(--state-success);">北方（伏位）</strong>。伏位安定平稳，有利于集中精力读书思考，学业事业双旺。</p>
+            </div>
+
+            <!-- 卫生间 -->
+            <div class="p-5 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center gap-2.5 mb-3">
+                <i data-lucide="bath" class="w-5 h-5 shrink-0" style="color: var(--color-primary);"></i>
+                <span class="text-sm body-font font-semibold" style="color: var(--color-text);">卫生间</span>
+              </div>
+              <p class="text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">宜设于<strong style="color: var(--state-error);">东北（六煞）</strong>或<strong style="color: var(--state-error);">西南（绝命）</strong>。以凶位压制秽气，化凶为吉。切忌设于生氣、延年等吉方。</p>
+            </div>
+
+            <!-- 餐厅 -->
+            <div class="p-5 rounded-lg" style="background: var(--color-bg-inset); border: 1px solid var(--color-border-light);">
+              <div class="flex items-center gap-2.5 mb-3">
+                <i data-lucide="utensils" class="w-5 h-5 shrink-0" style="color: var(--color-primary);"></i>
+                <span class="text-sm body-font font-semibold" style="color: var(--color-text);">餐厅</span>
+              </div>
+              <p class="text-sm body-font leading-relaxed" style="color: var(--color-text-secondary);">推荐设于<strong style="color: var(--state-success);">西方（生氣）</strong>或<strong style="color: var(--state-success);">南方（延年）</strong>。生氣位进食有助消化吸收，延年位促进家庭和谐。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== 相关推荐 ====== -->
+      <section class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <h2 class="body-font text-lg font-semibold mb-5" style="color: var(--color-text);">相关推荐</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <!-- 八字排盘 -->
+          <a href="#" class="flex items-center gap-4 p-4 rounded-xl transition-colors group" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);" data-dom-id="rec-bazi">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg-strong);">
+              <i data-lucide="columns-3" class="w-6 h-6" style="color: var(--color-primary);"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm body-font font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors" style="color: var(--color-text);">八字排盘</h3>
+              <p class="text-xs body-font truncate mt-0.5" style="color: var(--color-text-tertiary);">四柱八字，推算五行与大运流年</p>
+            </div>
+          </a>
+          <!-- 紫微斗数 -->
+          <a href="#" class="flex items-center gap-4 p-4 rounded-xl transition-colors group" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);" data-dom-id="rec-ziwei">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg-strong);">
+              <i data-lucide="orbit" class="w-6 h-6" style="color: var(--color-primary);"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm body-font font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors" style="color: var(--color-text);">紫微斗数</h3>
+              <p class="text-xs body-font truncate mt-0.5" style="color: var(--color-text-tertiary);">帝王之术，精准推断命宫与十二宫位</p>
+            </div>
+          </a>
+          <!-- 奇门遁甲 -->
+          <a href="#" class="flex items-center gap-4 p-4 rounded-xl transition-colors group" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);" data-dom-id="rec-qimen">
+            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg-strong);">
+              <i data-lucide="shield" class="w-6 h-6" style="color: var(--color-primary);"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm body-font font-semibold truncate group-hover:text-[var(--color-primary)] transition-colors" style="color: var(--color-text);">奇门遁甲</h3>
+              <p class="text-xs body-font truncate mt-0.5" style="color: var(--color-text-tertiary);">择吉择方，时空数理预测决策辅助</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ====== 免责声明 ====== -->
+      <footer class="mx-auto px-4 lg:px-8 pb-12" style="max-width: var(--max-width);">
+        <div class="p-4 rounded-lg text-xs body-font leading-relaxed" style="background: var(--color-bg-inset); color: var(--color-text-tertiary); border: 1px solid var(--color-border-light);">
+          <p class="mb-1"><strong style="color: var(--color-text-secondary);">免责声明：</strong>本工具仅供娱乐参考，基于传统风水理论与 AI 算法生成结果，不代表任何科学论断或专业建议。请理性看待分析结果，切勿将其作为重要决策的唯一依据。</p>
+          <p>天机 AI — 探索东方智慧的无限可能</p>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

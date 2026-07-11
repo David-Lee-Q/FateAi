@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风水堪舆分析 — 天机</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+:root { --color-primary: #004baa; --color-gold: #c8a84e; --color-bg: #0a0e1a; --color-bg-elevated: #111827; --color-bg-inset: #0d1424; --color-text: #e8ecf4; --color-text-secondary: #8b95a8; --color-text-tertiary: #5a6278; --color-border: rgba(255,255,255,0.08); --font-body: 'Noto Sans SC', sans-serif; --max-width: 1280px; --nav-height: 64px; }
+.nav-glass { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(40px); border-bottom: 1px solid rgba(255,255,255,0.12); }
+.nav-link { color: var(--color-text-secondary); font-size: 0.875rem; }
+.nav-link:hover { color: var(--color-text-inverse); }
+[data-icon] { display: inline-flex; align-items: center; justify-content: center; background-color: currentColor; }
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body); background: var(--color-bg); color: var(--color-text);">
+    <main class="relative z-10">
+        <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+            <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <a href="#"><span class="text-xl font-semibold" style="color: var(--color-gold);">天机</span></a>
+                <nav class="hidden md:flex items-center gap-8"><a href="#" class="nav-link">首页</a><a href="#" class="nav-link">东方命理</a><a href="#" class="nav-link">西方占卜</a><a href="#" class="nav-link">民俗趣味</a><a href="#" class="nav-link">AI 洞察</a><a href="#" class="nav-link">个人中心</a></nav>
+                <div class="flex items-center gap-4"><button style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);"><i data-lucide="search" style="width:20px;height:20px;"></i></button><div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold));"><i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i></div></div>
+            </div>
+        </header>
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-32" style="max-width: var(--max-width);">
+            <div class="flex items-center gap-3 mb-6">
+                <button class="inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg" style="color: var(--color-primary); background: rgba(0,75,170,0.06);"><i data-lucide="chevron-left" class="w-4 h-4"></i>返回</button>
+                <div class="flex items-center gap-2 text-sm" style="color: var(--color-text-tertiary);"><span>东方命理</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>风水堪舆</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span style="color: var(--color-text-secondary);">分析结果</span></div>
+            </div>
+            <!-- 风水堪舆专属头部 -->
+            <section class="mb-8 p-6 rounded-xl" style="background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(0,75,170,0.1) 100%); border: 1px solid rgba(34,197,94,0.2);">
+                <div class="flex items-start justify-between flex-wrap gap-4">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                            风水堪舆
+                        </span>
+                        <h1 class="mt-4 text-2xl md:text-3xl font-bold">坐北朝南 · 旺宅格局</h1>
+                        <p class="mt-2 text-sm" style="color: var(--color-text-secondary);">分析地址：XXXX市XXXX区XXXX路XX号</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-medium" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);">坐山</span>
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-medium" style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3);">向首</span>
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-medium" style="background: rgba(200,168,78,0.15); color: var(--color-gold); border: 1px solid rgba(200,168,78,0.3);">元运</span>
+                    </div>
+                </div>
+            </section>
+            <!-- 九宫八卦 -->
+            <section class="mb-8 p-6 md:p-8 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+                <h2 class="text-lg font-bold flex items-center gap-2 mb-6" style="color: var(--color-text);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+                    九宫飞星
+                </h2>
+                <div class="grid grid-cols-3 gap-3 max-w-md mx-auto">
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);"><span class="text-xs" style="color: #f87171;">东南</span><div class="text-lg font-bold" style="color: #f87171;">五黄</div><div class="text-xs" style="color: var(--color-text-tertiary);">廉贞星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);"><span class="text-xs" style="color: #4ade80;">正南</span><div class="text-lg font-bold" style="color: #4ade80;">九紫</div><div class="text-xs" style="color: var(--color-text-tertiary);">右弼星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.2);"><span class="text-xs" style="color: #fb923c;">西南</span><div class="text-lg font-bold" style="color: #fb923c;">一白</div><div class="text-xs" style="color: var(--color-text-tertiary);">贪狼星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.2);"><span class="text-xs" style="color: #fb923c;">正东</span><div class="text-lg font-bold" style="color: #fb923c;">三碧</div><div class="text-xs" style="color: var(--color-text-tertiary);">禄存星</div></div>
+                    <div class="text-center p-3 rounded-lg relative" style="background: rgba(200,168,78,0.15); border: 2px solid var(--color-gold);"><span class="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[10px]" style="background: var(--color-gold); color: #0a0e1a;">中宫</span><span class="text-xs mt-2" style="color: var(--color-gold);">中央</span><div class="text-lg font-bold" style="color: var(--color-gold);">二黑</div><div class="text-xs" style="color: var(--color-gold);">巨门星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.2);"><span class="text-xs" style="color: #60a5fa;">正西</span><div class="text-lg font-bold" style="color: #60a5fa;">七赤</div><div class="text-xs" style="color: var(--color-text-tertiary);">破军星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.2);"><span class="text-xs" style="color: #60a5fa;">东北</span><div class="text-lg font-bold" style="color: #60a5fa;">八白</div><div class="text-xs" style="color: var(--color-text-tertiary);">左辅星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);"><span class="text-xs" style="color: #a855f7;">正北</span><div class="text-lg font-bold" style="color: #a855f7;">六白</div><div class="text-xs" style="color: var(--color-text-tertiary);">武曲星</div></div>
+                    <div class="text-center p-3 rounded-lg" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);"><span class="text-xs" style="color: #a855f7;">西北</span><div class="text-lg font-bold" style="color: #a855f7;">四绿</div><div class="text-xs" style="color: var(--color-text-tertiary);">文昌星</div></div>
+                </div>
+            </section>
+            <!-- 风水分析 -->
+            <section class="mb-8 p-6 md:p-8 rounded-xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border);">
+                <h2 class="text-lg font-bold mb-6" style="color: var(--color-text);">风水诊断</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-lg" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-lg">✅</span><span class="text-sm font-medium" style="color: #10b981;">吉位</span></div>
+                        <p class="text-sm" style="color: var(--color-text-secondary);">正南方九紫右弼星临位，利文昌、桃花，宜摆放红色饰品增强运势。</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-lg">⚠️</span><span class="text-sm font-medium" style="color: #f87171;">需注意</span></div>
+                        <p class="text-sm" style="color: var(--color-text-secondary);">东南方五黄廉贞星临位，主是非疾病，宜摆放金属物品或绿色植物化解。</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-lg">✅</span><span class="text-sm font-medium" style="color: #10b981;">吉位</span></div>
+                        <p class="text-sm" style="color: var(--color-text-secondary);">东北方八白左辅星临位，主财帛、利创业，宜保持整洁明亮。</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);">
+                        <div class="flex items-center gap-2 mb-2"><span class="text-lg">💡</span><span class="text-sm font-medium" style="color: #fbbf24;">建议</span></div>
+                        <p class="text-sm" style="color: var(--color-text-secondary);">西北方四绿文昌星临位，利学业、仕途，可摆放文昌塔或富贵竹。</p>
+                    </div>
+                </div>
+            </section>
+            <!-- AI解读 -->
+            <section class="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%);">
+                <div class="absolute inset-0 pointer-events-none"><div class="absolute -top-10 -right-10 w-40 h-40 rounded-full" style="background: radial-gradient(circle, rgba(52,211,153,0.3) 0%, transparent 70%);"></div></div>
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(52,211,153,0.2);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
+                        <h2 class="text-lg font-bold" style="color: #fff;">AI 深度解读</h2>
+                        <span class="ml-auto text-[10px] px-2 py-0.5 rounded" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);">Powered by AI</span>
+                    </div>
+                    <div class="h-px mb-6" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);"></div>
+                    <div class="space-y-4 mb-6">
+                        <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.9);">此宅坐北朝南，属于<strong style="color: #6ee7b7;">旺宅格局</strong>。当前九宫飞星中，<strong style="color: #6ee7b7;">九紫右弼星</strong>飞临正南，利文昌、桃花、人缘。</p>
+                        <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.8);">东南五黄临位需注意，此处忌放锐利物品或红色装饰，宜用金属或植物化解。整体而言，此宅<strong style="color: #6ee7b7;">气场平和，适合居住</strong>。建议在大门处放置地垫增强贵人运。</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1 flex items-center px-4 py-3 rounded-lg" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);"><input type="text" placeholder="继续追问风水..." class="bg-transparent outline-none text-sm flex-1" style="color: #fff;"></div>
+                        <button class="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--color-gold); color: #0a0e1a;"><i data-lucide="send" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="fixed bottom-0 left-0 right-0 z-40" style="background: var(--color-bg-elevated); border-top: 1px solid var(--color-border-light);">
+            <div class="mx-auto flex items-center justify-center gap-4 md:gap-8 px-6 py-3" style="max-width: var(--max-width);">
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="heart" class="w-5 h-5"></i><span class="text-xs">收藏</span></button>
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="share-2" class="w-5 h-5"></i><span class="text-xs">分享</span></button>
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="file-text" class="w-5 h-5"></i><span class="text-xs">报告</span></button>
+                <button class="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style="color: var(--color-text-secondary);"><i data-lucide="refresh-cw" class="w-5 h-5"></i><span class="text-xs">重测</span></button>
+            </div>
+        </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

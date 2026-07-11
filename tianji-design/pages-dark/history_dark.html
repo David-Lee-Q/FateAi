@@ -1,0 +1,638 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史记录 — 天机</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1424;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-tertiary: #5a6278;
+  --color-text-inverse: #ffffff;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 历史记录卡片 */
+    .history-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      transition: all var(--transition-fast);
+    }
+    .history-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-border);
+    }
+    /* 体系标签 */
+    .system-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    /* 筛选下拉 */
+    .filter-select {
+      appearance: none;
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b92a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px;
+    }
+    .filter-select:hover {
+      border-color: var(--color-primary-lighter);
+    }
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-bg);
+    }
+    /* 操作图标按钮 */
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      background: var(--color-primary-bg);
+    }
+    .icon-btn-fav {
+      color: var(--color-text-tertiary);
+    }
+    .icon-btn-fav.favorited {
+      color: var(--color-gold);
+    }
+    .icon-btn-delete {
+      color: var(--color-text-tertiary);
+    }
+    .icon-btn-delete:hover {
+      background: rgba(196, 58, 58, 0.08);
+      color: var(--state-error);
+    }
+    /* 查看按钮 */
+    .btn-view {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--color-primary);
+      background: var(--color-primary-bg);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .btn-view:hover {
+      background: var(--color-primary-bg-strong);
+      border-color: var(--color-primary-lighter);
+    }
+    /* 清空按钮 */
+    .btn-clear-all {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--state-error);
+      background: rgba(196, 58, 58, 0.06);
+      border: 1px solid rgba(196, 58, 58, 0.2);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .btn-clear-all:hover {
+      background: rgba(196, 58, 58, 0.12);
+      border-color: rgba(196, 58, 58, 0.35);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--font-body);">
+    <main>
+
+      <!-- ========== 1. 导航栏 ========== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+      <!-- ========== 页面主体内容 ========== -->
+      <div class="mx-auto px-6 lg:px-8 pt-6 pb-32" style="max-width: var(--max-width);">
+
+        <!-- ========== 2. 面包屑 + 标题区 ========== -->
+        <section class="mb-6">
+          <!-- 面包屑 -->
+          <div class="flex items-center gap-2 mb-5 text-sm" style="color: var(--color-text-tertiary);">
+            <span>首页</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0"></i>
+            <span style="color: var(--color-text-secondary);">历史记录</span>
+          </div>
+          <!-- 标题 + 副标题 -->
+          <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-2" style="color: var(--color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+            历史记录
+          </h1>
+          <p class="text-sm md:text-base" style="color: var(--color-text-secondary);">
+            查看和管理你的占卜记录
+          </p>
+        </section>
+
+        <!-- ========== 3. 筛选栏 ========== -->
+        <section class="mb-6" data-dom-id="history-filter">
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- 体系筛选 -->
+            <select class="filter-select">
+              <option value="all">全部体系</option>
+              <option value="eastern">东方命理</option>
+              <option value="western">西方占卜</option>
+              <option value="folk">民俗</option>
+              <option value="ai">AI 洞察</option>
+            </select>
+            <!-- 时间排序 -->
+            <select class="filter-select">
+              <option value="newest">最新优先</option>
+              <option value="oldest">最早优先</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- ========== 4. 统计摘要 ========== -->
+        <section class="mb-6">
+          <div class="flex items-center gap-4 text-sm" style="color: var(--color-text-secondary);">
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <i data-lucide="scroll-text" class="w-4 h-4 shrink-0" style="color: var(--color-primary);"></i>
+              共 <strong class="font-semibold" style="color: var(--color-text);">8</strong> 条记录
+            </span>
+            <span style="color: var(--color-border-light);">|</span>
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 16 16" fill="var(--color-gold)" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+              </svg>
+              <strong class="font-semibold" style="color: var(--color-text);">3</strong> 条收藏
+            </span>
+          </div>
+        </section>
+
+        <!-- ========== 5. 历史列表 ========== -->
+        <section class="flex flex-col gap-3 mb-8">
+
+          <!-- 记录 1：八字排盘（收藏） -->
+          <div class="history-card">
+            <!-- 左侧：体系图标+标签 -->
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-primary-bg-strong);">
+                <i data-lucide="circle-dot" class="w-5 h-5" style="color: var(--color-primary);"></i>
+              </div>
+              <span class="system-tag" style="background: var(--color-primary-bg-strong); color: var(--color-primary);">八字排盘</span>
+            </div>
+            <!-- 中间：摘要+时间 -->
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">壬水日主生于午月，甲辰年偏印坐库分析</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-09 14:32</span>
+            </div>
+            <!-- 右侧：操作 -->
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav favorited" title="取消收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 2：塔罗牌阵 -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(139, 92, 246, 0.1);">
+                <i data-lucide="layers" class="w-5 h-5" style="color: #8b5cf6;"></i>
+              </div>
+              <span class="system-tag" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">塔罗牌阵</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">凯尔特十字牌阵 — 事业方向指引</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-08 20:15</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav" title="收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 3：紫微斗数（收藏） -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(200, 168, 78, 0.1);">
+                <i data-lucide="orbit" class="w-5 h-5" style="color: var(--color-gold-dark);"></i>
+              </div>
+              <span class="system-tag" style="background: rgba(200, 168, 78, 0.1); color: var(--color-gold-dark);">紫微斗数</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">命盘十二宫分析 — 事业宫紫微星坐守</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-07 10:48</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav favorited" title="取消收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 4：星座运势 -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(56, 189, 248, 0.1);">
+                <i data-lucide="sparkles" class="w-5 h-5" style="color: #38bdf8;"></i>
+              </div>
+              <span class="system-tag" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">星座运势</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">天蝎座本周运势 — 综合运势评分 82</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-06 08:30</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav" title="收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 5：梅花易数 -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(34, 197, 94, 0.1);">
+                <i data-lucide="flower-2" class="w-5 h-5" style="color: #22c55e;"></i>
+              </div>
+              <span class="system-tag" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">梅花易数</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">占问项目合作前景 — 火水未济变火风鼎</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-05 16:22</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav" title="收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 6：六爻排卦 -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(251, 146, 60, 0.1);">
+                <i data-lucide="hexagon" class="w-5 h-5" style="color: #fb923c;"></i>
+              </div>
+              <span class="system-tag" style="background: rgba(251, 146, 60, 0.1); color: #fb923c;">六爻排卦</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">天水讼卦变天火同人 — 诉讼纠纷问运</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-04 11:05</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav" title="收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 7：AI 洞察报告（收藏） -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, rgba(0,75,170,0.12), rgba(200,168,78,0.08));">
+                <i data-lucide="brain" class="w-5 h-5" style="color: var(--color-primary);"></i>
+              </div>
+              <span class="system-tag" style="background: linear-gradient(135deg, rgba(0,75,170,0.12), rgba(200,168,78,0.08)); color: var(--color-primary);">AI 洞察</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">综合运势报告 — 八字+塔罗+星座交叉分析</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-03 09:18</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav favorited" title="取消收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+          <!-- 记录 8：周公解梦 -->
+          <div class="history-card">
+            <div class="flex items-center gap-3 shrink-0" style="min-width: 130px;">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(168, 85, 247, 0.1);">
+                <i data-lucide="moon" class="w-5 h-5" style="color: #a855f7;"></i>
+              </div>
+              <span class="system-tag" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">解梦分析</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-1">
+              <p class="text-sm font-medium truncate" style="color: var(--color-text);">梦见大水漫延 — 民俗周公解梦分析</p>
+              <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">2026-07-02 07:45</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="icon-btn icon-btn-fav" title="收藏">
+                <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 1.5l1.85 3.75 4.15.6-3 2.93.71 4.12L8 10.94 4.29 12.9l.71-4.12-3-2.93 4.15-.6L8 1.5z"/>
+                </svg>
+              </button>
+              <button class="icon-btn icon-btn-delete" title="删除">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button class="btn-view" title="查看详情">查看</button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ========== 6. 底部操作 ========== -->
+        <section class="flex items-center justify-between">
+          <div></div>
+          <button class="btn-clear-all">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            清空全部记录
+          </button>
+        </section>
+
+        <!-- ========== 7. 空状态提示（默认隐藏） ========== -->
+        <section class="hidden flex-col items-center justify-center py-24">
+          <div class="w-20 h-20 rounded-full flex items-center justify-center mb-6" style="background: var(--color-primary-bg);">
+            <i data-lucide="scroll-text" class="w-10 h-10" style="color: var(--color-primary-lighter);"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2" style="color: var(--color-text);">暂无占卜记录</h3>
+          <p class="text-sm mb-6" style="color: var(--color-text-tertiary);">你的每一次占卜都会在这里留下记录</p>
+          <a href="#" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-white transition-colors" style="background: var(--color-primary);">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            开始占卜
+          </a>
+        </section>
+
+      </div>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+

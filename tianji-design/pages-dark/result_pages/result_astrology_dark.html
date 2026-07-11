@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>占星骰子解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-astrology: #7c3aed;
+            --color-mars: #ef4444;
+            --color-venus: #ec4899;
+            --color-mercury: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .dice-container {
+            perspective: 1000px;
+        }
+        .dice {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2d1b69, #1a1040);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(124, 58, 237, 0.4);
+            position: relative;
+        }
+        .dice-face {
+            font-size: 36px;
+            color: var(--color-gold);
+            text-shadow: 0 0 20px rgba(200, 168, 78, 0.5);
+        }
+        .planet-symbol {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 30px currentColor;
+        }
+        .aspect-line {
+            stroke-dasharray: 5, 5;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -100; }
+        }
+        .zodiac-wheel {
+            position: relative;
+        }
+        .sign-item {
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .interpretation-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">占星骰子</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-purple-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 占星骰子头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-purple-900/40 via-slate-900/50 to-indigo-900/40 rounded-2xl p-6 border border-purple-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-dice-d20 text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">占星骰子解读</h1>
+                    <p class="text-purple-300">行星 · 星座 · 宫位</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/40">
+                    <i class="fas fa-star mr-1"></i>行星：太阳
+                </span>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-fire mr-1"></i>星座：白羊座
+                </span>
+                <span class="px-3 py-1 bg-rose-500/20 text-rose-300 rounded-full text-sm border border-rose-500/40">
+                    <i class="fas fa-home mr-1"></i>宫位：第5宫
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 骰子结果展示 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-8 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-dice text-purple-400"></i>
+                骰子结果
+            </h2>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <!-- 第一颗骰子 - 行星 -->
+                <div class="flex flex-col items-center">
+                    <div class="dice-container mb-4">
+                        <div class="dice">
+                            <i class="fas fa-sun dice-face"></i>
+                        </div>
+                    </div>
+                    <span class="text-amber-400 font-bold text-lg mb-1">太阳 ☉</span>
+                    <span class="text-gray-400 text-sm">代表：核心自我、生命能量</span>
+                </div>
+                
+                <!-- 第二颗骰子 - 星座 -->
+                <div class="flex flex-col items-center">
+                    <div class="dice-container mb-4">
+                        <div class="dice">
+                            <span class="dice-face">♈</span>
+                        </div>
+                    </div>
+                    <span class="text-rose-400 font-bold text-lg mb-1">白羊座</span>
+                    <span class="text-gray-400 text-sm">代表：行动力、开创精神</span>
+                </div>
+                
+                <!-- 第三颗骰子 - 宫位 -->
+                <div class="flex flex-col items-center">
+                    <div class="dice-container mb-4">
+                        <div class="dice">
+                            <span class="dice-face text-2xl">5</span>
+                        </div>
+                    </div>
+                    <span class="text-purple-400 font-bold text-lg mb-1">第5宫</span>
+                    <span class="text-gray-400 text-sm">代表：恋爱、创意、子女</span>
+                </div>
+            </div>
+
+            <!-- 综合解读卡片 -->
+            <div class="interpretation-card rounded-xl p-5">
+                <h3 class="text-purple-400 font-semibold mb-3 flex items-center gap-2">
+                    <i class="fas fa-analysis"></i>
+                    综合含义
+                </h3>
+                <p class="text-gray-300 leading-relaxed">
+                    太阳落入白羊座第5宫，是极度有力的星象配置。你充满了创造力和热情，自我表达的方式直接而有力。在恋爱、创意、自我展现方面，你拥有充沛的生命能量。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 行星详解 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-sun text-amber-400"></i>
+                太阳 ☉ — 生命之光
+            </h2>
+            <div class="bg-amber-500/10 rounded-xl p-5 border border-amber-500/30 mb-4">
+                <p class="text-amber-300 leading-relaxed">
+                    太阳是占星术中最重要的星体，代表核心自我、生命力、个人意志和创造力的来源。它揭示了你如何展现自己的力量，以及你生命中最重要的领域。
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-900/50 rounded-lg p-4">
+                    <h4 class="text-amber-400 text-sm font-medium mb-2">正向特质</h4>
+                    <p class="text-gray-400 text-sm">自信、活力、创造力、领导力、慷慨</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-4">
+                    <h4 class="text-amber-400 text-sm font-medium mb-2">挑战课题</h4>
+                    <p class="text-gray-400 text-sm">避免自我中心、控制欲过强、过于争强好胜</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 星座详解 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl p-6 border border-slate-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-fire text-rose-400"></i>
+                白羊座 ♈ — 火的开始
+            </h2>
+            <div class="bg-rose-500/10 rounded-xl p-5 border border-rose-500/30 mb-4">
+                <p class="text-rose-300 leading-relaxed">
+                    白羊座是黄道十二星座的第一个，代表新生、冒险和勇气。这是一个充满热情和行动力的星座，喜欢挑战和竞争，不畏惧成为第一个吃螃蟹的人。
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-slate-900/50 rounded-lg p-4">
+                    <h4 class="text-rose-400 text-sm font-medium mb-2">性格特点</h4>
+                    <p class="text-gray-400 text-sm">勇敢、直接、充满活力、独立、积极</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-4">
+                    <h4 class="text-rose-400 text-sm font-medium mb-2">人生课题</h4>
+                    <p class="text-gray-400 text-sm">学会耐心、倾听他人、接受失败</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 宫位指引 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-purple-900/30 to-slate-900/50 rounded-2xl p-6 border border-purple-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-home text-purple-400"></i>
+                第5宫 — 创造与恋爱之宫
+            </h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                第5宫代表创造力、自我表达、恋爱关系、子女、娱乐和艺术才华。骰子落在此宫，暗示你在这几个方面拥有强大的能量和机遇。
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <i class="fas fa-heart text-rose-400 mb-2"></i>
+                    <p class="text-xs text-gray-400">恋爱</p>
+                    <p class="text-sm text-white">热情主动</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <i class="fas fa-palette text-amber-400 mb-2"></i>
+                    <p class="text-xs text-gray-400">创意</p>
+                    <p class="text-sm text-white">灵感丰富</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <i class="fas fa-theater-masks text-purple-400 mb-2"></i>
+                    <p class="text-xs text-gray-400">娱乐</p>
+                    <p class="text-sm text-white">享受生活</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <i class="fas fa-child text-cyan-400 mb-2"></i>
+                    <p class="text-xs text-gray-400">才华</p>
+                    <p class="text-sm text-white">艺术天赋</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-purple-900/30 to-slate-900/60 rounded-2xl p-6 border border-purple-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于占星原理的个性化分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    太阳落在白羊座第5宫，这是一个充满创造力和热情的配置。你的内在太阳燃烧得格外旺盛，这让你在自我表达、恋爱和创意领域有着非凡的能量。
+                    <br><br>
+                    <span class="text-purple-400 font-medium">核心启示：</span>你的人生舞台在创造与表达。在艺术创作、恋爱追求或任何需要展现自我的领域，你都能发光发热。这段时间适合大胆展示才华，追求心之所向。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">行动指引：</span>不要害怕成为焦点，让你的光芒被看见。同时注意在追求目标时保持真诚，避免过度竞争的心态。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-purple-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,609 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手相算命 — 天机</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #0a0e1a;
+  --color-bg-elevated: #111827;
+  --color-bg-inset: #0d1220;
+  --color-text: #e8ecf4;
+  --color-text-secondary: #a0aac0;
+  --color-text-tertiary: #6b7590;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #1e2740;
+  --color-border-light: #161e35;
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #a88a3a;
+
+  /* State colors */
+  --state-success: #10b981;
+  --state-warning: #f59e0b;
+  --state-error: #ef4444;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.4);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+  }
+
+  /* ========== 手掌装饰 SVG 样式 ========== */
+  .palm-illustration {
+    position: relative;
+  }
+  .palm-illustration svg {
+    filter: drop-shadow(0 0 30px rgba(200, 168, 78, 0.2));
+  }
+
+  /* ========== 手掌上传区域 ========== */
+  .upload-zone {
+    border: 2px dashed rgba(200, 168, 78, 0.3);
+    border-radius: var(--radius-xl);
+    background: rgba(200, 168, 78, 0.03);
+    transition: all var(--transition-base);
+    cursor: pointer;
+  }
+  .upload-zone:hover {
+    border-color: rgba(200, 168, 78, 0.5);
+    background: rgba(200, 168, 78, 0.06);
+  }
+  .upload-zone.drag-over {
+    border-color: var(--color-gold);
+    background: rgba(200, 168, 78, 0.1);
+    transform: scale(1.02);
+  }
+
+  /* ========== 结果卡片 ========== */
+  .result-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200, 168, 78, 0.3), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+  .result-card:hover::before { opacity: 1; }
+
+  /* ========== 生命线/感情线/智慧线 进度条 ========== */
+  .line-progress {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    position: relative;
+  }
+  .line-progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-out;
+  }
+
+  /* ========== 五行手相图标 ========== */
+  .wuxing-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all var(--transition-base);
+  }
+  .wuxing-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ========== 掌型卡片 ========== */
+  .palm-type-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-align: center;
+    transition: all var(--transition-base);
+    cursor: pointer;
+  }
+  .palm-type-card:hover {
+    border-color: rgba(200, 168, 78, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .palm-type-card.selected {
+    border-color: var(--color-gold);
+    background: rgba(200, 168, 78, 0.1);
+    box-shadow: 0 0 20px rgba(200, 168, 78, 0.15);
+  }
+
+  /* ========== 性别选择按钮 ========== */
+  .gender-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    font-weight: 500;
+    transition: all var(--transition-base);
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+  }
+  .gender-btn:hover {
+    border-color: rgba(200, 168, 78, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .gender-btn.selected {
+    border-color: var(--color-gold);
+    background: rgba(200, 168, 78, 0.12);
+    color: var(--color-gold-light);
+  }
+
+  /* ========== 分析中加载动画 ========== */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(200, 168, 78, 0.2); }
+    50% { box-shadow: 0 0 40px rgba(200, 168, 78, 0.4); }
+  }
+  .analyzing {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* ========== 导航栏 ========== */
+  .nav-glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(200, 168, 78, 0.04) 100%);
+    backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .nav-link {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast);
+  }
+  .nav-link:hover { color: var(--color-text-inverse); }
+  .nav-link.active { color: var(--color-text-inverse); }
+
+  /* ========== 星空背景 ========== */
+  .starfield { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .starfield .layer-1, .starfield .layer-2, .starfield .layer-3 {
+    position: absolute; border-radius: 50%; background: #fff;
+  }
+  .starfield .layer-1 {
+    width: 2px; height: 2px;
+    box-shadow: 120px 40px 0 0 rgba(255,255,255,0.7), 250px 120px 0 0 rgba(255,255,255,0.5),
+      400px 30px 0 0 rgba(255,255,255,0.6), 550px 180px 0 0 rgba(255,255,255,0.4),
+      700px 80px 0 0 rgba(255,255,255,0.8), 850px 200px 0 0 rgba(255,255,255,0.5);
+    animation: twinkle1 4s ease-in-out infinite alternate;
+  }
+  .starfield .layer-2 {
+    width: 1px; height: 1px;
+    box-shadow: 80px 100px 0 0 rgba(255,255,255,0.4), 200px 200px 0 0 rgba(255,255,255,0.3),
+      350px 80px 0 0 rgba(255,255,255,0.5), 480px 220px 0 0 rgba(255,255,255,0.3),
+      620px 140px 0 0 rgba(255,255,255,0.6);
+    animation: twinkle2 6s ease-in-out infinite alternate;
+  }
+  .starfield .layer-3 {
+    width: 3px; height: 3px;
+    box-shadow: 180px 60px 0 0 rgba(200,168,78,0.6), 450px 150px 0 0 rgba(200,168,78,0.4);
+    animation: twinkle3 5s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle1 { 0% { opacity: 0.4; } 100% { opacity: 1; } }
+  @keyframes twinkle2 { 0% { opacity: 0.6; } 100% { opacity: 0.3; } }
+  @keyframes twinkle3 { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+
+  /* ========== 按钮样式 ========== */
+  .btn-primary {
+    background: var(--color-gold);
+    color: var(--color-primary-darker);
+    font-weight: 600;
+    border-radius: var(--radius-lg);
+    padding: 14px 32px;
+    font-size: var(--text-base);
+    transition: all var(--transition-base);
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background: var(--color-gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(200, 168, 78, 0.3);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .content-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+</style>
+<style>
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  [data-icon] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-mask-size: contain; mask-size: contain;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+    background-color: currentColor;
+  }
+  @media (max-width: 768px) {
+    .mobile-menu-btn { display: flex; }
+    .nav-links { display: none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen antialiased body-font" style="background: #0a0e1a; color: var(--color-text);">
+    <main>
+
+      <!-- ==================== 1. 顶部导航栏 ==================== -->
+      <header class="nav-glass fixed top-0 left-0 w-full z-50" style="height: var(--nav-height);">
+        <div class="content-container h-full flex items-center justify-between">
+          <a href="home.html" class="flex items-center gap-3 no-underline">
+            <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+          </a>
+          <nav class="nav-links hidden md:flex items-center gap-8">
+            <a href="home.html" class="nav-link">首页</a>
+            <a href="#" class="nav-link">东方命理</a>
+            <a href="#" class="nav-link">西方占卜</a>
+            <a href="folk.html" class="nav-link active">民俗趣味</a>
+            <a href="aiinsight.html" class="nav-link">AI 洞察</a>
+            <a href="profile.html" class="nav-link">个人中心</a>
+          </nav>
+          <div class="hidden md:flex items-center gap-4">
+            <button class="nav-link p-2 rounded-lg" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);">
+              <i data-lucide="search" style="width:20px;height:20px;"></i>
+            </button>
+            <a href="profile.html" class="w-8 h-8 rounded-full flex items-center justify-center no-underline" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold));">
+              <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+            </a>
+          </div>
+          <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+            <i data-lucide="menu" style="width:24px;height:24px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================== 2. 页面标题区 ==================== -->
+      <section class="relative overflow-hidden" style="background: linear-gradient(180deg, #1a0a2e 0%, #0a0e1a 100%); padding-top: calc(var(--nav-height) + var(--space-16)); padding-bottom: var(--space-16);">
+        <div class="starfield">
+          <div class="layer-1"></div>
+          <div class="layer-2"></div>
+          <div class="layer-3"></div>
+        </div>
+        <div class="content-container relative z-10">
+          <!-- 面包屑 -->
+          <nav class="flex items-center gap-2 text-sm mb-6" style="color: var(--color-text-tertiary);">
+            <a href="home.html" class="hover:text-white no-underline" style="color: var(--color-text-tertiary);">首页</a>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <a href="folk.html" class="hover:text-white no-underline" style="color: var(--color-text-tertiary);">民俗趣味</a>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="color: var(--color-gold-light);">手相算命</span>
+          </nav>
+
+          <!-- 手掌装饰 + 标题 -->
+          <div class="flex items-center gap-6 mb-6">
+            <!-- 手掌 SVG 装饰 -->
+            <div class="palm-illustration hidden sm:flex items-center justify-center" style="width: 72px; height: 72px;">
+              <svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 8C32 8 28 16 28 24C28 32 32 36 32 36" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M20 12C20 12 14 20 14 28C14 36 18 42 18 42" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M44 12C44 12 50 20 50 28C50 36 46 42 46 42" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M32 28C32 28 24 32 20 40C16 48 16 56 32 56C48 56 48 48 44 40C40 32 32 28 32 28Z" fill="rgba(200,168,78,0.15)" stroke="var(--color-gold)" stroke-width="2"/>
+                <path d="M24 36C24 36 28 48 32 48C36 48 40 36 40 36" stroke="var(--color-gold-light)" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M26 44C26 44 30 50 32 50C34 50 38 44 38 44" stroke="var(--color-gold-light)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div>
+              <h1 class="display-font font-bold" style="font-size: clamp(2rem, 4vw, var(--text-4xl)); color: #fff; letter-spacing: 0.04em; line-height: var(--leading-tight);">
+                手相算命
+              </h1>
+              <p class="mt-3" style="color: var(--color-text-secondary); font-size: var(--text-base);">
+                上传手掌照片，AI 智能分析三大主线与掌型特征
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 3. 输入表单区 ==================== -->
+      <section style="background: #0a0e1a; padding: var(--space-12) 0 var(--space-16);">
+        <div class="content-container">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+            <!-- 左侧：上传区域 + 性别选择 -->
+            <div>
+              <h2 class="text-xl font-semibold mb-6" style="color: var(--color-text);">上传手掌照片</h2>
+
+              <!-- 上传区域 -->
+              <div class="upload-zone p-8 mb-6">
+                <div class="flex flex-col items-center justify-center text-center">
+                  <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background: rgba(200, 168, 78, 0.1);">
+                    <i data-lucide="upload-cloud" style="width:32px;height:32px;color:var(--color-gold);"></i>
+                  </div>
+                  <p class="text-base font-medium mb-2" style="color: var(--color-text);">点击或拖拽上传手掌照片</p>
+                  <p class="text-sm" style="color: var(--color-text-tertiary);">支持 JPG、PNG 格式，建议光线充足、手掌清晰</p>
+                </div>
+              </div>
+
+              <!-- 性别选择 -->
+              <div class="mb-6">
+                <label class="block text-sm font-medium mb-3" style="color: var(--color-text);">性别（用于辅助分析）</label>
+                <div class="flex gap-4">
+                  <button class="gender-btn selected" type="button">
+                    <i data-lucide="user" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
+                    男
+                  </button>
+                  <button class="gender-btn" type="button">
+                    <i data-lucide="user" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
+                    女
+                  </button>
+                </div>
+              </div>
+
+              <!-- 提交按钮 -->
+              <button class="btn-primary w-full" type="button">
+                <i data-lucide="sparkles" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
+                开始分析
+              </button>
+            </div>
+
+            <!-- 右侧：分析说明 -->
+            <div>
+              <h2 class="text-xl font-semibold mb-6" style="color: var(--color-text);">分析内容</h2>
+
+              <div class="space-y-4">
+                <!-- 三大主线 -->
+                <div class="result-card">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(200, 168, 78, 0.12);">
+                      <i data-lucide="activity" style="width:24px;height:24px;color:var(--color-gold);"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-base font-semibold" style="color: var(--color-text);">三大主线分析</h3>
+                      <p class="text-sm" style="color: var(--color-text-tertiary);">生命线 · 感情线 · 智慧线</p>
+                    </div>
+                  </div>
+                  <p class="text-sm" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                    深度解析手掌三大主线的形态、走向与特征，揭示性格特点与命运走向
+                  </p>
+                </div>
+
+                <!-- 掌型特征 -->
+                <div class="result-card">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(0, 75, 170, 0.15);">
+                      <i data-lucide="hand" style="width:24px;height:24px;color:var(--color-primary-lighter);"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-base font-semibold" style="color: var(--color-text);">掌型特征</h3>
+                      <p class="text-sm" style="color: var(--color-text-tertiary);">金 · 木 · 水 · 火 · 土</p>
+                    </div>
+                  </div>
+                  <p class="text-sm" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                    通过手掌形状、大小与指节比例，判别五行掌型，洞悉天赋特质
+                  </p>
+                </div>
+
+                <!-- 五行手相 -->
+                <div class="result-card">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(34, 197, 94, 0.12);">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="#22c55e" stroke-width="2"/>
+                        <path d="M12 6V12L16 14" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="text-base font-semibold" style="color: var(--color-text);">五行手相</h3>
+                      <p class="text-sm" style="color: var(--color-text-tertiary);">木 · 火 · 土 · 金 · 水</p>
+                    </div>
+                  </div>
+                  <p class="text-sm" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                    结合掌纹与五行理论，提供综合运势分析与人生指导建议
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. 掌型知识卡片（可选展示区）==================== -->
+      <section style="background: linear-gradient(180deg, #0a0e1a 0%, #0d1220 100%); padding: var(--space-16) 0 var(--space-24);">
+        <div class="content-container">
+          <h2 class="display-font text-2xl font-bold text-center mb-3" style="color: #fff; letter-spacing: 0.04em;">五种掌型解读</h2>
+          <p class="text-center mb-12" style="color: var(--color-text-secondary);">不同掌型代表着不同的天赋与性格特质</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- 金型手 -->
+            <div class="palm-type-card">
+              <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style="background: rgba(200, 168, 78, 0.15);">
+                <span style="font-size: 28px;">🪶</span>
+              </div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-text);">金型手</h4>
+              <p class="text-xs" style="color: var(--color-text-tertiary);">方厚端庄<br/>务实稳健</p>
+            </div>
+
+            <!-- 木型手 -->
+            <div class="palm-type-card">
+              <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style="background: rgba(34, 197, 94, 0.12);">
+                <span style="font-size: 28px;">🌿</span>
+              </div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-text);">木型手</h4>
+              <p class="text-xs" style="color: var(--color-text-tertiary);">修长优美<br/>聪慧敏锐</p>
+            </div>
+
+            <!-- 水型手 -->
+            <div class="palm-type-card">
+              <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style="background: rgba(56, 189, 248, 0.12);">
+                <span style="font-size: 28px;">💧</span>
+              </div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-text);">水型手</h4>
+              <p class="text-xs" style="color: var(--color-text-tertiary);">圆润柔和<br/>情感丰富</p>
+            </div>
+
+            <!-- 火型手 -->
+            <div class="palm-type-card">
+              <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style="background: rgba(251, 146, 60, 0.12);">
+                <span style="font-size: 28px;">🔥</span>
+              </div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-text);">火型手</h4>
+              <p class="text-xs" style="color: var(--color-text-tertiary);">尖尖纤长<br/>热情洋溢</p>
+            </div>
+
+            <!-- 土型手 -->
+            <div class="palm-type-card">
+              <div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style="background: rgba(168, 85, 247, 0.12);">
+                <span style="font-size: 28px;">🏔️</span>
+              </div>
+              <h4 class="text-sm font-semibold mb-1" style="color: var(--color-text);">土型手</h4>
+              <p class="text-xs" style="color: var(--color-text-tertiary);">浑厚宽大<br/>稳重可靠</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 页脚 ==================== -->
+      <footer style="background: #060a14; border-top: 1px solid rgba(255,255,255,0.06); padding: var(--space-12) 0 var(--space-8);">
+        <div class="content-container">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div class="max-w-md">
+              <span class="display-font text-base font-semibold" style="color: var(--color-gold);">天机</span>
+              <p class="mt-2" style="color: var(--color-text-tertiary); font-size: var(--text-xs); line-height: var(--leading-relaxed);">
+                免责声明：本工具所有占卜结果仅供娱乐参考，不构成任何决策建议。命运掌握在自己手中。
+              </p>
+            </div>
+            <div class="flex items-center gap-6">
+              <a href="#" class="text-sm transition-colors no-underline" style="color: var(--color-text-tertiary);">关于我们</a>
+              <a href="#" class="text-sm transition-colors no-underline" style="color: var(--color-text-tertiary);">使用条款</a>
+              <a href="#" class="text-sm transition-colors no-underline" style="color: var(--color-text-tertiary);">隐私政策</a>
+            </div>
+          </div>
+          <div class="mt-8 pt-6 text-center" style="border-top: 1px solid rgba(255,255,255,0.04);">
+            <p style="color: var(--color-text-tertiary); font-size: var(--text-xs);">
+              © 2026 天机 AI 运势查询工具. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

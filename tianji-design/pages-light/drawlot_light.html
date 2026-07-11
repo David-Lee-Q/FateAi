@@ -1,0 +1,798 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>签诗抽签 — 天机</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #f8fafc;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #f1f5f9;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #1a1e2e;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #8b6914;
+
+  /* State colors */
+  --state-success: #059669;
+  --state-warning: #d97706;
+  --state-error: #dc2626;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn { display: none; }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .hidden.md\:flex { display: none !important; }
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+  @layer components {
+    /* 签类型卡片 */
+    .lot-type-card {
+      position: relative;
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      text-align: center;
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+    .lot-type-card:hover {
+      border-color: var(--color-gold-light);
+      box-shadow: 0 4px 16px rgba(200, 168, 78, 0.15);
+      transform: translateY(-2px);
+    }
+    .lot-type-card.active {
+      border-color: var(--color-gold);
+      background: linear-gradient(135deg, rgba(200, 168, 78, 0.06), rgba(200, 168, 78, 0.02));
+      box-shadow: 0 4px 20px rgba(200, 168, 78, 0.2);
+    }
+    .lot-type-card.active .lot-type-icon {
+      color: var(--color-gold);
+    }
+    .lot-type-card.active .lot-type-name {
+      color: var(--color-text);
+    }
+    /* 签诗展示卡 */
+    .lot-poem-card {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .lot-poem-header {
+      background: linear-gradient(135deg, var(--color-primary-darker), #0a0f2e);
+      padding: var(--space-8) var(--space-8) var(--space-6);
+      position: relative;
+    }
+    .lot-poem-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+    }
+    /* 等级徽章 */
+    .lot-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 14px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark));
+      color: #fff;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(200, 168, 78, 0.35);
+    }
+    /* 推荐卡片 */
+    .recommend-card {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      transition: all var(--transition-base);
+      cursor: pointer;
+    }
+    .recommend-card:hover {
+      border-color: var(--color-primary-lighter);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      /* 签诗古风排版 */
+      .poem-classical {
+        font-family: 'Noto Serif SC', serif;
+        line-height: 2.2;
+        letter-spacing: 0.08em;
+        font-size: 1.2rem;
+        color: var(--color-text);
+      }
+      /* 摇签动画 */
+      @keyframes shake-lot {
+        0%, 100% { transform: rotate(0deg); }
+        10% { transform: rotate(-8deg); }
+        20% { transform: rotate(8deg); }
+        30% { transform: rotate(-12deg); }
+        40% { transform: rotate(12deg); }
+        50% { transform: rotate(-10deg); }
+        60% { transform: rotate(10deg); }
+        70% { transform: rotate(-6deg); }
+        80% { transform: rotate(6deg); }
+        90% { transform: rotate(-3deg); }
+      }
+      .shake-animation {
+        animation: shake-lot 1.2s ease-in-out;
+      }
+      /* 星星闪烁 */
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+      .star-twinkle {
+        animation: twinkle 3s ease-in-out infinite;
+      }
+      /* 金色渐变文字 */
+      .gold-text {
+        background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold), var(--color-gold-dark));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      /* 祥云飘动 */
+      @keyframes cloud-drift {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(12px); }
+      }
+      .cloud-drift {
+        animation: cloud-drift 8s ease-in-out infinite;
+      }
+      /* 祈福光晕 */
+      @keyframes glow-pulse {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.8; }
+      }
+      .glow-pulse {
+        animation: glow-pulse 4s ease-in-out infinite;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="font-family: var(--font-body);">
+
+    <!-- ========== 导航栏 ========== -->
+    <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========== 页面标题区 ========== -->
+        <section class="relative overflow-hidden" style="background: linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%);">
+            <!-- 背景装饰：星星 + 祥云 + 光晕 -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute w-full h-full" viewBox="0 0 1280 320" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="80" cy="40" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:0s"/>
+                    <circle cx="200" cy="80" r="1" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:0.5s"/>
+                    <circle cx="350" cy="30" r="1.2" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:1s"/>
+                    <circle cx="500" cy="90" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:1.5s"/>
+                    <circle cx="620" cy="50" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:0.3s"/>
+                    <circle cx="750" cy="100" r="1" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:2s"/>
+                    <circle cx="900" cy="35" r="1.3" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:0.8s"/>
+                    <circle cx="1050" cy="70" r="0.8" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:1.2s"/>
+                    <circle cx="1180" cy="45" r="1.5" fill="var(--color-gold-light)" class="star-twinkle" style="animation-delay:1.8s"/>
+                    <g class="cloud-drift" style="animation-delay:0s" opacity="0.08">
+                        <path d="M100 200 Q130 180 160 200 Q180 175 210 200 Q230 185 250 200" stroke="var(--color-gold-light)" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <g class="cloud-drift" style="animation-delay:2s" opacity="0.06">
+                        <path d="M900 220 Q930 200 960 220 Q980 195 1010 220 Q1030 205 1060 220" stroke="var(--color-gold-light)" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <g class="cloud-drift" style="animation-delay:4s" opacity="0.05">
+                        <path d="M500 250 Q530 230 560 250 Q580 225 610 250 Q630 235 660 250" stroke="var(--color-gold-light)" stroke-width="1.2" fill="none"/>
+                    </g>
+                    <circle cx="640" cy="160" r="120" fill="var(--color-gold)" class="glow-pulse" opacity="0.03"/>
+                    <circle cx="640" cy="160" r="200" fill="var(--color-primary-light)" class="glow-pulse" opacity="0.04" style="animation-delay:2s"/>
+                </svg>
+            </div>
+
+            <div class="relative mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20" style="max-width: var(--max-width);">
+                <!-- 面包屑 -->
+                <nav class="flex items-center gap-2 text-sm mb-6">
+                    <a href="#" class="transition-colors hover:text-white" style="color: rgba(255,255,255,0.5);">首页</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <a href="#" class="transition-colors hover:text-white" style="color: rgba(255,255,255,0.5);">民俗趣味</a>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="color: var(--color-gold-light);">签诗抽签</span>
+                </nav>
+
+                <!-- 标题 -->
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 gold-text" style="font-family: var(--font-display); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">签诗抽签</h1>
+                <p class="text-base sm:text-lg max-w-xl" style="color: rgba(255,255,255,0.6); line-height: var(--leading-relaxed);">虚拟摇签体验，AI 解读签诗启示</p>
+            </div>
+        </section>
+
+        <!-- ========== 签类型选择 ========== -->
+        <section class="py-10 sm:py-12" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <h2 class="text-lg sm:text-xl font-semibold mb-6" style="color: var(--color-text);">选择签类型</h2>
+                <div class="flex flex-nowrap overflow-x-auto gap-4 pb-2 no-scrollbar">
+                    <!-- 观音灵签 - 默认选中 -->
+                    <div class="lot-type-card active">
+                        <div class="lot-type-icon mb-3 flex justify-center">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                                <path d="M20 8 C20 8 14 16 14 22 C14 25.3 16.7 28 20 28 C23.3 28 26 25.3 26 22 C26 16 20 8 20 8Z" fill="currentColor" opacity="0.2"/>
+                                <path d="M20 12 C20 12 16 17 16 21 C16 23.2 17.8 25 20 25 C22.2 25 24 23.2 24 21 C24 17 20 12 20 12Z" fill="currentColor" opacity="0.35"/>
+                                <circle cx="20" cy="21" r="2.5" fill="currentColor" opacity="0.6"/>
+                            </svg>
+                        </div>
+                        <div class="lot-type-name text-sm font-semibold truncate" style="color: var(--color-text);">观音灵签</div>
+                        <div class="text-xs mt-1 truncate" style="color: var(--color-text-tertiary);">百签 · 观音菩萨</div>
+                    </div>
+                    <!-- 关帝灵签 -->
+                    <div class="lot-type-card">
+                        <div class="lot-type-icon mb-3 flex justify-center" style="color: var(--color-text-secondary);">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                <rect x="10" y="8" width="20" height="26" rx="2" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                                <path d="M16 15 H24 M16 20 H24 M16 25 H21" stroke="currentColor" stroke-width="1.2" opacity="0.4" stroke-linecap="round"/>
+                                <circle cx="20" cy="11" r="1.5" fill="currentColor" opacity="0.4"/>
+                            </svg>
+                        </div>
+                        <div class="lot-type-name text-sm font-semibold truncate" style="color: var(--color-text-secondary);">关帝灵签</div>
+                        <div class="text-xs mt-1 truncate" style="color: var(--color-text-tertiary);">六十四签 · 关圣帝君</div>
+                    </div>
+                    <!-- 月老灵签 -->
+                    <div class="lot-type-card">
+                        <div class="lot-type-icon mb-3 flex justify-center" style="color: var(--color-text-secondary);">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                <circle cx="20" cy="14" r="6" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                                <path d="M20 20 L20 30" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                                <path d="M14 26 Q20 34 26 26" stroke="currentColor" stroke-width="1.2" opacity="0.4" fill="none"/>
+                                <circle cx="20" cy="14" r="2" fill="currentColor" opacity="0.35"/>
+                            </svg>
+                        </div>
+                        <div class="lot-type-name text-sm font-semibold truncate" style="color: var(--color-text-secondary);">月老灵签</div>
+                        <div class="text-xs mt-1 truncate" style="color: var(--color-text-tertiary);">六十签 · 月老星君</div>
+                    </div>
+                    <!-- 车公灵签 -->
+                    <div class="lot-type-card">
+                        <div class="lot-type-icon mb-3 flex justify-center" style="color: var(--color-text-secondary);">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                                <path d="M20 10 L20 30 M10 20 L30 20" stroke="currentColor" stroke-width="1.2" opacity="0.35" stroke-linecap="round"/>
+                                <circle cx="20" cy="10" r="2.5" fill="currentColor" opacity="0.3"/>
+                                <circle cx="20" cy="30" r="2.5" fill="currentColor" opacity="0.3"/>
+                                <circle cx="10" cy="20" r="2.5" fill="currentColor" opacity="0.3"/>
+                                <circle cx="30" cy="20" r="2.5" fill="currentColor" opacity="0.3"/>
+                            </svg>
+                        </div>
+                        <div class="lot-type-name text-sm font-semibold truncate" style="color: var(--color-text-secondary);">车公灵签</div>
+                        <div class="text-xs mt-1 truncate" style="color: var(--color-text-tertiary);">六十签 · 车公元帅</div>
+                    </div>
+                    <!-- 吕祖灵签 -->
+                    <div class="lot-type-card">
+                        <div class="lot-type-icon mb-3 flex justify-center" style="color: var(--color-text-secondary);">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                <path d="M20 8 L28 32 L12 32 Z" stroke="currentColor" stroke-width="1.5" opacity="0.3" fill="none"/>
+                                <circle cx="20" cy="22" r="4" stroke="currentColor" stroke-width="1.2" opacity="0.35" fill="none"/>
+                                <circle cx="20" cy="22" r="1.5" fill="currentColor" opacity="0.4"/>
+                            </svg>
+                        </div>
+                        <div class="lot-type-name text-sm font-semibold truncate" style="color: var(--color-text-secondary);">吕祖灵签</div>
+                        <div class="text-xs mt-1 truncate" style="color: var(--color-text-tertiary);">一百签 · 纯阳帝君</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 意图输入 + 摇签 ========== -->
+        <section class="pb-10 sm:pb-12" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                    <!-- 左侧：问题输入 -->
+                    <div class="lg:col-span-3">
+                        <div class="rounded-xl p-6 sm:p-8" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+                            <label class="block text-base font-semibold mb-3" style="color: var(--color-text);">心中所想</label>
+                            <p class="text-sm mb-4" style="color: var(--color-text-tertiary);">写下您想问的事情，或者心中默念即可</p>
+                            <textarea class="w-full rounded-lg px-4 py-3 text-sm resize-none" rows="3" placeholder="例如：今年事业运势如何？感情能否修成正果？" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); outline: none; transition: border-color var(--transition-base);" onfocus="this.style.borderColor='var(--color-primary-lighter)'" onblur="this.style.borderColor='var(--color-border)'"></textarea>
+                            <div class="flex items-center gap-2 mt-3">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color: var(--color-gold); opacity: 0.6;"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M8 5 L8 8.5 L10.5 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <span class="text-xs" style="color: var(--color-text-tertiary);">心中默念三遍所求之事，再摇签效果更佳</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：签筒 + 摇签按钮 -->
+                    <div class="lg:col-span-2 flex flex-col items-center">
+                        <!-- 签筒 SVG -->
+                        <div class="mb-6" id="lot-tube-svg">
+                            <svg viewBox="0 0 120 180" fill="none" width="120" height="180">
+                                <defs>
+                                    <linearGradient id="tube-gradient" x1="60" y1="40" x2="60" y2="170" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#c8a84e"/>
+                                        <stop offset="30%" stop-color="#e8d48b"/>
+                                        <stop offset="70%" stop-color="#9a7b2e"/>
+                                        <stop offset="100%" stop-color="#6b5520"/>
+                                    </linearGradient>
+                                    <linearGradient id="tube-rim-gradient" x1="60" y1="36" x2="60" y2="48" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#e8d48b"/>
+                                        <stop offset="100%" stop-color="#c8a84e"/>
+                                    </linearGradient>
+                                    <linearGradient id="stick-gradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#f5e6b8"/>
+                                        <stop offset="100%" stop-color="#c8a84e"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- 签竹棒 -->
+                                <rect x="48" y="15" width="5" height="55" rx="2" fill="url(#stick-gradient)" transform="rotate(-5 50 42)"/>
+                                <rect x="55" y="10" width="5" height="60" rx="2" fill="url(#stick-gradient)" transform="rotate(3 57 40)"/>
+                                <rect x="62" y="18" width="5" height="52" rx="2" fill="url(#stick-gradient)" transform="rotate(-2 64 44)"/>
+                                <rect x="42" y="20" width="5" height="50" rx="2" fill="url(#stick-gradient)" transform="rotate(6 44 45)"/>
+                                <rect x="70" y="22" width="5" height="48" rx="2" fill="url(#stick-gradient)" transform="rotate(-4 72 46)"/>
+                                <!-- 签筒主体 -->
+                                <rect x="25" y="40" width="70" height="130" rx="6" fill="url(#tube-gradient)" stroke="#6b5520" stroke-width="1"/>
+                                <!-- 签筒底座 -->
+                                <rect x="22" y="162" width="76" height="10" rx="4" fill="#6b5520" opacity="0.6"/>
+                                <!-- 签筒口 -->
+                                <rect x="20" y="36" width="80" height="12" rx="4" fill="url(#tube-rim-gradient)" stroke="#6b5520" stroke-width="0.8"/>
+                                <!-- 筒身纹饰 -->
+                                <line x1="35" y1="60" x2="35" y2="150" stroke="#f5e6b8" stroke-width="0.5" opacity="0.2"/>
+                                <line x1="85" y1="60" x2="85" y2="150" stroke="#f5e6b8" stroke-width="0.5" opacity="0.2"/>
+                                <rect x="45" y="95" width="30" height="20" rx="2" fill="none" stroke="#f5e6b8" stroke-width="0.5" opacity="0.15"/>
+                            </svg>
+                        </div>
+
+                        <!-- 摇签按钮 -->
+                        <button data-dom-id="drawlot-shake" class="w-full max-w-xs px-8 py-4 rounded-xl text-lg font-semibold transition-all cursor-pointer" style="background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark)); color: #fff; box-shadow: 0 4px 20px rgba(200, 168, 78, 0.4); letter-spacing: 0.08em;" onmouseover="this.style.boxShadow='0 6px 28px rgba(200, 168, 78, 0.55)'; this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(200, 168, 78, 0.4)'; this.style.transform='translateY(0)'" onclick="document.getElementById('lot-tube-svg').classList.add('shake-animation'); setTimeout(function(){ document.getElementById('lot-tube-svg').classList.remove('shake-animation'); }, 1200);">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2 L10 14 M6 10 L10 14 L14 10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                摇签
+                            </span>
+                        </button>
+                        <p class="text-xs mt-3 text-center" style="color: var(--color-text-tertiary);">点击按钮开始虚拟摇签</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 签诗展示区（Mockup） ========== -->
+        <section class="py-10 sm:py-12" style="background: var(--color-bg-inset);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="lot-poem-card max-w-3xl mx-auto">
+                    <!-- 签诗头部 -->
+                    <div class="lot-poem-header text-center">
+                        <div class="flex items-center justify-center gap-3 mb-4">
+                            <span class="text-2xl sm:text-3xl font-bold" style="color: var(--color-gold-light); font-family: var(--font-display);">第廿七签</span>
+                            <span class="lot-badge">上签</span>
+                        </div>
+                        <p class="text-sm" style="color: rgba(255,255,255,0.5);">观音灵签 · 观音菩萨灵应</p>
+                    </div>
+
+                    <!-- 签诗正文 -->
+                    <div class="p-6 sm:p-8">
+                        <!-- 签诗原文 -->
+                        <div class="text-center mb-6">
+                            <h3 class="text-sm font-semibold mb-4" style="color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">签诗原文</h3>
+                            <div class="poem-classical">
+                                更君志气勤磨砺<br/>宝剑锋从磨砺出<br/>梅花香自苦寒来<br/>功成名就自然时
+                            </div>
+                        </div>
+
+                        <!-- 分割线 -->
+                        <div class="flex items-center gap-4 my-6">
+                            <div class="flex-1" style="height: 1px; background: linear-gradient(90deg, transparent, var(--color-border), transparent);"></div>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color: var(--color-gold); opacity: 0.4;"><path d="M4 8 L12 8" stroke="currentColor" stroke-width="1"/><circle cx="8" cy="8" r="2" fill="currentColor" opacity="0.5"/></svg>
+                            <div class="flex-1" style="height: 1px; background: linear-gradient(90deg, transparent, var(--color-border), transparent);"></div>
+                        </div>
+
+                        <!-- 白话翻译 -->
+                        <div class="mb-6">
+                            <h3 class="text-sm font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text-secondary);">
+                                <i data-lucide="book-open" class="w-4 h-4"></i>
+                                白话解意
+                            </h3>
+                            <p class="text-sm leading-relaxed" style="color: var(--color-text);">此签劝勉求签者，应坚持不懈地磨砺自己的志向和才能。就像宝剑需要反复锻造才能锋利，梅花必须经历严寒才能散发幽香，人的成就也需要时间和汗水的积累。只要持之以恒，功成名就之日自然会到来。</p>
+                        </div>
+
+                        <!-- 分割线 -->
+                        <div class="flex items-center gap-4 my-6">
+                            <div class="flex-1" style="height: 1px; background: linear-gradient(90deg, transparent, var(--color-border), transparent);"></div>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color: var(--color-gold); opacity: 0.4;"><path d="M4 8 L12 8" stroke="currentColor" stroke-width="1"/><circle cx="8" cy="8" r="2" fill="currentColor" opacity="0.5"/></svg>
+                            <div class="flex-1" style="height: 1px; background: linear-gradient(90deg, transparent, var(--color-border), transparent);"></div>
+                        </div>
+
+                        <!-- 典故 -->
+                        <div class="mb-2">
+                            <h3 class="text-sm font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text-secondary);">
+                                <i data-lucide="scroll-text" class="w-4 h-4"></i>
+                                签诗典故
+                            </h3>
+                            <p class="text-sm leading-relaxed" style="color: var(--color-text);">此签取意自明代《警世贤文》中"勤奋篇"："宝剑锋从磨砺出，梅花香自苦寒来。"古人以铸剑需千锤百炼为喻，告诫世人成功无捷径，唯有勤奋与坚持。历史上诸多名臣名将，如越王勾践卧薪尝胆、太公渭水垂钓十年，皆印证此理。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== AI 解读 ========== -->
+        <section class="py-10 sm:py-12" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex items-center justify-center rounded-lg" style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));">
+                            <i data-lucide="sparkles" class="w-4 h-4" style="color: var(--color-text-inverse);"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold" style="color: var(--color-text);">AI 解读</h2>
+                            <p class="text-xs" style="color: var(--color-text-tertiary);">结合您的问题进行针对性分析</p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl p-6 sm:p-8" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+                        <div class="flex items-start gap-3 mb-4">
+                            <div class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style="background: var(--color-primary-bg-strong);">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--color-primary)" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="var(--color-primary)"/></svg>
+                            </div>
+                            <p class="text-sm leading-relaxed" style="color: var(--color-text);">从您关心的"今年事业运势"来看，此签为<strong style="color: var(--color-gold-dark);">上签</strong>，总体预示着<strong style="color: var(--color-primary);">事业前景向好</strong>。签诗中"更君志气勤磨砺"暗示当前阶段需要你主动提升技能、拓展视野，不宜坐等机遇降临。</p>
+                        </div>
+                        <div class="flex items-start gap-3 mb-4">
+                            <div class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style="background: var(--color-primary-bg-strong);">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--color-primary)" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="var(--color-primary)"/></svg>
+                            </div>
+                            <p class="text-sm leading-relaxed" style="color: var(--color-text);">"宝剑锋从磨砺出"进一步强调，可能在近期会面临一些挑战或压力，但这些正是成长和突破的关键。建议以积极心态面对困难。</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style="background: var(--color-primary-bg-strong);">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--color-primary)" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="var(--color-primary)"/></svg>
+                            </div>
+                            <p class="text-sm leading-relaxed" style="color: var(--color-text);">"功成名就自然时"表明好消息可能在下半年或年底到来。保持耐心和持续努力，收获的季节终会到来。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 化解与建议 ========== -->
+        <section class="py-10 sm:py-12" style="background: var(--color-bg-inset);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex items-center justify-center rounded-lg" style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark));">
+                            <i data-lucide="lightbulb" class="w-4 h-4" style="color: var(--color-text-inverse);"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold" style="color: var(--color-text);">化解与建议</h2>
+                            <p class="text-xs" style="color: var(--color-text-tertiary);">趋吉避凶，顺势而为</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- 建议1 -->
+                        <div class="rounded-lg p-5" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color: var(--color-gold);"><path d="M10 3 L10 12 M10 15 L10 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.2"/></svg>
+                                <h3 class="text-sm font-semibold truncate" style="color: var(--color-text);">方位指引</h3>
+                            </div>
+                            <p class="text-xs leading-relaxed line-clamp-3" style="color: var(--color-text-secondary);">贵人方位在东南，工作朝东南方向为宜。出行或搬家可优先考虑朝南朝东的方向。</p>
+                        </div>
+                        <!-- 建议2 -->
+                        <div class="rounded-lg p-5" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color: var(--color-primary);"><rect x="3" y="5" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M3 8 H17 M7 5 V3 M13 5 V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <h3 class="text-sm font-semibold truncate" style="color: var(--color-text);">吉日良辰</h3>
+                            </div>
+                            <p class="text-xs leading-relaxed line-clamp-3" style="color: var(--color-text-secondary);">农历三、六、九为吉日，逢虎日、兔日更佳。重要事务宜安排在上午九时至十一时之间。</p>
+                        </div>
+                        <!-- 建议3 -->
+                        <div class="rounded-lg p-5" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color: var(--state-success);"><path d="M10 3 C10 3 5 8 5 12 C5 14.8 7.2 17 10 17 C12.8 17 15 14.8 15 12 C15 8 10 3 10 3Z" stroke="currentColor" stroke-width="1.2"/><circle cx="10" cy="12" r="2" fill="currentColor" opacity="0.3"/></svg>
+                                <h3 class="text-sm font-semibold truncate" style="color: var(--color-text);">五行调和</h3>
+                            </div>
+                            <p class="text-xs leading-relaxed line-clamp-3" style="color: var(--color-text-secondary);">五行缺水者可多穿蓝黑衣物，桌面摆放水养植物。属火者佩戴玉石饰品可增运势。</p>
+                        </div>
+                        <!-- 建议4 -->
+                        <div class="rounded-lg p-5" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-light);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="color: var(--state-warning);"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.2"/><path d="M4 17 C4 14 6.7 12 10 12 C13.3 12 16 14 16 17" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                                <h3 class="text-sm font-semibold truncate" style="color: var(--color-text);">贵人相助</h3>
+                            </div>
+                            <p class="text-xs leading-relaxed line-clamp-3" style="color: var(--color-text-secondary);">近期留意身边属龙、属蛇之人，可能有合作或助运之机。多参加社交活动，广结善缘。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 追问 + 保存 + 重新摇签 ========== -->
+        <section class="py-10 sm:py-12" style="background: var(--color-bg);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <div class="max-w-3xl mx-auto">
+                    <!-- 追问输入 -->
+                    <div class="rounded-xl p-6 sm:p-8 mb-6" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+                        <h3 class="text-base font-semibold mb-3 flex items-center gap-2" style="color: var(--color-text);">
+                            <i data-lucide="message-circle" class="w-4 h-4" style="color: var(--color-primary);"></i>
+                            追问 AI
+                        </h3>
+                        <p class="text-sm mb-4" style="color: var(--color-text-tertiary);">对签诗有更多疑问？可以向 AI 进一步提问</p>
+                        <div class="flex gap-3">
+                            <input type="text" class="flex-1 rounded-lg px-4 py-3 text-sm" placeholder="例如：感情方面具体有什么建议？" style="background: var(--color-bg-inset); border: 1px solid var(--color-border); color: var(--color-text); outline: none; transition: border-color var(--transition-base);" onfocus="this.style.borderColor='var(--color-primary-lighter)'" onblur="this.style.borderColor='var(--color-border)'"/>
+                            <button class="shrink-0 px-5 py-3 rounded-lg text-sm font-medium transition-all cursor-pointer" style="background: var(--color-primary); color: var(--color-text-inverse);" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">追问</button>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮组 -->
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button class="flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all cursor-pointer" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); color: var(--color-text);" onmouseover="this.style.borderColor='var(--color-primary-lighter)'" onmouseout="this.style.borderColor='var(--color-border)'">
+                            <i data-lucide="bookmark" class="w-4 h-4"></i>
+                            保存签诗
+                        </button>
+                        <button class="flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all cursor-pointer" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); color: var(--color-text);" onmouseover="this.style.borderColor='var(--color-primary-lighter)'" onmouseout="this.style.borderColor='var(--color-border)'">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                            分享好友
+                        </button>
+                        <button class="flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all cursor-pointer" style="background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark)); color: #fff; box-shadow: 0 2px 12px rgba(200, 168, 78, 0.3);" onmouseover="this.style.boxShadow='0 4px 16px rgba(200, 168, 78, 0.45)'" onmouseout="this.style.boxShadow='0 2px 12px rgba(200, 168, 78, 0.3)'">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2 L14 8 L2 14 Z" fill="#fff" opacity="0.8"/></svg>
+                            重新摇签
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 相关推荐 ========== -->
+        <section class="py-10 sm:py-12" style="background: var(--color-bg-inset);">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+                <h2 class="text-lg sm:text-xl font-semibold mb-6" style="color: var(--color-text);">您可能还感兴趣</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- 周公解梦 -->
+                    <div class="recommend-card">
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="color: var(--color-primary);">
+                                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M12 6 C12 6 9 9 9 12 C9 13.7 10.3 15 12 15 C13.7 15 15 13.7 15 12 C15 9 12 6 12 6Z" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+                                    <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.3"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-semibold truncate mb-1" style="color: var(--color-text);">周公解梦</h3>
+                                <p class="text-xs line-clamp-2" style="color: var(--color-text-secondary);">输入梦境关键词，AI 结合传统解梦典籍为您解析梦境寓意。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 姓名测算 -->
+                    <div class="recommend-card">
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: rgba(200, 168, 78, 0.08);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="color: var(--color-gold);">
+                                    <rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M9 9 H15 M9 12 H15 M9 15 H12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-semibold truncate mb-1" style="color: var(--color-text);">姓名测算</h3>
+                                <p class="text-xs line-clamp-2" style="color: var(--color-text-secondary);">基于姓名笔画、五行、三才配置，AI 深度解析您的姓名运势。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 生肖运势 -->
+                    <div class="recommend-card">
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 flex items-center justify-center rounded-lg" style="width: 48px; height: 48px; background: var(--color-primary-bg);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="color: var(--color-primary);">
+                                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M7 10 Q12 6 17 10" stroke="currentColor" stroke-width="1.2" opacity="0.5" fill="none"/>
+                                    <path d="M7 14 Q12 18 17 14" stroke="currentColor" stroke-width="1.2" opacity="0.5" fill="none"/>
+                                    <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.15"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-sm font-semibold truncate mb-1" style="color: var(--color-text);">生肖运势</h3>
+                                <p class="text-xs line-clamp-2" style="color: var(--color-text-secondary);">2025 年十二生肖运势详解，涵盖事业、财运、感情、健康全方位。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="py-8" style="background: var(--color-primary-darker);">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8 text-center" style="max-width: var(--max-width);">
+            <p class="text-xs" style="color: rgba(255,255,255,0.4);">天机 AI 运势查询工具 · 仅供娱乐参考，不构成任何决策建议</p>
+        </div>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+
+

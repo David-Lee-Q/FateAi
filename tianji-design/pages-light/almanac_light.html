@@ -1,0 +1,998 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄历宜忌 — 天机</title>
+    <style id="theme-vars">
+/* ============================================
+   Tianji — AI Fortune Telling Tool
+   Brand Design System: colors_and_type.css
+   Primary: #004baa (Deep Celestial Blue)
+   ============================================ */
+
+:root {
+  /* ---- Color System ---- */
+  --color-primary: #004baa;
+  --color-primary-light: #1a6fd4;
+  --color-primary-lighter: #4a90d9;
+  --color-primary-lightest: #b3d4f5;
+  --color-primary-dark: #003580;
+  --color-primary-darker: #002060;
+  --color-primary-bg: rgba(0, 75, 170, 0.06);
+  --color-primary-bg-strong: rgba(0, 75, 170, 0.12);
+
+  --color-bg: #f8fafc;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #f1f5f9;
+  --color-bg-overlay: rgba(0, 20, 50, 0.5);
+
+  --color-text: #1a1e2e;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+
+  /* Gold accent for fortune/cosmic feel */
+  --color-gold: #c8a84e;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #8b6914;
+
+  /* State colors */
+  --state-success: #059669;
+  --state-warning: #d97706;
+  --state-error: #dc2626;
+  --state-info: #004baa;
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.25rem;
+  --text-6xl: 4rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 20, 50, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 20, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 20, 50, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 20, 50, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 20, 50, 0.05);
+
+  /* ---- Transition ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ---- Layout ---- */
+  --max-width: 1280px;
+  --nav-height: 64px;
+}
+
+/* ---- Utility Classes ---- */
+.display-font {
+  font-family: var(--font-display);
+}
+.body-font {
+  font-family: var(--font-body);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg); color: var(--color-text); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ========== 导航栏玻璃效果 ========== */
+      .nav-glass {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.03) 40%,
+          rgba(200, 168, 78, 0.04) 100%
+        );
+        backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .nav-link:hover { color: var(--color-text-inverse); }
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--color-text);
+        cursor: pointer;
+        padding: 8px;
+      }
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; }
+        .nav-links { display: none !important; }
+      }
+
+      /* ========== 页面基础布局 ========== */
+      .content-container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding-left: var(--space-6);
+        padding-right: var(--space-6);
+      }
+
+      /* ========== 面包屑 ========== */
+      .breadcrumb-link {
+        font-size: var(--text-sm);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        transition: color var(--transition-fast);
+        white-space: nowrap;
+      }
+      .breadcrumb-link:hover { color: var(--color-primary); }
+      .breadcrumb-sep {
+        margin: 0 var(--space-2);
+        color: var(--color-text-tertiary);
+        font-size: var(--text-sm);
+      }
+
+      /* ========== 日期选择 Tab ========== */
+      .date-tab-group {
+        display: inline-flex;
+        gap: 4px;
+        background: var(--color-bg-inset);
+        border-radius: var(--radius-lg);
+        padding: 4px;
+      }
+      .date-tab {
+        padding: var(--space-2) var(--space-5);
+        border-radius: var(--radius-md);
+        border: none;
+        background: transparent;
+        color: var(--color-text-secondary);
+        font-size: var(--text-sm);
+        font-family: var(--font-body);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+      }
+      .date-tab.active {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        box-shadow: var(--shadow-sm);
+      }
+      .date-tab:not(.active):hover {
+        color: var(--color-text);
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      /* ========== 农历信息卡片 ========== */
+      .lunar-card {
+        background: var(--color-bg-elevated);
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        box-shadow: var(--shadow-sm);
+      }
+      .lunar-info-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+      }
+      .lunar-info-label {
+        font-size: var(--text-xs);
+        color: var(--color-text-tertiary);
+        white-space: nowrap;
+      }
+      .lunar-info-value {
+        font-size: var(--text-base);
+        font-weight: 600;
+        color: var(--color-text);
+        white-space: nowrap;
+      }
+
+      /* ========== 宜忌对比区域 ========== */
+      .yi-panel {
+        background: linear-gradient(135deg, rgba(26, 138, 92, 0.08), rgba(26, 138, 92, 0.03));
+        border: 1px solid rgba(26, 138, 92, 0.2);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+      }
+      .ji-panel {
+        background: linear-gradient(135deg, rgba(196, 58, 58, 0.08), rgba(196, 58, 58, 0.03));
+        border: 1px solid rgba(196, 58, 58, 0.2);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+      }
+      .yi-jtag {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-5);
+        border-radius: var(--radius-lg);
+        font-size: var(--text-sm);
+        white-space: nowrap;
+        transition: transform var(--transition-fast);
+      }
+      .yi-jtag:hover { transform: translateY(-1px); }
+      .yi-jtag.green {
+        background: rgba(26, 138, 92, 0.12);
+        color: var(--state-success);
+        border: 1px solid rgba(26, 138, 92, 0.2);
+      }
+      .yi-jtag.red {
+        background: rgba(196, 58, 58, 0.12);
+        color: var(--state-error);
+        border: 1px solid rgba(196, 58, 58, 0.2);
+      }
+
+      /* ========== 吉神凶神标签 ========== */
+      .spirit-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: var(--text-sm);
+        white-space: nowrap;
+        font-family: var(--font-body);
+      }
+      .spirit-tag.lucky {
+        background: rgba(200, 168, 78, 0.12);
+        color: var(--color-gold-dark);
+        border: 1px solid rgba(200, 168, 78, 0.25);
+      }
+      .spirit-tag.unlucky {
+        background: rgba(196, 58, 58, 0.08);
+        color: var(--state-error);
+        border: 1px solid rgba(196, 58, 58, 0.15);
+      }
+
+      /* ========== 十二时辰卡片 ========== */
+      .hour-scroll {
+        display: flex;
+        gap: var(--space-4);
+        overflow-x: auto;
+        padding-bottom: var(--space-3);
+        scroll-snap-type: x mandatory;
+      }
+      .hour-scroll::-webkit-scrollbar { height: 4px; }
+      .hour-scroll::-webkit-scrollbar-track { background: var(--color-bg-inset); border-radius: 2px; }
+      .hour-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+      .hour-card {
+        flex-shrink: 0;
+        width: 100px;
+        scroll-snap-align: start;
+        background: var(--color-bg-elevated);
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        text-align: center;
+        transition: all var(--transition-fast);
+        cursor: default;
+      }
+      .hour-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      .hour-card .hour-name {
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--color-text);
+        margin-bottom: var(--space-1);
+        white-space: nowrap;
+      }
+      .hour-card .hour-time {
+        font-size: var(--text-xs);
+        color: var(--color-text-tertiary);
+        white-space: nowrap;
+        margin-bottom: var(--space-2);
+      }
+      .hour-card .hour-badge {
+        display: inline-block;
+        padding: 2px var(--space-3);
+        border-radius: var(--radius-full);
+        font-size: 11px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .hour-card.lucky-hour { border-color: rgba(26, 138, 92, 0.3); }
+      .hour-card.lucky-hour .hour-badge { background: rgba(26, 138, 92, 0.15); color: var(--state-success); }
+      .hour-card.bad-hour { border-color: rgba(196, 58, 58, 0.3); }
+      .hour-card.bad-hour .hour-badge { background: rgba(196, 58, 58, 0.15); color: var(--state-error); }
+      .hour-card.neutral-hour { border-color: var(--color-border); }
+      .hour-card.neutral-hour .hour-badge { background: rgba(139, 146, 168, 0.15); color: var(--color-text-tertiary); }
+
+      /* ========== 冲煞方位卡片 ========== */
+      .clash-card {
+        background: var(--color-bg-elevated);
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+      }
+      .clash-direction {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+        color: var(--color-text-inverse);
+        font-family: var(--font-display);
+        font-size: var(--text-xl);
+        font-weight: 700;
+      }
+
+      /* ========== AI 推荐卡片 ========== */
+      .ai-card {
+        background: linear-gradient(135deg, rgba(0, 75, 170, 0.06), rgba(200, 168, 78, 0.04));
+        border: 1px solid rgba(0, 75, 170, 0.15);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+      }
+      .ai-recommend-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--color-border-light);
+      }
+      .ai-recommend-item:last-child { border-bottom: none; }
+      .ai-recommend-icon {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 75, 170, 0.1);
+        color: var(--color-primary);
+      }
+
+      /* ========== 相关推荐卡片 ========== */
+      .related-card {
+        background: var(--color-bg-elevated);
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        transition: all var(--transition-base);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .related-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--color-primary-lighter);
+      }
+      .related-icon-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+        margin-bottom: var(--space-4);
+      }
+
+      /* ========== Section 标题 ========== */
+      .section-heading {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+      }
+      .section-heading-icon {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-primary-bg);
+        color: var(--color-primary);
+      }
+      .section-heading h2 {
+        font-family: var(--font-body);
+        font-size: var(--text-xl);
+        font-weight: 600;
+        color: var(--color-text);
+        white-space: nowrap;
+      }
+
+      /* ========== 响应式 ========== */
+      @media (max-width: 768px) {
+        .yi-panel, .ji-panel { padding: var(--space-5); }
+        .hour-card { width: 85px; padding: var(--space-3); }
+        .ai-card { padding: var(--space-5); }
+        .content-container { padding-left: var(--space-4); padding-right: var(--space-4); }
+      }
+      @media (max-width: 480px) {
+        .hour-card { width: 75px; }
+        .yi-jtag { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); }
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="background: var(--color-bg); color: var(--color-text);">
+    <main>
+
+      <!-- ==================== 1. 顶部导航栏 ==================== -->
+      <header class="sticky top-0 z-50 w-full nav-glass" style="height: var(--nav-height);">
+        <div class="mx-auto flex items-center justify-between h-full px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 no-underline">
+                <span class="display-font text-xl font-semibold tracking-wide" style="color: var(--color-gold);">天机</span>
+            </a>
+            <!-- 桌面导航 -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="nav-link">首页</a>
+                <a href="#" class="nav-link">东方命理</a>
+                <a href="#" class="nav-link">西方占卜</a>
+                <a href="#" class="nav-link">民俗趣味</a>
+                <a href="#" class="nav-link">AI 洞察</a>
+                <a href="#" class="nav-link">个人中心</a>
+            </nav>
+            <!-- 右侧操作 -->
+            <div class="hidden md:flex items-center gap-4">
+                <button class="p-2 rounded-lg transition-colors" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);" aria-label="搜索">
+                    <i data-lucide="search" style="width:20px;height:20px;"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); cursor:pointer;" aria-label="个人中心">
+                    <i data-lucide="user" style="width:16px;height:16px;color:#fff;"></i>
+                </div>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn md:hidden" style="background:none;border:none;color:var(--color-text);cursor:pointer;">
+                <i data-lucide="menu" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+    </header><!-- ==================== 2. 面包屑 + 标题区域 ==================== -->
+      <section class="pt-20 pb-6 md:pt-24 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <!-- 面包屑 -->
+          <nav class="flex items-center flex-wrap mb-4">
+            <a href="#" class="breadcrumb-link">首页</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="#" class="breadcrumb-link">工具</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="text-sm" style="color: var(--color-text-secondary); white-space: nowrap;">黄历宜忌</span>
+          </nav>
+          <!-- 标题 -->
+          <h1 class="display-font font-bold mb-2" style="font-size: clamp(28px, 3.5vw, 48px); color: var(--color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word; letter-spacing: 0.02em;">
+            黄历宜忌
+          </h1>
+          <p class="body-font" style="font-size: var(--text-lg); color: var(--color-text-secondary); max-width: 520px; line-height: var(--leading-relaxed);">
+            传统黄历通胜，择吉避凶
+          </p>
+        </div>
+      </section>
+
+      <!-- ==================== 3. 日期选择 Tab ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="date-tab-group">
+              <button class="date-tab active">今日</button>
+              <button class="date-tab">选择日期</button>
+              <button class="date-tab">日期范围</button>
+            </div>
+            <div class="flex items-center gap-2" style="color: var(--color-text-secondary); font-size: var(--text-sm);">
+              <i data-lucide="calendar" style="width:16px;height:16px;"></i>
+              <span>2026年7月10日 农历五月廿六</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. 农历信息区 ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="lunar-card">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+              <!-- 农历日期 -->
+              <div class="lunar-info-item">
+                <span class="lunar-info-label">农历日期</span>
+                <span class="lunar-info-value" style="color: var(--color-gold-dark);">五月廿六</span>
+              </div>
+              <!-- 干支纪日 -->
+              <div class="lunar-info-item">
+                <span class="lunar-info-label">干支纪日</span>
+                <span class="lunar-info-value">丙午月 己亥日</span>
+              </div>
+              <!-- 节气 -->
+              <div class="lunar-info-item">
+                <span class="lunar-info-label">节气</span>
+                <span class="lunar-info-value">小暑</span>
+              </div>
+              <!-- 生肖 -->
+              <div class="lunar-info-item">
+                <span class="lunar-info-label">今日生肖</span>
+                <span class="lunar-info-value">马</span>
+              </div>
+              <!-- 星宿 -->
+              <div class="lunar-info-item hidden sm:flex">
+                <span class="lunar-info-label">值日星宿</span>
+                <span class="lunar-info-value">壁宿</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 宜忌主区域（两列对比） ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 左列：今日宜 -->
+            <div class="yi-panel">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(26, 138, 92, 0.15);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--state-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                  <h3 class="body-font text-lg font-semibold" style="color: var(--state-success);">今日宜</h3>
+                  <p class="text-xs" style="color: var(--color-text-tertiary);">适合进行的活动事项</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <span class="yi-jtag green">
+                  <i data-lucide="heart" style="width:14px;height:14px;"></i>
+                  嫁娶
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="plane" style="width:14px;height:14px;"></i>
+                  出行
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="briefcase" style="width:14px;height:14px;"></i>
+                  开业
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="home" style="width:14px;height:14px;"></i>
+                  搬家
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="file-signature" style="width:14px;height:14px;"></i>
+                  签约
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="building-2" style="width:14px;height:14px;"></i>
+                  交易
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="hammer" style="width:14px;height:14px;"></i>
+                  动土
+                </span>
+                <span class="yi-jtag green">
+                  <i data-lucide="scissors" style="width:14px;height:14px;"></i>
+                  裁衣
+                </span>
+              </div>
+            </div>
+            <!-- 右列：今日忌 -->
+            <div class="ji-panel">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: rgba(196, 58, 58, 0.15);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--state-error)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+                <div>
+                  <h3 class="body-font text-lg font-semibold" style="color: var(--state-error);">今日忌</h3>
+                  <p class="text-xs" style="color: var(--color-text-tertiary);">应避免进行的活动事项</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <span class="yi-jtag red">
+                  <i data-lucide="warehouse" style="width:14px;height:14px;"></i>
+                  开仓
+                </span>
+                <span class="yi-jtag red">
+                  <i data-lucide="monument" style="width:14px;height:14px;"></i>
+                  安葬
+                </span>
+                <span class="yi-jtag red">
+                  <i data-lucide="hard-hat" style="width:14px;height:14px;"></i>
+                  修造
+                </span>
+                <span class="yi-jtag red">
+                  <i data-lucide="anchor" style="width:14px;height:14px;"></i>
+                  入水
+                </span>
+                <span class="yi-jtag red">
+                  <i data-lucide="pill" style="width:14px;height:14px;"></i>
+                  合药
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 6. 吉神凶神列表 ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="section-heading">
+            <div class="section-heading-icon">
+              <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+            </div>
+            <h2>吉神凶神</h2>
+          </div>
+          <!-- 吉神 -->
+          <div class="mb-4">
+            <span class="text-sm font-medium mb-3 block" style="color: var(--color-gold-dark);">吉神宜趋</span>
+            <div class="flex flex-wrap gap-2">
+              <span class="spirit-tag lucky">
+                <i data-lucide="sun" style="width:14px;height:14px;"></i>
+                天德
+              </span>
+              <span class="spirit-tag lucky">
+                <i data-lucide="moon" style="width:14px;height:14px;"></i>
+                月德
+              </span>
+              <span class="spirit-tag lucky">
+                <i data-lucide="star" style="width:14px;height:14px;"></i>
+                天恩
+              </span>
+              <span class="spirit-tag lucky">
+                <i data-lucide="shield-check" style="width:14px;height:14px;"></i>
+                天瑞
+              </span>
+              <span class="spirit-tag lucky">
+                <i data-lucide="zap" style="width:14px;height:14px;"></i>
+                驿马
+              </span>
+            </div>
+          </div>
+          <!-- 凶神 -->
+          <div>
+            <span class="text-sm font-medium mb-3 block" style="color: var(--state-error);">凶神宜忌</span>
+            <div class="flex flex-wrap gap-2">
+              <span class="spirit-tag unlucky">
+                <i data-lucide="alert-triangle" style="width:14px;height:14px;"></i>
+                五虚
+              </span>
+              <span class="spirit-tag unlucky">
+                <i data-lucide="x-circle" style="width:14px;height:14px;"></i>
+                朱雀
+              </span>
+              <span class="spirit-tag unlucky">
+                <i data-lucide="cloud-rain" style="width:14px;height:14px;"></i>
+                天狗
+              </span>
+              <span class="spirit-tag unlucky">
+                <i data-lucide="ban" style="width:14px;height:14px;"></i>
+                劫煞
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 7. 十二时辰吉凶表 ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="section-heading">
+            <div class="section-heading-icon">
+              <i data-lucide="clock" style="width:18px;height:18px;"></i>
+            </div>
+            <h2>十二时辰吉凶</h2>
+          </div>
+          <div class="hour-scroll">
+            <!-- 子时 -->
+            <div class="hour-card neutral-hour">
+              <div class="hour-name">子时</div>
+              <div class="hour-time">23:00-01:00</div>
+              <span class="hour-badge">平</span>
+            </div>
+            <!-- 丑时 -->
+            <div class="hour-card bad-hour">
+              <div class="hour-name">丑时</div>
+              <div class="hour-time">01:00-03:00</div>
+              <span class="hour-badge">凶</span>
+            </div>
+            <!-- 寅时 -->
+            <div class="hour-card lucky-hour">
+              <div class="hour-name">寅时</div>
+              <div class="hour-time">03:00-05:00</div>
+              <span class="hour-badge">吉</span>
+            </div>
+            <!-- 卯时 -->
+            <div class="hour-card lucky-hour">
+              <div class="hour-name">卯时</div>
+              <div class="hour-time">05:00-07:00</div>
+              <span class="hour-badge">吉</span>
+            </div>
+            <!-- 辰时 -->
+            <div class="hour-card neutral-hour">
+              <div class="hour-name">辰时</div>
+              <div class="hour-time">07:00-09:00</div>
+              <span class="hour-badge">平</span>
+            </div>
+            <!-- 巳时 -->
+            <div class="hour-card lucky-hour">
+              <div class="hour-name">巳时</div>
+              <div class="hour-time">09:00-11:00</div>
+              <span class="hour-badge">吉</span>
+            </div>
+            <!-- 午时 -->
+            <div class="hour-card bad-hour">
+              <div class="hour-name">午时</div>
+              <div class="hour-time">11:00-13:00</div>
+              <span class="hour-badge">凶</span>
+            </div>
+            <!-- 未时 -->
+            <div class="hour-card neutral-hour">
+              <div class="hour-name">未时</div>
+              <div class="hour-time">13:00-15:00</div>
+              <span class="hour-badge">平</span>
+            </div>
+            <!-- 申时 -->
+            <div class="hour-card lucky-hour">
+              <div class="hour-name">申时</div>
+              <div class="hour-time">15:00-17:00</div>
+              <span class="hour-badge">吉</span>
+            </div>
+            <!-- 酉时 -->
+            <div class="hour-card neutral-hour">
+              <div class="hour-name">酉时</div>
+              <div class="hour-time">17:00-19:00</div>
+              <span class="hour-badge">平</span>
+            </div>
+            <!-- 戌时 -->
+            <div class="hour-card bad-hour">
+              <div class="hour-name">戌时</div>
+              <div class="hour-time">19:00-21:00</div>
+              <span class="hour-badge">凶</span>
+            </div>
+            <!-- 亥时 -->
+            <div class="hour-card lucky-hour">
+              <div class="hour-name">亥时</div>
+              <div class="hour-time">21:00-23:00</div>
+              <span class="hour-badge">吉</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 8. 冲煞方位 ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="section-heading">
+            <div class="section-heading-icon">
+              <i data-lucide="compass" style="width:18px;height:18px;"></i>
+            </div>
+            <h2>冲煞方位</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- 冲 -->
+            <div class="clash-card">
+              <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="clash-direction">冲</div>
+                <div class="text-left">
+                  <div class="body-font font-semibold" style="font-size: var(--text-xl); color: var(--color-text);">冲蛇</div>
+                  <div class="text-sm" style="color: var(--color-text-secondary);">属蛇者今日运势多变</div>
+                </div>
+              </div>
+              <div class="text-xs" style="color: var(--color-text-tertiary);">
+                <i data-lucide="info" style="width:12px;height:12px;vertical-align:middle;"></i>
+                己亥日，亥与巳相冲，故冲蛇
+              </div>
+            </div>
+            <!-- 煞 -->
+            <div class="clash-card">
+              <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="clash-direction">煞</div>
+                <div class="text-left">
+                  <div class="body-font font-semibold" style="font-size: var(--text-xl); color: var(--color-text);">煞东</div>
+                  <div class="text-sm" style="color: var(--color-text-secondary);">今日煞方在正东</div>
+                </div>
+              </div>
+              <div class="text-xs" style="color: var(--color-text-tertiary);">
+                <i data-lucide="info" style="width:12px;height:12px;vertical-align:middle;"></i>
+                大事不宜东行，宜避正东方
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 9. AI 个性化推荐 ==================== -->
+      <section class="pb-6 md:pb-8" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="section-heading">
+            <div class="section-heading-icon" style="background: linear-gradient(135deg, rgba(0, 75, 170, 0.12), rgba(200, 168, 78, 0.08));">
+              <i data-lucide="brain" style="width:18px;height:18px;"></i>
+            </div>
+            <h2>AI 个性化推荐</h2>
+          </div>
+          <div class="ai-card">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary), var(--color-gold));">
+                <i data-lucide="sparkles" style="width:14px;height:14px;color:#fff;"></i>
+              </div>
+              <div>
+                <span class="body-font font-semibold text-sm" style="color: var(--color-primary);">天机 AI 分析</span>
+                <span class="text-xs ml-2" style="color: var(--color-text-tertiary);">基于今日黄历为您生成</span>
+              </div>
+            </div>
+            <div class="ai-recommend-item">
+              <div class="ai-recommend-icon">
+                <i data-lucide="briefcase" style="width:16px;height:16px;"></i>
+              </div>
+              <div>
+                <span class="body-font font-medium text-sm" style="color: var(--color-text);">适合签约合作</span>
+                <p class="text-xs mt-1" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">今日天德、月德吉星高照，签约合作事项运势极佳，可选择在上午巳时或下午申时进行。</p>
+              </div>
+            </div>
+            <div class="ai-recommend-item">
+              <div class="ai-recommend-icon">
+                <i data-lucide="plane" style="width:16px;height:16px;"></i>
+              </div>
+              <div>
+                <span class="body-font font-medium text-sm" style="color: var(--color-text);">远行出行有利</span>
+                <p class="text-xs mt-1" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">驿马星动，出行方位宜避开正东。推荐向西北或正南方向出行，逢吉时辰效果更佳。</p>
+              </div>
+            </div>
+            <div class="ai-recommend-item">
+              <div class="ai-recommend-icon">
+                <i data-lucide="heart" style="width:16px;height:16px;"></i>
+              </div>
+              <div>
+                <span class="body-font font-medium text-sm" style="color: var(--color-text);">婚嫁喜事适宜</span>
+                <p class="text-xs mt-1" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">天恩吉星护佑，嫁娶为今日大吉之选。建议选择午时之后的申时举行仪式，避开午时凶时。</p>
+              </div>
+            </div>
+            <div class="ai-recommend-item">
+              <div class="ai-recommend-icon">
+                <i data-lucide="alert-circle" style="width:16px;height:16px;color:var(--state-error);"></i>
+              </div>
+              <div>
+                <span class="body-font font-medium text-sm" style="color: var(--state-error);">避免修造动工</span>
+                <p class="text-xs mt-1" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">虽然黄历宜动土，但今日五虚、劫煞并见，大型修造工程建议另择吉日，小范围修整无碍。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 10. 相关推荐 ==================== -->
+      <section class="pb-12 md:pb-16" style="background: var(--color-bg);">
+        <div class="content-container">
+          <div class="section-heading">
+            <div class="section-heading-icon">
+              <i data-lucide="layout-grid" style="width:18px;height:18px;"></i>
+            </div>
+            <h2>相关推荐</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- 运势日历 -->
+            <a href="#" class="related-card block">
+              <div class="related-icon-box">
+                <i data-lucide="calendar-days" style="width:24px;height:24px;"></i>
+              </div>
+              <h3 class="body-font font-semibold mb-2 truncate" style="font-size: var(--text-base); color: var(--color-text);">运势日历</h3>
+              <p class="text-sm line-clamp-2" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                日历视图纵览每日运势，宜忌变化一目了然，助您提前规划。
+              </p>
+            </a>
+            <!-- 签诗抽签 -->
+            <a href="#" class="related-card block">
+              <div class="related-icon-box">
+                <i data-lucide="scroll-text" style="width:24px;height:24px;"></i>
+              </div>
+              <h3 class="body-font font-semibold mb-2 truncate" style="font-size: var(--text-base); color: var(--color-text);">签诗抽签</h3>
+              <p class="text-sm line-clamp-2" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                AI智能抽签，融合传统签诗智慧，为您指点迷津、解答疑惑。
+              </p>
+            </a>
+            <!-- 生肖运势 -->
+            <a href="#" class="related-card block">
+              <div class="related-icon-box">
+                <i data-lucide="star" style="width:24px;height:24px;"></i>
+              </div>
+              <h3 class="body-font font-semibold mb-2 truncate" style="font-size: var(--text-base); color: var(--color-text);">生肖运势</h3>
+              <p class="text-sm line-clamp-2" style="color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+                十二生肖专属运势详解，涵盖事业、财运、感情、健康多维分析。
+              </p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 页脚 ==================== -->
+      <footer class="py-8" style="background: var(--color-bg-inset); border-top: 1px solid var(--color-border-light);">
+        <div class="content-container text-center">
+          <span class="display-font text-sm tracking-wide" style="color: var(--color-gold-dark);">天机</span>
+          <span class="text-xs ml-2" style="color: var(--color-text-tertiary);">AI 智能运势查询工具</span>
+          <div class="mt-2 text-xs" style="color: var(--color-text-tertiary);">
+            黄历数据仅供参考，不构成任何决策建议
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+
+
+

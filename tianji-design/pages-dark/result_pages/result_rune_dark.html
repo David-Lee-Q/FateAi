@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>符文占卜解读 - 天机</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-bg: #0a0e1a;
+            --color-bg-secondary: #121829;
+            --color-bg-card: #1a2235;
+            --color-primary: #004baa;
+            --color-gold: #c8a84e;
+            --color-gold-light: #e8d5a3;
+            --color-text: #e8e8e8;
+            --color-text-secondary: #8b8b8b;
+            --color-border: rgba(200, 168, 78, 0.2);
+            --color-rune: #f97316;
+            --color-wood: #a16207;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        .nav-glass {
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .rune-stone {
+            width: 80px;
+            height: 90px;
+            background: linear-gradient(145deg, #d4d4d4, #a3a3a3);
+            border-radius: 8px 8px 4px 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #1c1917;
+            box-shadow: 
+                5px 5px 15px rgba(0, 0, 0, 0.5),
+                -2px -2px 10px rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        .rune-stone::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            height: 30%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+            border-radius: 6px 6px 50% 50%;
+        }
+        .rune-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+        .rune-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(161, 98, 7, 0.05));
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            transition: all 0.3s ease;
+        }
+        .rune-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.2);
+        }
+        .rune-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 350px;
+        }
+        .rune-layout .center-rune {
+            grid-column: 2;
+            grid-row: 2;
+        }
+        .glow-rune {
+            filter: drop-shadow(0 0 10px var(--color-rune));
+        }
+        .stone-bg {
+            background: linear-gradient(135deg, #1c1917, #292524);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-amber-400 flex items-center justify-center">
+                    <i class="fas fa-yin-yang text-white text-lg"></i>
+                </div>
+                <span class="text-lg font-semibold text-white">天机</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                    李
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="pt-20 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="#" class="hover:text-white transition">首页</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="#" class="hover:text-white transition">符文占卜</a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-orange-400">解读结果</span>
+        </div>
+    </div>
+
+    <!-- 符文头部 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-r from-stone-900 via-orange-900/40 to-stone-900 rounded-2xl p-6 border border-orange-500/30">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center">
+                    <i class="fas fa-rune text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white">符文占卜</h1>
+                    <p class="text-orange-300">如尼符文 · 三符文阵</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="px-3 py-1 bg-orange-500/20 text-orange-300 rounded-full text-sm border border-orange-500/40">
+                    <i class="fas fa-fire mr-1"></i>恩赫雷兹
+                </span>
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm border border-amber-500/40">
+                    <i class="fas fa-shield-alt mr-1"></i>埃hwaz
+                </span>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm border border-emerald-500/40">
+                    <i class="fas fa-sun mr-1"></i> Sowilo
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 符文展示 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-stone-800/50 to-stone-900/50 rounded-2xl p-8 border border-stone-700/50">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-th text-orange-400"></i>
+                符文阵法
+            </h2>
+
+            <!-- 石符视觉展示 -->
+            <div class="flex justify-center mb-8">
+                <div class="stone-bg rounded-2xl p-8 border border-stone-600/30">
+                    <div class="flex gap-8">
+                        <div class="flex flex-col items-center">
+                            <div class="rune-stone mb-3">
+                                <span class="glow-rune">ᚠ</span>
+                            </div>
+                            <span class="text-orange-400 font-semibold text-sm">Fehu</span>
+                            <span class="text-gray-400 text-xs">ᚠ</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="rune-stone mb-3">
+                                <span class="glow-rune">ᚷ</span>
+                            </div>
+                            <span class="text-orange-400 font-semibold text-sm">Gebo</span>
+                            <span class="text-gray-400 text-xs">ᚷ</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="rune-stone mb-3">
+                                <span class="glow-rune">ᛊ</span>
+                            </div>
+                            <span class="text-orange-400 font-semibold text-sm">Sowilo</span>
+                            <span class="text-gray-400 text-xs">ᛊ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 符文含义 -->
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="rune-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                            <span class="text-orange-400 text-xl font-bold">ᚠ</span>
+                        </div>
+                        <div>
+                            <h3 class="text-orange-400 font-semibold">Fehu 费胡</h3>
+                            <p class="text-xs text-gray-500">财富与成功</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        代表财富、收获和繁荣。提醒你关注物质资源与机会。第一个符文预示着事情的开始阶段。
+                    </p>
+                </div>
+                <div class="rune-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                            <span class="text-orange-400 text-xl font-bold">ᚷ</span>
+                        </div>
+                        <div>
+                            <h3 class="text-orange-400 font-semibold">Gebo 盖博</h3>
+                            <p class="text-xs text-gray-500">礼物与交换</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        代表礼物、交换与合作关系。核心问题涉及人际互动中的给予与接受。提醒保持互惠平衡。
+                    </p>
+                </div>
+                <div class="rune-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                            <span class="text-orange-400 text-xl font-bold">ᛊ</span>
+                        </div>
+                        <div>
+                            <h3 class="text-orange-400 font-semibold">Sowilo 索维洛</h3>
+                            <p class="text-xs text-gray-500">光明与胜利</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        代表太阳、能量和 triumph 。预示着挑战的克服与目标的达成。暗示你将获得胜利。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 综合解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-stone-800/50 to-slate-900/50 rounded-2xl p-6 border border-stone-700/50">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-book-open text-amber-400"></i>
+                符文古义解读
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="bg-slate-900/50 rounded-xl p-5 border border-stone-700/30">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-quote-left text-orange-400"></i>
+                        <h3 class="text-orange-400 font-semibold">古北欧箴言</h3>
+                    </div>
+                    <p class="text-gray-300 italic leading-relaxed">
+                        "牛会死去，亲人会离去，唯有自己的功德永远相随。"
+                    </p>
+                    <p class="text-gray-500 text-sm mt-2">— Fehu 符文古义</p>
+                </div>
+                
+                <div class="rune-card rounded-xl p-5">
+                    <h3 class="text-orange-400 font-semibold mb-3">三符文联动解读</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        费胡开启，盖博连接，索维洛达成。这是一组充满正能量的符文组合。
+                        <br><br>
+                        <span class="text-amber-400">解读：</span>你正处于一个需要「给予」才能「获得」的时刻。通过真诚的付出，你将建立起有价值的关系网络，而最终太阳的光芒将照亮你的道路，带来圆满的成功。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 符文对照表 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-orange-900/20 to-slate-900/50 rounded-2xl p-6 border border-orange-500/30">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-list text-orange-400"></i>
+                常用符文对照
+            </h2>
+            
+            <div class="rune-grid">
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚠ</span>
+                    <span class="text-xs text-gray-400">Fehu</span>
+                    <p class="text-xs text-gray-500 mt-1">财富</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚢ</span>
+                    <span class="text-xs text-gray-400">Uruz</span>
+                    <p class="text-xs text-gray-500 mt-1">力量</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚦ</span>
+                    <span class="text-xs text-gray-400">Thurisaz</span>
+                    <p class="text-xs text-gray-500 mt-1">保护</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚨ</span>
+                    <span class="text-xs text-gray-400">Ansuz</span>
+                    <p class="text-xs text-gray-500 mt-1">沟通</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚱ</span>
+                    <span class="text-xs text-gray-400">Raido</span>
+                    <p class="text-xs text-gray-500 mt-1">旅程</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚲ</span>
+                    <span class="text-xs text-gray-400">Kenaz</span>
+                    <p class="text-xs text-gray-500 mt-1">点燃</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚷ</span>
+                    <span class="text-xs text-gray-400">Gebo</span>
+                    <p class="text-xs text-gray-500 mt-1">礼物</p>
+                </div>
+                <div class="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <span class="text-2xl text-orange-400 font-bold block mb-1">ᚹ</span>
+                    <span class="text-xs text-gray-400">Wunjo</span>
+                    <p class="text-xs text-gray-500 mt-1">喜悦</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI深度解读 -->
+    <div class="px-4 max-w-6xl mx-auto mb-8">
+        <div class="bg-gradient-to-br from-slate-800/60 via-orange-900/30 to-slate-900/60 rounded-2xl p-6 border border-orange-500/30">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold text-white">AI 深度解读</h2>
+                    <p class="text-xs text-gray-400">基于古日耳曼传统的个性化分析</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                <p class="text-gray-300 leading-relaxed">
+                    三枚如尼符文石从古老的橡木中显现，它们承载着北欧先民千年智慧的结晶。
+                    <br><br>
+                    <span class="text-orange-400 font-medium">核心启示：</span>这是一组关于「给予」与「收获」的上吉卦象。费胡告诉你：现在是播种的时候，不要吝啬你的资源与善意。盖博提醒你：所有关系都是建立在互惠基础上的，请确保给予与接受保持平衡。索维洛则带来了美好的预言：经过这段时期的努力，光明的未来正在等待着你。
+                    <br><br>
+                    <span class="text-amber-400 font-medium">行动指引：</span>保持开放的心态去分享你的时间、才能或资源。同时留意那些愿意与你建立互惠关系的伙伴。光明已在前方。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700/50 px-4 py-3 z-40">
+        <div class="max-w-6xl mx-auto flex justify-center gap-6">
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-orange-400 transition">
+                <i class="fas fa-heart text-lg"></i>
+                <span class="text-xs">收藏</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition">
+                <i class="fas fa-share-alt text-lg"></i>
+                <span class="text-xs">分享</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-amber-400 transition">
+                <i class="fas fa-file-alt text-lg"></i>
+                <span class="text-xs">生成报告</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-emerald-400 transition">
+                <i class="fas fa-redo text-lg"></i>
+                <span class="text-xs">重新测算</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
