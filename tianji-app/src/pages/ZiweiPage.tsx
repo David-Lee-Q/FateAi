@@ -175,16 +175,24 @@ export default function ZiweiPage() {
 
                 {/* 出生日期 */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text)' }}>
+                  <label className="block text-sm font-medium mb-1.5 cursor-pointer" style={{ color: 'var(--color-text)' }}>
                     出生日期
                   </label>
-                  <input
-                    type="date"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors"
-                    placeholder="请选择出生日期"
-                  />
+                  <div
+                    className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors cursor-pointer"
+                    onClick={(e) => {
+                      (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+                    }}
+                  >
+                    <input
+                      type="date"
+                      value={birthDate}
+                      onChange={(e) => setBirthDate(e.target.value)}
+                      className="w-full bg-transparent border-none outline-none cursor-pointer"
+                      placeholder="请选择出生日期"
+                      style={{ color: 'inherit' }}
+                    />
+                  </div>
                 </div>
 
                 {/* 出生时辰 */}

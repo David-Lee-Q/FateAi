@@ -187,16 +187,28 @@ export default function NumerologyPage() {
       case 'life-path':
         return (
           <div>
-            <label className="block mb-2" style={labelStyle}>出生日期</label>
-            <input
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors"
+            <label className="block mb-2 cursor-pointer" style={labelStyle}>出生日期</label>
+            <div
+              className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors cursor-pointer"
               style={inputStyle}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--color-gold)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; }}
-            />
+              onClick={(e) => {
+                (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+              }}
+            >
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="w-full bg-transparent border-none outline-none cursor-pointer"
+                style={{ color: 'inherit' }}
+                onFocus={(e) => {
+                  (e.currentTarget.closest('div') as HTMLElement).style.borderColor = 'var(--color-gold)';
+                }}
+                onBlur={(e) => {
+                  (e.currentTarget.closest('div') as HTMLElement).style.borderColor = 'var(--color-border)';
+                }}
+              />
+            </div>
             <p className="text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>选择您的出生日期，计算生命灵数</p>
           </div>
         );

@@ -69,6 +69,17 @@ export async function getFortuneResult(
 }
 
 /**
+ * 获取占卜结果（兼容前端调用习惯）
+ * @param id 结果 ID
+ */
+export async function fetchFortuneResult(
+  id: string
+): Promise<any> {
+  const response = await http.get<any>(`/fortune/result/${id}`);
+  return response.data;
+}
+
+/**
  * 获取历史查询记录
  */
 export async function getHistory(): Promise<ApiResponse<FortuneResult[]>> {

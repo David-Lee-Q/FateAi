@@ -644,11 +644,8 @@ export default function NametestPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: '#a0aac0' }}>出生日期（可选）</label>
-                  <input
-                    type="date"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#a0aac0', cursor: 'pointer' }}>出生日期（可选）</label>
+                  <div
                     style={{
                       width: '100%',
                       padding: '12px 16px',
@@ -660,16 +657,37 @@ export default function NametestPage() {
                       fontFamily: 'var(--font-body)',
                       outline: 'none',
                       transition: 'all 150ms ease',
+                      cursor: 'pointer',
                     }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(0,75,170,0.15)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 75, 170, 0.1)';
+                    onClick={(e) => {
+                      (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
                     }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#1e2740';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  />
+                  >
+                    <input
+                      type="date"
+                      value={birthDate}
+                      onChange={(e) => setBirthDate(e.target.value)}
+                      style={{
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'inherit',
+                        fontSize: 'inherit',
+                        fontFamily: 'inherit',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
+                      onFocus={(e) => {
+                        (e.currentTarget.closest('div') as HTMLElement).style.borderColor = 'rgba(0,75,170,0.15)';
+                        (e.currentTarget.closest('div') as HTMLElement).style.boxShadow = '0 0 0 3px rgba(0, 75, 170, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        (e.currentTarget.closest('div') as HTMLElement).style.borderColor = '#1e2740';
+                        (e.currentTarget.closest('div') as HTMLElement).style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
                   <p className="text-xs mt-1.5" style={{ color: '#7a8599' }}>填写后可结合八字分析</p>
                 </div>
               </div>

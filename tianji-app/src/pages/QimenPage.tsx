@@ -198,13 +198,21 @@ export default function QimenPage() {
                 {method === 'date' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text)' }}>起局日期</label>
-                      <input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors"
-                      />
+                      <label className="block text-sm font-medium mb-1.5 cursor-pointer" style={{ color: 'var(--color-text)' }}>起局日期</label>
+                      <div
+                        className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+                        }}
+                      >
+                        <input
+                          type="date"
+                          value={date}
+                          onChange={(e) => setDate(e.target.value)}
+                          className="w-full bg-transparent border-none outline-none cursor-pointer"
+                          style={{ color: 'inherit' }}
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text)' }}>起局时辰</label>
