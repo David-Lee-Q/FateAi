@@ -67,7 +67,7 @@ export default function LiuyaoPage() {
         lines: coinResults.length === 6 ? coinResults.map((r) => r.value) : undefined,
         number: numberInput,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/liuyao/${result.data.id}`);
     } catch {
       alert('占卜失败，请稍后重试');
     } finally {

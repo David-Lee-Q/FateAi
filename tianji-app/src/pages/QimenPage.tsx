@@ -83,7 +83,7 @@ export default function QimenPage() {
         hour: h,
         question,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/qimen/${result.data.id}`);
     } catch {
       alert('起局失败，请稍后重试');
     } finally {

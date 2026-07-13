@@ -57,7 +57,7 @@ export default function ZodiacPage() {
     });
 
     if (resultData) {
-      navigate(`/result/${resultData.id}`);
+      navigate(`/result/zodiac/${resultData.id}`);
     }
   };
 

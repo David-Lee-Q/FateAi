@@ -79,7 +79,7 @@ export default function RunePage() {
         question,
         spreadType,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/rune/${result.data.id}`);
     } catch {
       alert('占卜失败，请稍后重试');
     } finally {

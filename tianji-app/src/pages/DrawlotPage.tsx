@@ -367,7 +367,7 @@ export default function DrawlotPage() {
         lotTitle: drawnLot.title,
         lotLevel: lotLevel.level,
       });
-      // navigate(`/result/${result.data.id}`); // 根据实际路由调整
+      // navigate(`/result/drawlot/${result.data.id}`);
     } catch {
       alert('求签失败，请稍后重试');
     } finally {

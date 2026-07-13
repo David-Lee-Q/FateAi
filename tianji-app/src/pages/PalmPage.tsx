@@ -114,7 +114,7 @@ export default function PalmPage() {
     });
 
     if (result) {
-      navigate(`/result/${result.id}`);
+      navigate(`/result/palm/${result.id}`);
     }
   };
 

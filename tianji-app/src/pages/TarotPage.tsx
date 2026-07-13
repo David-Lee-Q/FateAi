@@ -107,7 +107,7 @@ export default function TarotPage() {
       });
 
       if (result) {
-        navigate(`/result/${result.id}`);
+        navigate(`/result/tarot/${result.id}`);
       }
       setRevealing(false);
     }, animDuration);

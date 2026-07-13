@@ -46,7 +46,7 @@ export default function FengshuiPage() {
         direction: facing,
         buildingType: envType,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/fengshui/${result.data.id}`);
     } catch {
       alert('分析失败，请稍后重试');
     } finally {

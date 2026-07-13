@@ -108,7 +108,7 @@ export default function MoonphasePage() {
         question,
         category: selectedCategory,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/moonphase/${result.data.id}`);
     } catch {
       alert('占卜失败，请稍后重试');
     } finally {

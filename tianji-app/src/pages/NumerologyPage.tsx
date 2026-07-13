@@ -166,7 +166,7 @@ export default function NumerologyPage() {
         value: getCurrentInput(),
         lifePathNumber: activeType === 'life-path' ? lifePathNumber : undefined,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/numerology/${result.data.id}`);
     } catch {
       alert('分析失败，请稍后重试');
     } finally {

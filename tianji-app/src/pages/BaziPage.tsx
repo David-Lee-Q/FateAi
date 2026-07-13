@@ -87,7 +87,7 @@ export default function BaziPage() {
     e.preventDefault();
     if (!year || !month || !day || !hour || !gender) return;
     const res = await query({ year, month, day, hour, gender, calendarType, province, city });
-    if (res) navigate(`/result/${res.id}`);
+    if (res) navigate(`/result/bazi/${res.id}`);
   };
 
   return (

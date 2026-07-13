@@ -8,7 +8,26 @@ const BaziPage = lazy(() => import('@/pages/BaziPage'));
 const TarotPage = lazy(() => import('@/pages/TarotPage'));
 const ZodiacPage = lazy(() => import('@/pages/ZodiacPage'));
 const DreamPage = lazy(() => import('@/pages/DreamPage'));
+// 结果页面
 const ResultPage = lazy(() => import('@/pages/ResultPage'));
+const BaziResultPage = lazy(() => import('@/pages/BaziResultPage'));
+const TarotResultPage = lazy(() => import('@/pages/TarotResultPage'));
+const ZodiacResultPage = lazy(() => import('@/pages/ZodiacResultPage'));
+const ZiweiResultPage = lazy(() => import('@/pages/ZiweiResultPage'));
+const DreamResultPage = lazy(() => import('@/pages/DreamResultPage'));
+const FengshuiResultPage = lazy(() => import('@/pages/FengshuiResultPage'));
+const MoonphaseResultPage = lazy(() => import('@/pages/MoonphaseResultPage'));
+const AlmanacResultPage = lazy(() => import('@/pages/AlmanacResultPage'));
+const LiuyaoResultPage = lazy(() => import('@/pages/LiuyaoResultPage'));
+const MeihuaResultPage = lazy(() => import('@/pages/MeihuaResultPage'));
+const QimenResultPage = lazy(() => import('@/pages/QimenResultPage'));
+const NumerologyResultPage = lazy(() => import('@/pages/NumerologyResultPage'));
+const NametestResultPage = lazy(() => import('@/pages/NametestResultPage'));
+const ShengxiaoResultPage = lazy(() => import('@/pages/ShengxiaoResultPage'));
+const AstrodiceResultPage = lazy(() => import('@/pages/AstrodiceResultPage'));
+const RuneResultPage = lazy(() => import('@/pages/RuneResultPage'));
+const DrawlotResultPage = lazy(() => import('@/pages/DrawlotResultPage'));
+const PalmResultPage = lazy(() => import('@/pages/PalmResultPage'));
 
 // 新增页面
 const ZiweiPage = lazy(() => import('@/pages/ZiweiPage'));
@@ -73,6 +92,25 @@ function App() {
           <Route path="/" element={withSuspense(HomePage)} />
           <Route path="/result" element={withSuspense(ResultPage)} />
           <Route path="/result/:id" element={withSuspense(ResultPage)} />
+          {/* 专属结果页面 */}
+          <Route path="/result/bazi/:id" element={withSuspense(BaziResultPage)} />
+          <Route path="/result/tarot/:id" element={withSuspense(TarotResultPage)} />
+          <Route path="/result/zodiac/:id" element={withSuspense(ZodiacResultPage)} />
+          <Route path="/result/ziwei/:id" element={withSuspense(ZiweiResultPage)} />
+          <Route path="/result/dream/:id" element={withSuspense(DreamResultPage)} />
+          <Route path="/result/fengshui/:id" element={withSuspense(FengshuiResultPage)} />
+          <Route path="/result/moonphase/:id" element={withSuspense(MoonphaseResultPage)} />
+          <Route path="/result/almanac/:id" element={withSuspense(AlmanacResultPage)} />
+          <Route path="/result/liuyao/:id" element={withSuspense(LiuyaoResultPage)} />
+          <Route path="/result/meihua/:id" element={withSuspense(MeihuaResultPage)} />
+          <Route path="/result/qimen/:id" element={withSuspense(QimenResultPage)} />
+          <Route path="/result/numerology/:id" element={withSuspense(NumerologyResultPage)} />
+          <Route path="/result/nametest/:id" element={withSuspense(NametestResultPage)} />
+          <Route path="/result/shengxiao/:id" element={withSuspense(ShengxiaoResultPage)} />
+          <Route path="/result/astrodice/:id" element={withSuspense(AstrodiceResultPage)} />
+          <Route path="/result/rune/:id" element={withSuspense(RuneResultPage)} />
+          <Route path="/result/drawlot/:id" element={withSuspense(DrawlotResultPage)} />
+          <Route path="/result/palm/:id" element={withSuspense(PalmResultPage)} />
 
           {/* 分类聚合页 */}
           <Route path="/eastern" element={withSuspense(EasternPage)} />

@@ -73,7 +73,7 @@ export default function AstrodicePage() {
         zodiac: diceResults.zodiac,
         house: diceResults.house,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/astrodice/${result.data.id}`);
     } catch {
       alert('占卜失败，请稍后重试');
     } finally {

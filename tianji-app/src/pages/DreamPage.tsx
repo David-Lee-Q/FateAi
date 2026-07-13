@@ -134,7 +134,7 @@ export default function DreamPage() {
     });
 
     if (result) {
-      navigate(`/result/${result.id}`);
+      navigate(`/result/dream/${result.id}`);
     }
   };
 

@@ -45,7 +45,7 @@ export default function MeihuaPage() {
         num2,
         question,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/meihua/${result.data.id}`);
     } catch {
       alert('占卜失败，请稍后重试');
     } finally {

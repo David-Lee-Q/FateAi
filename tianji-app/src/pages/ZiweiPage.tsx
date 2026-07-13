@@ -50,7 +50,7 @@ export default function ZiweiPage() {
         hour: h,
         gender,
       });
-      navigate(`/result/${result.data.id}`);
+      navigate(`/result/ziwei/${result.data.id}`);
     } catch {
       alert('排盘失败，请稍后重试');
     } finally {
