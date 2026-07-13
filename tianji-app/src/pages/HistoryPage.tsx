@@ -198,7 +198,7 @@ export default function HistoryPage() {
                   <Trash2 size={16} />
                 </button>
                 {/* 查看 */}
-                <button onClick={() => navigate(`/result/${record.id}`)} title="查看详情" style={{
+                <button onClick={() => navigate(`/result/${record.system}/${record.id}`)} title="查看详情" style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   padding: '8px 16px', borderRadius: 8, fontSize: 'var(--text-sm)', fontWeight: 500,
                   color: 'var(--color-primary)', background: 'var(--color-primary-bg)',
