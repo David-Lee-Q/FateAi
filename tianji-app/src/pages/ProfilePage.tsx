@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import {
   User, Clock, Settings, Database, Award, Edit3, Download,
   Trash2, Brain, Eye, EyeOff, Save, Check, AlertCircle,
-  UserCircle,
+  UserCircle, FileJson, Search,
 } from 'lucide-react';
 import { getAiConfig, saveAiConfig } from '@/services/api';
 import type { AiConfig } from '@/services/api';
+import { useSearchHistory } from '@/hooks/useSearchHistory';
 
 /* ============ 模拟用户数据 ============ */
 const MOCK_USER = {
@@ -45,6 +46,53 @@ export default function ProfilePage() {
   const [showApiKey, setShowApiKey] = useState(false);
   const [aiSaving, setAiSaving] = useState(false);
   const [aiSaveMessage, setAiSaveMessage] = useState('');
+
+  // 搜索历史
+  const { history, deleteHistory, clearHistory, getFormattedHistory, exportData, importData } = useSearchHistory();
+  const [formattedHistory, setFormattedHistory] = useState<Array<{id: string; text: string; time: string; system?: string}>>([]);
+  const [dataOperationMsg, setDataOperationMsg] = useState('');
+
+  // 格式化历史记录
+  useEffect(() => {
+    setFormattedHistory(getFormattedHistory());
+  }, [getFormattedHistory]);
+
+  // 占卜系统中文名映射
+  const SYSTEM_NAMES: Record<string, string> = {
+    dream: '周公解梦', tarot: '塔罗牌', zodiac: '星座运势', bazi: '八字命理',
+    ziwei: '紫微斗数', fengshui: '风水堪舆', drawlot: '签诗抽签', palm: '手相算命',
+    astrodice: '骰子占卜', rune: '符文占卜', shengxiao: '生肖运势', almanac: '黄历宜忌',
+    moonphase: '月相占卜', liuyao: '六爻占卜', meihua: '梅花易数', qimen: '奇门遁甲',
+    numerology: '数字能量', nametest: '姓名测试',
+  };
+
+  /** 导出数据 */
+  const handleExportData = () => {
+    const data = exportData();
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tianji_data_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setDataOperationMsg('导出成功');
+    setTimeout(() => setDataOperationMsg(''), 3000);
+  };
+
+  /** 删除单条记录 */
+  const handleDeleteRecord = (id: string) => {
+    deleteHistory(id);
+  };
+
+  /** 清空所有数据 */
+  const handleClearAllData = () => {
+    if (window.confirm('确定要删除所有数据吗？此操作不可恢复。')) {
+      clearHistory();
+      setDataOperationMsg('已清空所有数据');
+      setTimeout(() => setDataOperationMsg(''), 3000);
+    }
+  };
 
   /** 加载 AI 配置 */
   useEffect(() => {
@@ -425,37 +473,163 @@ export default function ProfilePage() {
                 {/* 统计数字 */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 24 }}>
                   <div style={statCardStyle}>
-                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-4xl)', fontWeight: 700, whiteSpace: 'nowrap', color: 'var(--color-gold)' }}>{MOCK_USER.totalQueries}</p>
-                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 8, whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>历史查询总数</p>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-4xl)', fontWeight: 700, whiteSpace: 'nowrap', color: 'var(--color-gold)' }}>{history.length}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 8, whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>查询历史条数</p>
                   </div>
                   <div style={statCardStyle}>
                     <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-4xl)', fontWeight: 700, whiteSpace: 'nowrap', color: 'var(--color-gold)' }}>{MOCK_USER.totalFavorites}</p>
                     <p style={{ fontSize: 'var(--text-sm)', marginTop: 8, whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>收藏结果数量</p>
                   </div>
                 </div>
-                {/* 操作按钮 */}
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <button style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
-                    cursor: 'pointer', whiteSpace: 'nowrap', border: 'none', flex: 1, minWidth: 140,
-                    background: 'var(--color-primary)', color: 'var(--color-text-inverse)',
+
+                {/* 查询历史记录 */}
+                <div style={{ marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Search size={16} color="var(--color-primary-lighter)" />
+                      <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--color-text)' }}>查询历史</h3>
+                    </div>
+                    {formattedHistory.length > 0 && (
+                      <button
+                        onClick={handleClearAllData}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          color: 'var(--state-error)', fontSize: 'var(--text-xs)',
+                          display: 'flex', alignItems: 'center', gap: 4,
+                        }}
+                      >
+                        <Trash2 size={12} /> 清空
+                      </button>
+                    )}
+                  </div>
+                  <div style={{
+                    background: 'rgba(0,0,0,0.2)', border: '1px solid var(--color-border)',
+                    borderRadius: 12, padding: '12px 16px', maxHeight: 320, overflowY: 'auto',
                   }}>
-                    <Download size={16} /> 导出所有数据
-                  </button>
-                  <button style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
-                    cursor: 'pointer', whiteSpace: 'nowrap', flex: 1, minWidth: 140,
-                    background: 'transparent', color: 'var(--state-error)',
-                    border: '1px solid rgba(196, 58, 58, 0.3)',
-                  }}>
+                    {formattedHistory.length === 0 ? (
+                      <p style={{ textAlign: 'center', padding: 24, color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm)' }}>
+                        暂无查询记录
+                      </p>
+                    ) : (
+                      formattedHistory.map((item) => (
+                        <div
+                          key={item.id}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '12px 0', borderBottom: '1px solid var(--color-border)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                            <Clock size={14} color="var(--color-text-tertiary)" style={{ flexShrink: 0 }} />
+                            <div style={{ minWidth: 0 }}>
+                              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {item.text}
+                              </p>
+                              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
+                                {item.system ? SYSTEM_NAMES[item.system] || item.system : '通用搜索'} · {item.time}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteRecord(item.id)}
+                            style={{
+                              background: 'none', border: 'none', cursor: 'pointer',
+                              color: 'var(--color-text-tertiary)', padding: 8,
+                              display: 'flex', alignItems: 'center',
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* 数据导入导出 */}
+                <div style={{ marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                    <FileJson size={16} color="var(--color-gold)" />
+                    <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--color-text)' }}>数据导入导出</h3>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={handleExportData}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
+                        cursor: 'pointer', whiteSpace: 'nowrap', border: 'none', flex: 1, minWidth: 140,
+                        background: 'var(--color-primary)', color: 'var(--color-text-inverse)',
+                      }}
+                    >
+                      <Download size={16} /> 导出数据
+                    </button>
+                    <label
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
+                        cursor: 'pointer', whiteSpace: 'nowrap', flex: 1, minWidth: 140,
+                        background: 'transparent', color: 'var(--color-primary-lighter)',
+                        border: '1px solid var(--color-primary-lighter)',
+                      }}
+                    >
+                      <FileJson size={16} /> 导入数据
+                      <input
+                        type="file"
+                        accept=".json"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              const text = ev.target?.result as string;
+                              if (importData(text)) {
+                                setDataOperationMsg('导入成功');
+                              } else {
+                                setDataOperationMsg('导入失败，文件格式错误');
+                              }
+                              setTimeout(() => setDataOperationMsg(''), 3000);
+                            };
+                            reader.readAsText(file);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* 危险操作 */}
+                <div style={{ paddingTop: 16, borderTop: '1px solid var(--color-border)' }}>
+                  <button
+                    onClick={handleClearAllData}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
+                      cursor: 'pointer', whiteSpace: 'nowrap', width: '100%',
+                      background: 'transparent', color: 'var(--state-error)',
+                      border: '1px solid rgba(196, 58, 58, 0.3)',
+                    }}
+                  >
                     <Trash2 size={16} /> 删除所有数据
                   </button>
+                  <p style={{ fontSize: 'var(--text-xs)', marginTop: 8, color: 'var(--color-text-tertiary)' }}>
+                    删除操作不可恢复，请谨慎操作。
+                  </p>
                 </div>
-                <p style={{ fontSize: 'var(--text-xs)', marginTop: 12, color: 'var(--color-text-tertiary)' }}>
-                  删除操作不可恢复，请谨慎操作。删除后将清除所有历史查询记录与收藏数据。
-                </p>
+
+                {/* 操作提示 */}
+                {dataOperationMsg && (
+                  <div style={{
+                    marginTop: 16, padding: '12px 16px', borderRadius: 8,
+                    background: dataOperationMsg.includes('成功') ? 'rgba(46,204,113,0.1)' : 'rgba(196,58,58,0.1)',
+                    color: dataOperationMsg.includes('成功') ? 'var(--state-success)' : 'var(--state-error)',
+                    fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: 8,
+                  }}>
+                    {dataOperationMsg.includes('成功') ? <Check size={14} /> : <AlertCircle size={14} />}
+                    {dataOperationMsg}
+                  </div>
+                )}
               </section>
             )}
 

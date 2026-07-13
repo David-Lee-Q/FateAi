@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search, Clock, Sparkles, LayoutGrid, Flame,
   Trash2, X, ArrowRight, ChevronRight, Zap,
   Heart, Star, Award, Lightbulb, Scroll,
 } from 'lucide-react';
+import { useSearchHistory } from '@/hooks/useSearchHistory';
 
 /* ============ 工具数据 ============ */
 interface ToolItem {
@@ -26,22 +27,29 @@ const ALL_TOOLS: ToolItem[] = [
   { name: '星座运势', path: '/zodiac', category: 'western', desc: '十二星座每日运势更新，涵盖爱情、事业、财运等维度', matchReason: '星座与梦境同样受天象影响', badgeText: '每日运势', badgeType: 'blue', iconType: 'zodiac' },
 ];
 
-/* ============ 搜索历史 ============ */
-interface HistoryItem {
-  id: string;
-  text: string;
-  time: string;
-}
-
-const INITIAL_HISTORY: HistoryItem[] = [
-  { id: '1', text: '做梦了', time: '刚刚' },
-  { id: '2', text: '今日运势', time: '2 小时前' },
-  { id: '3', text: '塔罗牌占卜', time: '昨天' },
-  { id: '4', text: '本周财运', time: '3 天前' },
-  { id: '5', text: '算卦问事', time: '1 周前' },
-];
-
 const HOT_SEARCHES = ['今日运势', '做梦了', '塔罗牌', '算卦', '八字', '桃花运', '抽签', '财运', '事业运', '感情运势', '本周运势', '蛇年运势'];
+
+// 占卜系统与关键词映射
+const SYSTEM_MAP: Record<string, string> = {
+  '周公解梦': 'dream',
+  '塔罗牌': 'tarot',
+  '星座': 'zodiac',
+  '八字': 'bazi',
+  '紫微斗数': 'ziwei',
+  '风水': 'fengshui',
+  '抽签': 'drawlot',
+  '手相': 'palm',
+  '骰子': 'astrodice',
+  '符文': 'rune',
+  '生肖': 'shengxiao',
+  '黄历': 'almanac',
+  '月相': 'moonphase',
+  '六爻': 'liuyao',
+  '梅花': 'meihua',
+  '奇门': 'qimen',
+  '数字能量': 'numerology',
+  '姓名': 'nametest',
+};
 
 /* ============ 样式 ============ */
 const containerStyle: React.CSSProperties = {
@@ -74,28 +82,52 @@ const historyItemStyle: React.CSSProperties = {
 export default function SearchPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [searchHistory, setSearchHistory] = useState(INITIAL_HISTORY);
+  const { addHistory, deleteHistory, clearHistory, getFormattedHistory } = useSearchHistory();
+  const [formattedHistory, setFormattedHistory] = useState<Array<{id: string; text: string; time: string; system?: string}>>([]);
+
+  // 格式化历史记录
+  useEffect(() => {
+    setFormattedHistory(getFormattedHistory());
+  }, [getFormattedHistory, addHistory, deleteHistory, clearHistory]);
 
   /** 过滤工具 */
   const filteredTools = query.trim()
     ? ALL_TOOLS.filter((t) => t.name.includes(query) || t.desc.includes(query))
-    : ALL_TOOLS;
+    : [];
 
-  /** 添加搜索历史 */
-  const addToHistory = (text: string) => {
-    setQuery(text);
-    if (!searchHistory.find((h) => h.text === text)) {
-      setSearchHistory((prev) => [{ id: Date.now().toString(), text, time: '刚刚' }, ...prev].slice(0, 10));
+  /** 识别搜索关键词对应的系统 */
+  const detectSystem = (text: string): string | undefined => {
+    for (const [keyword, system] of Object.entries(SYSTEM_MAP)) {
+      if (text.includes(keyword)) return system;
+    }
+    return undefined;
+  };
+
+  /** 添加搜索历史并跳转到对应工具 */
+  const handleToolClick = (tool: ToolItem) => {
+    const toolName = tool.name.replace(/占卜|算命/g, '');
+    addHistory(tool.name, tool.path.replace('/', ''));
+    navigate(tool.path);
+  };
+
+  /** 处理热门搜索点击 */
+  const handleHotSearch = (tag: string) => {
+    setQuery(tag);
+    const system = detectSystem(tag);
+    addHistory(tag, system);
+    // 如果匹配到系统，跳转到对应页面
+    if (system) {
+      navigate(`/${system}`);
     }
   };
 
-  /** 删除单条历史 */
-  const deleteHistory = (id: string) => {
-    setSearchHistory((prev) => prev.filter((h) => h.id !== id));
+  /** 处理历史记录点击 */
+  const handleHistoryClick = (item: typeof formattedHistory[0]) => {
+    setQuery(item.text);
+    if (item.system) {
+      navigate(`/${item.system}`);
+    }
   };
-
-  /** 清空全部历史 */
-  const clearAllHistory = () => setSearchHistory([]);
 
   return (
     <div>
@@ -128,7 +160,7 @@ export default function SearchPage() {
             {filteredTools.map((tool) => (
               <div
                 key={tool.name}
-                onClick={() => navigate(tool.path)}
+                onClick={() => handleToolClick(tool)}
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
@@ -181,7 +213,7 @@ export default function SearchPage() {
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
             {HOT_SEARCHES.map((tag) => (
-              <button key={tag} onClick={() => addToHistory(tag)} style={hotTagStyle}>
+              <button key={tag} onClick={() => handleHotSearch(tag)} style={hotTagStyle}>
                 {tag}
               </button>
             ))}
@@ -199,19 +231,19 @@ export default function SearchPage() {
               </div>
               <h2 style={{ fontWeight: 600, fontSize: 'var(--text-lg)', color: 'var(--color-text)' }}>搜索历史</h2>
             </div>
-            <button onClick={clearAllHistory} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-body)' }}>
+            <button onClick={clearHistory} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-body)' }}>
               清空全部
             </button>
           </div>
           <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: 16, padding: '16px 24px' }}>
-            {searchHistory.length === 0 && (
+            {formattedHistory.length === 0 && (
               <p style={{ textAlign: 'center', padding: 16, color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm)' }}>暂无搜索历史</p>
             )}
-            {searchHistory.map((item) => (
+            {formattedHistory.map((item) => (
               <div key={item.id} style={historyItemStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
                   <Clock size={14} color="var(--color-text-tertiary)" style={{ flexShrink: 0 }} />
-                  <span onClick={() => addToHistory(item.text)} style={{ cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span onClick={() => handleHistoryClick(item)} style={{ cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {item.text}
                   </span>
                   <span style={{ flexShrink: 0, color: 'var(--color-text-tertiary)', fontSize: 'var(--text-xs)' }}>{item.time}</span>

@@ -189,18 +189,27 @@ export default function NumerologyPage() {
           <div>
             <label className="block mb-2 cursor-pointer" style={labelStyle}>出生日期</label>
             <div
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-colors cursor-pointer"
-              style={inputStyle}
-              onClick={(e) => {
-                (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+              className="w-full rounded-xl px-4 py-3 text-sm cursor-pointer relative overflow-hidden"
+              style={{
+                ...inputStyle,
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: '48px',
               }}
             >
               <input
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full bg-transparent border-none outline-none cursor-pointer"
-                style={{ color: 'inherit' }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                }}
                 onFocus={(e) => {
                   (e.currentTarget.closest('div') as HTMLElement).style.borderColor = 'var(--color-gold)';
                 }}
@@ -208,6 +217,9 @@ export default function NumerologyPage() {
                   (e.currentTarget.closest('div') as HTMLElement).style.borderColor = 'var(--color-border)';
                 }}
               />
+              <span style={{ display: 'flex', alignItems: 'center', height: '100%', pointerEvents: 'none' }}>
+                {birthDate || <span style={{ color: 'rgba(255,255,255,0.3)' }}>请选择日期</span>}
+              </span>
             </div>
             <p className="text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>选择您的出生日期，计算生命灵数</p>
           </div>

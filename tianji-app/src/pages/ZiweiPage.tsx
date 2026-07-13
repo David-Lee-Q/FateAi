@@ -179,19 +179,32 @@ export default function ZiweiPage() {
                     出生日期
                   </label>
                   <div
-                    className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors cursor-pointer"
-                    onClick={(e) => {
-                      (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+                    className="w-full rounded-lg px-4 py-3 text-sm cursor-pointer relative overflow-hidden"
+                    style={{
+                      background: 'var(--color-input-bg, rgba(255,255,255,0.05))',
+                      border: '1px solid var(--color-border, rgba(255,255,255,0.1))',
+                      color: 'var(--color-text)',
+                      transition: 'all 150ms ease',
+                      minHeight: '48px',
                     }}
                   >
                     <input
                       type="date"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
-                      className="w-full bg-transparent border-none outline-none cursor-pointer"
-                      placeholder="请选择出生日期"
-                      style={{ color: 'inherit' }}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        opacity: 0,
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                      }}
                     />
+                    <span style={{ display: 'flex', alignItems: 'center', height: '100%', pointerEvents: 'none' }}>
+                      {birthDate || <span style={{ color: 'rgba(255,255,255,0.3)' }}>请选择出生日期</span>}
+                    </span>
                   </div>
                 </div>
 

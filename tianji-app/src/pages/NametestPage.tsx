@@ -646,21 +646,14 @@ export default function NametestPage() {
                 <div>
                   <label className="block text-sm font-medium mb-2" style={{ color: '#a0aac0', cursor: 'pointer' }}>出生日期（可选）</label>
                   <div
+                    className="w-full rounded-lg px-4 py-3 text-sm cursor-pointer relative overflow-hidden"
                     style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      borderRadius: 'var(--radius-lg)',
                       background: '#0d1220',
                       border: '1.5px solid var(--color-border)',
                       color: '#e8ecf4',
-                      fontSize: '1rem',
-                      fontFamily: 'var(--font-body)',
-                      outline: 'none',
+                      fontSize: '0.875rem',
                       transition: 'all 150ms ease',
-                      cursor: 'pointer',
-                    }}
-                    onClick={(e) => {
-                      (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+                      minHeight: '48px',
                     }}
                   >
                     <input
@@ -668,15 +661,13 @@ export default function NametestPage() {
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
                       style={{
+                        position: 'absolute',
+                        inset: 0,
                         width: '100%',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'inherit',
-                        fontSize: 'inherit',
-                        fontFamily: 'inherit',
-                        outline: 'none',
+                        height: '100%',
+                        opacity: 0,
                         cursor: 'pointer',
-                        padding: 0,
+                        fontSize: '16px',
                       }}
                       onFocus={(e) => {
                         (e.currentTarget.closest('div') as HTMLElement).style.borderColor = 'rgba(0,75,170,0.15)';
@@ -687,6 +678,9 @@ export default function NametestPage() {
                         (e.currentTarget.closest('div') as HTMLElement).style.boxShadow = 'none';
                       }}
                     />
+                    <span style={{ display: 'flex', alignItems: 'center', height: '100%', pointerEvents: 'none' }}>
+                      {birthDate || <span style={{ color: '#5a6478' }}>请选择日期</span>}
+                    </span>
                   </div>
                   <p className="text-xs mt-1.5" style={{ color: '#7a8599' }}>填写后可结合八字分析</p>
                 </div>

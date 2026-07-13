@@ -200,18 +200,32 @@ export default function QimenPage() {
                     <div>
                       <label className="block text-sm font-medium mb-1.5 cursor-pointer" style={{ color: 'var(--color-text)' }}>起局日期</label>
                       <div
-                        className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors cursor-pointer"
-                        onClick={(e) => {
-                          (e.currentTarget.querySelector('input') as HTMLInputElement)?.focus();
+                        className="w-full rounded-lg px-4 py-3 text-sm cursor-pointer relative overflow-hidden"
+                        style={{
+                          background: 'var(--color-input-bg, rgba(255,255,255,0.05))',
+                          border: '1px solid var(--color-border, rgba(255,255,255,0.1))',
+                          color: 'var(--color-text)',
+                          transition: 'all 150ms ease',
+                          minHeight: '48px',
                         }}
                       >
                         <input
                           type="date"
                           value={date}
                           onChange={(e) => setDate(e.target.value)}
-                          className="w-full bg-transparent border-none outline-none cursor-pointer"
-                          style={{ color: 'inherit' }}
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            width: '100%',
+                            height: '100%',
+                            opacity: 0,
+                            cursor: 'pointer',
+                            fontSize: '16px', // 防止 iOS 自动缩放
+                          }}
                         />
+                        <span style={{ display: 'flex', alignItems: 'center', height: '100%', pointerEvents: 'none' }}>
+                          {date || <span style={{ color: 'rgba(255,255,255,0.3)' }}>请选择日期</span>}
+                        </span>
                       </div>
                     </div>
                     <div>
