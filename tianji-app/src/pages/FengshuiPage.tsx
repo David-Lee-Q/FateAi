@@ -3,34 +3,34 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mountain, Loader2, ChevronRight } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
-/** 坐向选项 */
+/** 坐向选项 - 使用后端需要的大写英文 */
 const FACING_OPTIONS = [
-  { value: 's', label: '坐北朝南', desc: '经典朝向，采光通风最佳' },
-  { value: 'n', label: '坐南朝北', desc: '适合特定地形需求' },
-  { value: 'e', label: '坐西朝东', desc: '迎朝阳，朝气蓬勃' },
-  { value: 'w', label: '坐东朝西', desc: '夕照余晖，韵味独特' },
-  { value: 'se', label: '坐西北朝东南', desc: '兼顾采光与通风' },
-  { value: 'nw', label: '坐东南朝西北', desc: '因地制宜的选择' },
-  { value: 'ne', label: '坐西南朝东北', desc: '南方常见朝向' },
-  { value: 'sw', label: '坐东北朝西南', desc: '适应地形布局' },
+  { value: 'S', label: '坐北朝南', desc: '经典朝向，采光通风最佳' },
+  { value: 'N', label: '坐南朝北', desc: '适合特定地形需求' },
+  { value: 'W', label: '坐西朝东', desc: '迎朝阳，朝气蓬勃' },
+  { value: 'E', label: '坐东朝西', desc: '夕照余晖，韵味独特' },
+  { value: 'SE', label: '坐西北朝东南', desc: '兼顾采光与通风' },
+  { value: 'NW', label: '坐东南朝西北', desc: '因地制宜的选择' },
+  { value: 'SW', label: '坐西南朝东北', desc: '南方常见朝向' },
+  { value: 'NE', label: '坐东北朝西南', desc: '适应地形布局' },
 ];
 
-/** 环境类型选项 */
+/** 环境类型选项 - 映射到后端值 */
 const ENV_OPTIONS = [
-  { value: 'apartment', label: '住宅公寓', icon: '🏢' },
-  { value: 'villa', label: '别墅洋房', icon: '🏡' },
+  { value: 'residential', label: '住宅公寓', icon: '🏠' },
+  { value: 'residential', label: '别墅洋房', icon: '🏡' },
   { value: 'office', label: '办公室', icon: '🏢' },
-  { value: 'shop', label: '商铺门店', icon: '🏪' },
-  { value: 'factory', label: '厂房仓库', icon: '🏭' },
-  { value: 'land', label: '宅基地/空地', icon: '🌿' },
+  { value: 'commercial', label: '商铺门店', icon: '🏪' },
+  { value: 'commercial', label: '厂房仓库', icon: '🏭' },
+  { value: 'residential', label: '宅基地/空地', icon: '🌿' },
 ];
 
 /** 风水方位分析页面 */
 export default function FengshuiPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [facing, setFacing] = useState('s');
-  const [envType, setEnvType] = useState('apartment');
+  const [facing, setFacing] = useState('S');
+  const [envType, setEnvType] = useState('residential');
   const [floor, setFloor] = useState('');
   const [buildYear, setBuildYear] = useState('');
   const [address, setAddress] = useState('');
@@ -41,7 +41,7 @@ export default function FengshuiPage() {
     if (!facing) return;
     setLoading(true);
     try {
-      // 后端需要：direction（方位）、buildingType（建筑类型）
+      // 后端需要：direction（大写N/NE/E/SE/S/SW/W/NW）、buildingType（residential/commercial/office）
       const result = await submitFortuneQuery('fengshui', {
         direction: facing,
         buildingType: envType,
@@ -122,7 +122,7 @@ export default function FengshuiPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {ENV_OPTIONS.map((opt) => (
                     <div
-                      key={opt.value}
+                      key={opt.value + opt.label}
                       onClick={() => setEnvType(opt.value)}
                       className="rounded-lg p-3 flex items-center gap-2 cursor-pointer transition-all"
                       style={{

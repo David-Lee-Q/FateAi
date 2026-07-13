@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   Share2, Loader2, Sparkles, Clock, ChevronLeft, Send, RefreshCw, Heart, FileText,
   ChevronRight as ChevronRightIcon,
@@ -646,7 +648,7 @@ function SmartContentCard({
                       className="p-3 rounded-xl text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                       style={{ 
                         background: bgColors[idx % bgColors.length],
-                        border: `1px solid ${colors[idx % colors.length]}30`
+                        border: '1px solid rgba(128, 128, 128, 0.18)'
                       }}
                     >
                       <div className="text-xs mb-1.5" style={{ color: 'var(--color-text-tertiary)' }}>
@@ -676,7 +678,7 @@ function SmartContentCard({
                       className="p-3 rounded-xl text-center transition-all duration-300 hover:-translate-y-1"
                       style={{ 
                         background: bgColors[idx % bgColors.length],
-                        border: `1px solid ${colors[idx % colors.length]}30`
+                        border: '1px solid rgba(128, 128, 128, 0.18)'
                       }}
                     >
                       <div className="text-xs mb-1.5" style={{ color: 'var(--color-text-tertiary)' }}>
@@ -949,7 +951,7 @@ function SmartContentCard({
                 className="p-3 rounded-xl transition-all duration-200 hover:scale-[1.02]"
                 style={{ 
                   background: `linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(139, 92, 246, 0.03))`,
-                  border: `1px solid ${line.color}40`
+                  border: '1px solid rgba(128, 128, 128, 0.25)'
                 }}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -961,7 +963,7 @@ function SmartContentCard({
                 </p>
                 {line.status && (
                   <span className="inline-block mt-1.5 text-[10px] px-2 py-0.5 rounded" style={{ 
-                    background: `${line.color}20`, 
+                    background: 'rgba(128, 128, 128, 0.12)', 
                     color: line.color
                   }}>
                     {line.status}
@@ -990,7 +992,7 @@ function SmartContentCard({
                 <div 
                   key={item.key}
                   className="p-4 rounded-xl text-center"
-                  style={{ background: `${item.color}10`, border: `1px solid ${item.color}30` }}
+                  style={{ background: 'rgba(128, 128, 128, 0.06)', border: '1px solid rgba(128, 128, 128, 0.18)' }}
                 >
                   <span className="text-xl mb-1 block">{item.icon}</span>
                   <div className="text-lg font-bold" style={{ color: item.color }}>{item.value}%</div>
@@ -1166,7 +1168,7 @@ function SmartContentCard({
                   const shenColors = ['#fbbf24', '#f59e0b', '#d97706', '#b45309', '#fcd34d', '#fde68a'];
                   return (
                     <div key={shen} className="flex items-center gap-2 p-2 rounded-xl transition-all duration-300 hover:-translate-y-1" 
-                      style={{ background: 'rgba(0, 0, 0, 0.2)', border: `1px solid ${shenColors[idx % shenColors.length]}30` }}>
+                      style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(128, 128, 128, 0.18)' }}>
                       <span className="text-xs font-bold" style={{ color: shenColors[idx % shenColors.length] }}>{shen}</span>
                       <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{zhi}</span>
                     </div>
@@ -1437,7 +1439,7 @@ function SmartContentCard({
                     className="p-4 rounded-xl text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                     style={{ 
                       background: symbolColors[i % symbolColors.length],
-                      border: `1px solid ${symbolTextColors[i % symbolTextColors.length]}40`,
+                      border: '1px solid rgba(128, 128, 128, 0.25)',
                     }}
                   >
                     <div className="text-lg mb-1">{String(s)}</div>
@@ -1873,7 +1875,7 @@ function SmartContentCard({
                     <div key={gong} className="p-3 rounded-xl text-center transition-all duration-300 hover:-translate-y-1" 
                       style={{ 
                         background: idx < 5 ? 'rgba(167, 139, 250, 0.2)' : 'rgba(139, 92, 246, 0.15)',
-                        border: `1px solid ${colors[idx % colors.length]}40`
+                        border: '1px solid rgba(128, 128, 128, 0.25)'
                       }}>
                       <div className="text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>{gong}</div>
                       <div className="text-sm font-bold" style={{ color: colors[idx % colors.length] }}>{xing}</div>
@@ -2016,12 +2018,12 @@ function SmartContentCard({
                   className="aspect-square rounded-xl flex flex-col items-center justify-center p-2 transition-all duration-200 hover:scale-105"
                   style={{ 
                     background: 'rgba(0, 0, 0, 0.3)',
-                    border: `2px solid ${statColor}40`
+                    border: '2px solid rgba(128, 128, 128, 0.25)'
                   }}
                 >
                   <span className="text-lg font-bold" style={{ color: elemColor }}>{info.number}</span>
                   <span className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>{info.element}</span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full mt-1" style={{ background: `${statColor}20`, color: statColor }}>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full mt-1" style={{ background: 'rgba(128, 128, 128, 0.12)', color: statColor }}>
                     {info.status}
                   </span>
                 </div>
@@ -2230,13 +2232,13 @@ function SmartContentCard({
               { label: '使命', value: personalYear, color: '#10b981', abbr: 'PY', desc: '年度方向' },
             ].map((item) => (
               <div key={item.abbr} className="p-4 rounded-xl text-center transition-all duration-200 hover:scale-[1.02]" 
-                style={{ background: `${item.color}08`, border: `2px solid ${item.color}35` }}>
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center mx-auto mb-2" style={{ background: `${item.color}18` }}>
+                style={{ background: 'rgba(0, 0, 0, 0.04)', border: '2px solid rgba(128, 128, 128, 0.18)' }}>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mx-auto mb-2" style={{ background: 'rgba(0, 0, 0, 0.08)' }}>
                   <span className="text-xs font-bold" style={{ color: item.color }}>{item.abbr}</span>
                 </div>
                 <div className="text-2xl font-bold mb-1" style={{ color: item.color }}>{item.value || '-'}</div>
                 <div className="text-[10px] font-medium" style={{ color: 'var(--color-text-tertiary)' }}>{item.label}</div>
-                <div className="text-[9px] mt-0.5" style={{ color: `${item.color}80` }}>{item.desc}</div>
+                <div className="text-[9px] mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>{item.desc}</div>
               </div>
             ))}
           </div>
@@ -2291,9 +2293,9 @@ function SmartContentCard({
                 const colors = ['#06b6d4', '#8b5cf6', '#ec4899', '#10b981'];
                 const color = colors[idx % colors.length];
                 return (
-                  <div key={key} className="p-4 rounded-xl" style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
+                  <div key={key} className="p-4 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.04)', border: '1px solid rgba(128, 128, 128, 0.12)' }}>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-medium" style={{ background: `${color}20`, color: color }}>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-medium" style={{ background: 'rgba(128, 128, 128, 0.12)', color: color }}>
                         {key}
                       </span>
                     </div>
@@ -2928,7 +2930,7 @@ function SmartContentCard({
             <p className="text-gray-300 text-xs leading-relaxed">
               {phase}如同{illumination > 50 ? '清晨的太阳，你的能量正在稳步上升。这是一段充满活力的时期，适合将想法转化为行动。' : '黄昏的余晖，能量逐渐回落。这是适合反思、整理和为下一轮做准备的时期。'}
               <br/><br/>
-              <span className="text-purple-400 font-medium">核心启示：</span>{energy || `月相能量正在${illumination > 50 ? '上升' : '衰减'}，${illumination > 50 ? '这是制定决策、开启新事物的绝佳时机。' : '适合回顾总结，为新一轮周期做准备。'}}
+              <span className="text-purple-400 font-medium">核心启示：</span>{energy || ('月相能量正在' + (illumination > 50 ? '上升' : '衰减') + '，' + (illumination > 50 ? '这是制定决策、开启新事物的绝佳时机。' : '适合回顾总结，为新一轮周期做准备。'))}
               <br/><br/>
               <span className="text-amber-400 font-medium">行动指引：</span>{suitableActivities?.[0] || (illumination > 50 ? '专注于你真正想要启动的事情，采取第一个行动。' : '整理思绪，为下一阶段做好规划。')}
             </p>
@@ -3279,8 +3281,7 @@ function SmartContentCard({
             <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
               {Object.entries(monthlyAnalysis).slice(0, 12).map(([month, info]) => {
                 const monthInfo = info as { score: number; status: string };
-                const statusColor = monthInfo.status === '大吉' || monthInfo.status === '吉' ? '#22c55e' : 
-                                   monthInfo.status === '平' ? '#eab308' : '#f43f5e';
+                const statusColor = (monthInfo.status === '大吉' || monthInfo.status === '吉') ? '#22c55e' : (monthInfo.status === '平') ? '#eab308' : '#f43f5e';
                 const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
                 const monthIndex = parseInt(month) - 1 || 0;
                 return (
@@ -3289,7 +3290,7 @@ function SmartContentCard({
                     className="p-3 rounded-xl text-center transition-all duration-200 hover:scale-105"
                     style={{ 
                       background: 'rgba(0, 0, 0, 0.2)',
-                      border: `1px solid ${statusColor}40`
+                      border: '1px solid rgba(128, 128, 128, 0.25)'
                     }}
                   >
                     <div className="text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>{months[monthIndex]}</div>
@@ -3358,7 +3359,7 @@ function SmartContentCard({
             <text x="23" y="30" textAnchor="middle" fill="white" fontSize="12">签</text>
           </svg>
           {luck ? (
-            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium mb-2" style={{ background: `${luckColors[luck] || 'var(--color-primary)'}22`, color: luckColors[luck] || 'var(--color-primary)' }}>
+            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium mb-2" style={{ background: 'rgba(0, 75, 170, 0.1)', color: 'var(--color-primary)' }}>
               {luck}
             </span>
           ) : null}
@@ -3834,110 +3835,40 @@ interface FollowUpMessage {
 }
 
 /**
- * 简易 Markdown 文本渲染
- * 处理：### 标题、- 列表、**加粗**、换行
+ * Markdown 文本渲染 - 使用 react-markdown
  */
 function MarkdownText({ text, theme = 'light' }: { text: string; theme?: 'light' | 'dark' }) {
-  const lines = text.split('\n');
-  const elements: React.ReactNode[] = [];
-  let listItems: string[] = [];
-
-  const flushList = () => {
-    if (listItems.length > 0) {
-      elements.push(
-        <ul key={`ul-${elements.length}`} className="list-disc pl-5 space-y-1 mb-3">
-          {listItems.map((item, idx) => (
-            <li key={idx} dangerouslySetInnerHTML={{ __html: renderInline(item) }} />
-          ))}
-        </ul>
-      );
-      listItems = [];
-    }
-  };
-
-  const renderInline = (s: string): string => {
-    return s
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`(.+?)`/g, '<code>$1</code>');
-  };
-
-  lines.forEach((line, idx) => {
-    const trimmed = line.trim();
-
-    // 标题
-    if (/^###\s+/.test(trimmed)) {
-      flushList();
-      const content = trimmed.replace(/^###\s+/, '');
-      elements.push(
-        <h3
-          key={`h3-${idx}`}
-          className="text-base font-bold mt-4 mb-2"
-          style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.95)' : 'var(--color-text)' }}
-        >
-          {content}
-        </h3>
-      );
-      return;
-    }
-    if (/^##\s+/.test(trimmed)) {
-      flushList();
-      const content = trimmed.replace(/^##\s+/, '');
-      elements.push(
-        <h2
-          key={`h2-${idx}`}
-          className="text-lg font-bold mt-4 mb-2"
-          style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.95)' : 'var(--color-text)' }}
-        >
-          {content}
-        </h2>
-      );
-      return;
-    }
-
-    // 无序列表
-    if (/^[-•]\s+/.test(trimmed)) {
-      listItems.push(trimmed.replace(/^[-•]\s+/, ''));
-      return;
-    }
-
-    // 有序列表
-    if (/^\d+\.\s+/.test(trimmed)) {
-      flushList();
-      const content = trimmed.replace(/^\d+\.\s+/, '');
-      elements.push(
-        <div key={`ol-${idx}`} className="flex gap-2 mb-1 pl-2">
-          <span style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.6)' : 'var(--color-text-tertiary)' }}>
-            {trimmed.match(/^\d+/)?.[0]}.
-          </span>
-          <span dangerouslySetInnerHTML={{ __html: renderInline(content) }} />
-        </div>
-      );
-      return;
-    }
-
-    // 空行
-    if (trimmed === '') {
-      flushList();
-      elements.push(<div key={`br-${idx}`} className="h-2" />);
-      return;
-    }
-
-    // 普通段落
-    flushList();
-    elements.push(
-      <p
-        key={`p-${idx}`}
-        className="mb-2 leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: renderInline(line) }}
-      />
-    );
-  });
-
-  flushList();
+  const textColor = theme === 'dark' ? 'rgba(255,255,255,0.9)' : 'var(--color-text)';
+  const headingColor = theme === 'dark' ? 'rgba(255,255,255,0.95)' : 'var(--color-text)';
+  const secondaryColor = theme === 'dark' ? 'rgba(255,255,255,0.6)' : 'var(--color-text-tertiary)';
 
   return (
-    <div style={{ color: theme === 'dark' ? 'rgba(255,255,255,0.9)' : 'var(--color-text)' }}>
-      {elements}
+    <div style={{ color: textColor }} className="markdown-content">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2" style={{ color: headingColor }}>{children}</h1>,
+          h2: ({ children }) => <h2 className="text-lg font-bold mt-4 mb-2" style={{ color: headingColor }}>{children}</h2>,
+          h3: ({ children }) => <h3 className="text-base font-bold mt-3 mb-2" style={{ color: headingColor }}>{children}</h3>,
+          p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+          ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 mb-3">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 mb-3">{children}</ol>,
+          li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+          strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+          em: ({ children }) => <em className="italic">{children}</em>,
+          code: ({ children }) => (
+            <code className="px-1.5 py-0.5 rounded text-sm" style={{ backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', color: secondaryColor }}>
+              {children}
+            </code>
+          ),
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 pl-4 my-2 opacity-80" style={{ borderColor: secondaryColor }}>{children}</blockquote>
+          ),
+          hr: () => <hr className="my-4 opacity-30" />,
+        }}
+      >
+        {text}
+      </ReactMarkdown>
     </div>
   );
 }
@@ -4067,7 +3998,7 @@ function DataSection({ data, system }: { data: Record<string, unknown>; system: 
                       style={{ background: 'var(--color-bg-inset)', border: '1px solid var(--color-border)' }}
                     >
                       <div className="text-sm font-medium mb-1" style={{ color: 'var(--color-primary)' }}>
-                        {item.palace || item.name ? String(item.palace || item.name) : `宫位${idx + 1}`}
+                        {item.palace || item.name ? String(item.palace || item.name) : ('宫位' + (idx + 1))}
                       </div>
                       <div className="text-xs space-y-0.5">
                         {item.mainStar ? (
