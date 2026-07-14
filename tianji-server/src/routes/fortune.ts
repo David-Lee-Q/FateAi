@@ -29,6 +29,8 @@ import { getShengxiaoFortune } from '../services/shengxiao.service';
 import { getDailyAlmanac } from '../services/almanac.service';
 import { drawLot } from '../services/drawlot.service';
 import { analyzePalm } from '../services/palm.service';
+import { calculateTieban } from '../services/tieban.service';
+import { calculateDaliuren } from '../services/daliuren.service';
 import type {
   FortuneSystem, FortuneQueryRequest, FortuneResult,
   BaziInputParams, TarotInputParams, ZodiacInputParams, DreamInputParams,
@@ -37,6 +39,8 @@ import type {
   MoonphaseInputParams, RuneInputParams, NametestInputParams,
   ShengxiaoInputParams, AlmanacInputParams,
   PalmInputParams,
+  TiebanInputParams,
+  DaliurenInputParams,
 } from '../types';
 import { resultStorage } from '../utils/storage';
 import { interpretFortune, followUpInterpret } from '../services/ai-interpreter';
@@ -64,7 +68,7 @@ router.post('/query', async (req: Request, res: Response) => {
 
     const validSystems: FortuneSystem[] = [
       'bazi', 'tarot', 'zodiac', 'dream',
-      'ziwei', 'liuyao', 'meihua', 'qimen', 'fengshui',
+      'ziwei', 'liuyao', 'meihua', 'qimen', 'tieban', 'daliuren', 'fengshui',
       'numerology', 'astrodice', 'moonphase', 'rune',
       'nametest', 'shengxiao', 'almanac', 'drawlot', 'palm',
       'report', 'compare',
@@ -166,6 +170,28 @@ router.post('/query', async (req: Request, res: Response) => {
           return;
         }
         data = castQimen(year, month, day, hour, params.question);
+        break;
+      }
+
+      case 'tieban': {
+        const params = inputParams as unknown as TiebanInputParams;
+        const { year, month, day, hour, gender } = params;
+        if (!year || !month || !day || hour === undefined || !gender) {
+          res.status(400).json({ success: false, message: '铁板神数需要：year, month, day, hour, gender' });
+          return;
+        }
+        data = calculateTieban(year, month, day, hour, gender);
+        break;
+      }
+
+      case 'daliuren': {
+        const params = inputParams as unknown as DaliurenInputParams;
+        const { year, month, day, hour, gender } = params;
+        if (!year || !month || !day || hour === undefined || !gender) {
+          res.status(400).json({ success: false, message: '大六壬需要：year, month, day, hour, gender' });
+          return;
+        }
+        data = calculateDaliuren(year, month, day, hour, gender);
         break;
       }
 

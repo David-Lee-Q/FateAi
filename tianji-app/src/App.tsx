@@ -34,6 +34,8 @@ const ZiweiPage = lazy(() => import('@/pages/ZiweiPage'));
 const LiuyaoPage = lazy(() => import('@/pages/LiuyaoPage'));
 const MeihuaPage = lazy(() => import('@/pages/MeihuaPage'));
 const QimenPage = lazy(() => import('@/pages/QimenPage'));
+const TiebanPage = lazy(() => import('@/pages/TiebanPage'));
+const DaliurenPage = lazy(() => import('@/pages/DaliurenPage'));
 const FengshuiPage = lazy(() => import('@/pages/FengshuiPage'));
 const NumerologyPage = lazy(() => import('@/pages/NumerologyPage'));
 const AstrodicePage = lazy(() => import('@/pages/AstrodicePage'));
@@ -52,6 +54,8 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const SearchPage = lazy(() => import('@/pages/SearchPage'));
 const HistoryPage = lazy(() => import('@/pages/HistoryPage'));
 const AdvicePage = lazy(() => import('@/pages/AdvicePage'));
+const TiebanResultPage = lazy(() => import('@/pages/TiebanResultPage'));
+const DaliurenResultPage = lazy(() => import('@/pages/DaliurenResultPage'));
 
 // 分类聚合页
 const EasternPage = lazy(() => import('@/pages/EasternPage'));
@@ -111,6 +115,8 @@ function App() {
           <Route path="/result/rune/:id" element={withSuspense(RuneResultPage)} />
           <Route path="/result/drawlot/:id" element={withSuspense(DrawlotResultPage)} />
           <Route path="/result/palm/:id" element={withSuspense(PalmResultPage)} />
+          <Route path="/result/tieban/:id" element={withSuspense(TiebanResultPage)} />
+          <Route path="/result/daliuren/:id" element={withSuspense(DaliurenResultPage)} />
 
           {/* 分类聚合页 */}
           <Route path="/eastern" element={withSuspense(EasternPage)} />
@@ -124,8 +130,8 @@ function App() {
           <Route path="/liuyao" element={withSuspense(LiuyaoPage)} />
           <Route path="/meihua" element={withSuspense(MeihuaPage)} />
           <Route path="/qimen" element={withSuspense(QimenPage)} />
-          <Route path="/tieban" element={withSuspense(QimenPage)} />
-          <Route path="/daliuren" element={withSuspense(QimenPage)} />
+          <Route path="/tieban" element={withSuspense(TiebanPage)} />
+          <Route path="/daliuren" element={withSuspense(DaliurenPage)} />
           <Route path="/fengshui" element={withSuspense(FengshuiPage)} />
 
           {/* 西方占卜系列 */}

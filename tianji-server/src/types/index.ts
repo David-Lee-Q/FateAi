@@ -432,6 +432,26 @@ export interface PalmInputParams {
   image: string;              // Base64 编码的手掌图片
 }
 
+/** 铁板神数输入参数 */
+export interface TiebanInputParams {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  gender: 'male' | 'female';
+  question?: string;
+}
+
+/** 大六壬输入参数 */
+export interface DaliurenInputParams {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  gender: 'male' | 'female';
+  question?: string;
+}
+
 /** 手相主线结构 */
 export interface PalmLine {
   name: string;         // 线的名称
