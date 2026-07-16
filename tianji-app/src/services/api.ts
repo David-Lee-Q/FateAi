@@ -8,7 +8,7 @@ import type {
 } from '@/types';
 
 /** API 基础地址 */
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 /** 创建 axios 实例 */
 const http = axios.create({

@@ -48,7 +48,9 @@ export interface FortuneResult {
   system: FortuneSystem;
   createdAt: string;
   status: 'completed' | 'pending';
+  interpretation?: string;
   data: Record<string, unknown>;
+  input?: Record<string, unknown>;
 }
 
 /** 通用 API 响应（兼容后端 { success, data } 和 { code, message, data } 两种格式） */

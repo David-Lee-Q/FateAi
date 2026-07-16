@@ -89,7 +89,7 @@ function WuxingBar({ element, percentage, strength }: {
 }
 
 // AI 深度解读组件
-function AIDeepDive({ interpretation }: { interpretation: string }) {
+function AIDeepDive({ resultId, interpretation }: { resultId: string; interpretation: string }) {
   const [question, setQuestion] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -97,7 +97,7 @@ function AIDeepDive({ interpretation }: { interpretation: string }) {
     if (!question.trim()) return;
     setSubmitting(true);
     try {
-      await submitFollowUp({ question, system: 'bazi' });
+      await submitFollowUp(resultId, question);
       setQuestion('');
     } finally {
       setSubmitting(false);
@@ -154,6 +154,65 @@ function AIDeepDive({ interpretation }: { interpretation: string }) {
   );
 }
 
+/**
+ * 按标题分割八字解读文本，提取指定 Tab 对应的内容
+ */
+function getTabContent(text: string, activeTab: string): string {
+  const tabKeywords: Record<string, string[]> = {
+    '性格特征': ['性格', '人格', '个人特质'],
+    '事业财运': ['事业', '工作', '职业', '财运', '财富', '理财'],
+    '感情婚姻': ['感情', '爱情', '婚姻', '桃花', '恋爱'],
+    '健康养生': ['健康', '身体', '保健', '养生'],
+    '大运流年': ['大运', '流年', '近期', '运势'],
+  };
+
+  const keywordList = tabKeywords[activeTab] || [];
+  const lines = text.split('\n');
+  const matchedSections: string[] = [];
+  let currentSection = '';
+  let currentMatches = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    const numMatch = trimmed.match(/^###\s*\d+\.\s*(.+)/);
+    if (numMatch) {
+      if (currentMatches && currentSection) {
+        matchedSections.push(currentSection.trim());
+      }
+      const title = numMatch[1].trim();
+      currentMatches = keywordList.some(k => title.includes(k));
+      currentSection = currentMatches ? line + '\n' : '';
+      continue;
+    }
+
+    const mdMatch = trimmed.match(/^###\s*(.+)/);
+    if (mdMatch) {
+      if (currentMatches && currentSection) {
+        matchedSections.push(currentSection.trim());
+      }
+      const title = mdMatch[1].trim();
+      currentMatches = keywordList.some(k => title.includes(k));
+      currentSection = currentMatches ? line + '\n' : '';
+      continue;
+    }
+
+    if (currentMatches) {
+      currentSection += line + '\n';
+    }
+  }
+
+  if (currentMatches && currentSection) {
+    matchedSections.push(currentSection.trim());
+  }
+
+  if (matchedSections.length > 0) {
+    return matchedSections.join('\n\n');
+  }
+
+  return '该维度暂无详细分析，可尝试切换其他 Tab 查看。';
+}
+
 // 八字结果页面
 export default function BaziResultPage() {
   const { id } = useParams<{ id: string }>();
@@ -190,11 +249,15 @@ export default function BaziResultPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getFortuneResult(id);
-        setResult(data);
+        const response = await getFortuneResult(id);
+        const fortuneResult = response.data;
+        if (!fortuneResult) {
+          throw new Error('数据为空');
+        }
+        setResult(fortuneResult);
 
-        if (data.data) {
-          const { wuxingData } = parseBaziData(data.data);
+        if (fortuneResult.data) {
+          const { wuxingData } = parseBaziData(fortuneResult.data);
           setWuxing(wuxingData);
         }
       } catch (err) {
@@ -419,12 +482,14 @@ export default function BaziResultPage() {
             ))}
           </div>
           <div className="space-y-4 prose prose-sm prose-invert max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.interpretation || ''}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {getTabContent(result.interpretation || '', activeTab)}
+            </ReactMarkdown>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive interpretation={result.interpretation || ''} />
+        <AIDeepDive resultId={result.id || ''} interpretation={result.interpretation || ''} />
       </main>
 
       {/* 固定底部操作栏 */}
