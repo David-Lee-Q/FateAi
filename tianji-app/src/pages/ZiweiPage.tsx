@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Star, Calendar, Clock, User, Loader2, ChevronRight, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Star, Clock, User, Loader2, ChevronRight, ChevronDown } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
+import DatePicker from '@/components/DatePicker';
 
 /** 时辰选项 */
 const SHICHEN_OPTIONS = [
@@ -26,7 +27,7 @@ type ChartType = 'benming' | 'daxian' | 'liunian' | 'liuyue';
 export default function ZiweiPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState({ year: '', month: '', day: '' });
   const [birthTime, setBirthTime] = useState('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar');
@@ -37,17 +38,14 @@ export default function ZiweiPage() {
 
   /** 提交紫微斗数排盘 */
   const handleSubmit = async () => {
-    if (!birthDate || !birthTime) return;
+    if (!birthDate.year || !birthDate.month || !birthDate.day || !birthTime) return;
     setLoading(true);
     try {
-      // 将日期字符串解析为年/月/日
-      const [y, m, d] = birthDate.split('-').map(Number);
-      const h = Number(birthTime);
       const result = await submitFortuneQuery('ziwei', {
-        year: y,
-        month: m,
-        day: d,
-        hour: h,
+        year: parseInt(birthDate.year),
+        month: parseInt(birthDate.month),
+        day: parseInt(birthDate.day),
+        hour: Number(birthTime),
         gender,
       });
       navigate(`/result/ziwei/${result.data.id}`);
@@ -174,39 +172,12 @@ export default function ZiweiPage() {
                 </div>
 
                 {/* 出生日期 */}
-                <div>
-                  <label className="block text-sm font-medium mb-1.5 cursor-pointer" style={{ color: 'var(--color-text)' }}>
-                    出生日期
-                  </label>
-                  <div
-                    className="w-full rounded-lg px-4 py-3 text-sm cursor-pointer relative overflow-hidden"
-                    style={{
-                      background: 'var(--color-input-bg, rgba(255,255,255,0.05))',
-                      border: '1px solid var(--color-border, rgba(255,255,255,0.1))',
-                      color: 'var(--color-text)',
-                      transition: 'all 150ms ease',
-                      minHeight: '48px',
-                    }}
-                  >
-                    <input
-                      type="date"
-                      value={birthDate}
-                      onChange={(e) => setBirthDate(e.target.value)}
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '100%',
-                        height: '100%',
-                        opacity: 0,
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                      }}
-                    />
-                    <span style={{ display: 'flex', alignItems: 'center', height: '100%', pointerEvents: 'none' }}>
-                      {birthDate || <span style={{ color: 'rgba(255,255,255,0.3)' }}>请选择出生日期</span>}
-                    </span>
-                  </div>
-                </div>
+                <DatePicker
+                  label="出生日期"
+                  value={birthDate}
+                  onChange={setBirthDate}
+                  placeholder="请选择出生日期"
+                />
 
                 {/* 出生时辰 */}
                 <div>

@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { CircleDot, Calendar, User, Clock, Loader2, ChevronRight, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, ChevronDown } from 'lucide-react';
 import { useFortune } from '@/hooks/useFortune';
+import DatePicker from '@/components/DatePicker';
 
 /** 时辰选项 */
 const SHICHEN_OPTIONS = [
@@ -72,9 +73,7 @@ function SelectField({
 export default function BaziPage() {
   const navigate = useNavigate();
   const { loading, error, query } = useFortune('bazi');
-  const [year, setYear] = useState('');
-  const [month, setMonth] = useState('');
-  const [day, setDay] = useState('');
+  const [birthDate, setBirthDate] = useState({ year: '', month: '', day: '' });
   const [hour, setHour] = useState('');
   const [gender, setGender] = useState<'male' | 'female'>('');
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar');
@@ -85,6 +84,7 @@ export default function BaziPage() {
   /** 提交八字排盘 */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const { year, month, day } = birthDate;
     if (!year || !month || !day || !hour || !gender) return;
     const res = await query({ year, month, day, hour, gender, calendarType, province, city });
     if (res) navigate(`/result/bazi/${res.id}`);
@@ -182,30 +182,13 @@ export default function BaziPage() {
                   </div>
                 </div>
 
-                {/* 出生日期：年月日一行 */}
-                <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text)' }}>出生日期</label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <select value={year} onChange={(e) => setYear(e.target.value)} className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors">
-                      <option value="" disabled>年份</option>
-                      {YEAR_OPTIONS.map((y) => (
-                        <option key={y} value={y}>{y}年</option>
-                      ))}
-                    </select>
-                    <select value={month} onChange={(e) => setMonth(e.target.value)} className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors">
-                      <option value="" disabled>月份</option>
-                      {MONTH_OPTIONS.map((m) => (
-                        <option key={m} value={m}>{m}月</option>
-                      ))}
-                    </select>
-                    <select value={day} onChange={(e) => setDay(e.target.value)} className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors">
-                      <option value="" disabled>日期</option>
-                      {DAY_OPTIONS.map((d) => (
-                        <option key={d} value={d}>{d}日</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                {/* 出生日期 */}
+                <DatePicker
+                  label="出生日期"
+                  value={birthDate}
+                  onChange={setBirthDate}
+                  placeholder="请选择出生日期"
+                />
 
                 {/* 时辰 + 性别一行 */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -302,7 +285,7 @@ export default function BaziPage() {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    disabled={loading || !year || !month || !day || !hour || !gender}
+                    disabled={loading || !birthDate.year || !birthDate.month || !birthDate.day || !hour || !gender}
                     className="btn-primary w-full py-3 rounded-lg text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? (

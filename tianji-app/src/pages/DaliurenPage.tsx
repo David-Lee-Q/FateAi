@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Compass, Calendar, Clock, Loader2, ChevronRight, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Compass, Clock, Loader2, User } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
+import DatePicker from '@/components/DatePicker';
 
 /** 起课方式 */
 type MethodType = 'birth' | 'current' | 'question';
@@ -30,14 +31,14 @@ export default function DaliurenPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState<MethodType>('birth');
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState({ year: '', month: '', day: '' });
   const [birthHour, setBirthHour] = useState('');
   const [gender, setGender] = useState('male');
   const [question, setQuestion] = useState('');
 
   /** 提交大六壬占卜 */
   const handleSubmit = async () => {
-    if (method === 'birth' && (!birthDate || !birthHour)) {
+    if (method === 'birth' && (!birthDate.year || !birthDate.month || !birthDate.day || !birthHour)) {
       alert('请填写完整的出生信息');
       return;
     }
@@ -49,14 +50,10 @@ export default function DaliurenPage() {
     let year: number, month: number, day: number, hour: number;
     
     if (method === 'birth') {
-      [year, month, day] = birthDate.split('-').map(Number);
+      year = parseInt(birthDate.year);
+      month = parseInt(birthDate.month);
+      day = parseInt(birthDate.day);
       hour = Number(birthHour);
-    } else if (method === 'question') {
-      const now = new Date();
-      year = now.getFullYear();
-      month = now.getMonth() + 1;
-      day = now.getDate();
-      hour = now.getHours();
     } else {
       const now = new Date();
       year = now.getFullYear();
@@ -185,60 +182,32 @@ export default function DaliurenPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {/* 出生日期输入（按出生时间时显示） */}
                 {method === 'birth' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5 cursor-pointer" style={{ color: 'var(--color-text)' }}>
-                        <Calendar size={14} className="inline mr-1" />
-                        出生日期
-                      </label>
-                      <div
-                        className="w-full rounded-lg px-4 py-3 text-sm cursor-pointer overflow-hidden"
-                        style={{
-                          background: 'var(--color-input-bg, rgba(255,255,255,0.05))',
-                          border: '1px solid var(--color-border, rgba(255,255,255,0.1))',
-                          color: 'var(--color-text)',
-                          transition: 'all 150ms ease',
-                          minHeight: '48px',
-                          position: 'relative',
-                        }}
-                      >
-                        <input
-                          type="date"
-                          value={birthDate}
-                          onChange={(e) => setBirthDate(e.target.value)}
-                          className="w-full h-full cursor-pointer"
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            opacity: 0,
-                            fontSize: '16px',
-                          }}
-                        />
-                        <span style={{ display: 'flex', alignItems: 'center', height: '100%', pointerEvents: 'none' }}>
-                          {birthDate || <span style={{ color: 'rgba(255,255,255,0.3)' }}>请选择日期</span>}
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text)' }}>
-                        <Clock size={14} className="inline mr-1" />
-                        出生时辰
-                      </label>
-                      <select
-                        value={birthHour}
-                        onChange={(e) => setBirthHour(e.target.value)}
-                        className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors"
-                      >
-                        <option value="">请选择</option>
-                        {SHICHEN_OPTIONS.map((t) => (
-                          <option key={t.value} value={t.value}>{t.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </>
+                  <DatePicker
+                    label="出生日期"
+                    value={birthDate}
+                    onChange={setBirthDate}
+                    placeholder="请选择日期"
+                  />
+                )}
+
+                {/* 出生时辰（按出生时间时显示） */}
+                {method === 'birth' && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--color-text)' }}>
+                      <Clock size={14} className="inline mr-1" />
+                      出生时辰
+                    </label>
+                    <select
+                      value={birthHour}
+                      onChange={(e) => setBirthHour(e.target.value)}
+                      className="w-full rounded-lg px-4 py-2.5 text-sm outline-none transition-colors"
+                    >
+                      <option value="">请选择时辰</option>
+                      {SHICHEN_OPTIONS.map((t) => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 )}
 
                 {/* 性别选择 */}
@@ -289,7 +258,7 @@ export default function DaliurenPage() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={loading || (method === 'birth' && (!birthDate || !birthHour)) || (method === 'question' && !question)}
+                  disabled={loading || (method === 'birth' && (!birthDate.year || !birthDate.month || !birthDate.day || !birthHour)) || (method === 'question' && !question)}
                   className="inline-flex items-center gap-2 px-10 py-3.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                   style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)', color: '#0a0e1a' }}
                 >

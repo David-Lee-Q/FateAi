@@ -68,8 +68,13 @@ export default function QimenResultPage() {
   }
 
   const question = result.question || result.data?.question || '奇门占卜';
-  const details = result.details || {};
-  const aiContent = result.aiAnalysis || result.aiInterpretation || '';
+  const details = result.details || result.data?.details || {};
+  // AI 解读从多个可能的位置获取
+  const aiContent = result.aiInterpretation
+    || result.aiAnalysis
+    || result.data?.aiInterpretation
+    || result.data?.suggestion
+    || '';
 
   // 九宫方位映射
   const palaceMap: Record<string, { name: string; star: string; door: string; shadow: string }> = {

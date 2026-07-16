@@ -349,11 +349,13 @@ router.post('/query', async (req: Request, res: Response) => {
     }
 
     // ====== AI 解读：异步调用 LLM 生成自然语言解读 ======
+    let aiText = '';
     try {
-      const aiText = await interpretFortune(system, data as unknown as Record<string, unknown>, inputParams as Record<string, unknown>);
-      // 将 AI 解读附加到 result.data 中
+      aiText = await interpretFortune(system, data as unknown as Record<string, unknown>, inputParams as Record<string, unknown>);
+      // 将 AI 解读附加到 result.data 中（兼容两种字段名）
       if (data && typeof data === 'object') {
         (data as unknown as Record<string, unknown>).aiInterpretation = aiText;
+        (data as unknown as Record<string, unknown>).interpretation = aiText;
       }
     } catch (aiError) {
       // AI 调用失败不阻塞结果返回，打印日志即可
@@ -366,6 +368,7 @@ router.post('/query', async (req: Request, res: Response) => {
       system,
       createdAt: new Date().toISOString(),
       status: 'completed',
+      interpretation: aiText,
       data,
     };
     resultStorage.set(result.id, result);

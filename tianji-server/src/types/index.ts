@@ -572,6 +572,7 @@ export interface FortuneResult {
   system: FortuneSystem;
   createdAt: string;
   status: 'completed' | 'pending';
+  interpretation?: string; // AI 解读文本
   data: BaziResult | TarotResult | ZodiacResult | DreamResult
     | ZiweiResult | LiuyaoResult | MeihuaResult | QimenResult | FengshuiResult
     | NumerologyResult | AstrodiceResult | MoonphaseResult | RuneResult
