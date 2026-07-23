@@ -20,9 +20,10 @@ send_feishu() {
     if $HAS_PYTHON; then
         content_json=$(echo "$content" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
     else
-        # 纯 bash 回退：转义双引号和反斜杠
-        content_json="\"${content//\\/\\\\}\""
-        content_json="\"${content_json//\"/\\\"}\""
+        # 纯 bash 回退：先转义反斜杠和双引号，再外包双引号
+        local escaped="${content//\\/\\\\}"
+        escaped="${escaped//\"/\\\"}"
+        content_json="\"${escaped}\""
     fi
 
     local payload
