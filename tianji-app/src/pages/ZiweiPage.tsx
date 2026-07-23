@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Clock, User, Loader2, ChevronRight, ChevronDown } from 'lucide-react';
+import { Star, Loader2, ChevronDown } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 import DatePicker from '@/components/DatePicker';
 

@@ -114,17 +114,16 @@ router.post('/query', async (req: Request, res: Response) => {
 
       case 'dream': {
         const params = inputParams as unknown as DreamInputParams;
-        // keywords 和 description 至少有一个
+        const desc = params.description?.trim() || '';
         const hasKeywords = Array.isArray(params.keywords) && params.keywords.length > 0;
-        const hasDescription = params.description && params.description.trim().length > 0;
+        const hasDescription = desc.length > 0;
         if (!hasKeywords && !hasDescription) {
           res.status(400).json({ success: false, message: '解梦需要：keywords 或 description（至少填一项）' });
           return;
         }
-        // 如果有 description，将其作为关键词加入
         const keywords = hasKeywords ? [...params.keywords] : [];
-        if (hasDescription && !keywords.includes(params.description)) {
-          keywords.push(params.description);
+        if (hasDescription && !keywords.includes(desc)) {
+          keywords.push(desc);
         }
         data = interpretDream(keywords);
         break;

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -62,7 +62,7 @@ function TarotCard({ card, position, orientation }: {
 }
 
 // AI 深度解读组件
-function AIDeepDive({ interpretation, system }: { interpretation: string; system: string }) {
+function AIDeepDive({ interpretation, resultId }: { interpretation: string; resultId: string }) {
   const [question, setQuestion] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -70,7 +70,7 @@ function AIDeepDive({ interpretation, system }: { interpretation: string; system
     if (!question.trim()) return;
     setSubmitting(true);
     try {
-      await submitFollowUp({ question, system });
+      await submitFollowUp(resultId, question);
       setQuestion('');
     } finally {
       setSubmitting(false);
@@ -141,8 +141,8 @@ export default function TarotResultPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getFortuneResult(id);
-        setResult(data);
+        const resp = await getFortuneResult(id);
+        setResult(resp.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载失败');
       } finally {
@@ -178,14 +178,15 @@ export default function TarotResultPage() {
   }
 
   // 解析塔罗牌数据
-  const cards = result.data?.cards || [
+  const rawData = (result.data || {}) as Record<string, unknown>;
+  const cards = (rawData.cards as Array<Record<string, unknown>>) || [
     { name: '愚人', nameEn: 'The Fool', position: '过去', orientation: 'upright', meaning: '新的开始、冒险' },
     { name: '恋人', nameEn: 'The Lovers', position: '现在', orientation: 'reversed', meaning: '抉择、平衡' },
     { name: '星星', nameEn: 'The Star', position: '未来', orientation: 'upright', meaning: '希望、疗愈' },
   ];
 
   const interpretation = result.interpretation || '';
-  const guidance = result.guidance || {};
+  const guidance = (rawData.guidance || {}) as Record<string, string>;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
@@ -353,7 +354,7 @@ export default function TarotResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive interpretation={interpretation} system="tarot" />
+        <AIDeepDive interpretation={interpretation} resultId={result.id} />
       </main>
 
       {/* 固定底部操作栏 */}

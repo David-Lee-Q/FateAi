@@ -192,8 +192,8 @@ export default function ShengxiaoResultPage() {
               <span style={{ color: '#c8a84e' }}>|</span> 每月运势一览
             </h2>
             <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-              {monthlyFortune.map((m: any, i: number) => {
-                const fc = FORTUNE_COLORS[m.fortune] || FORTUNE_COLORS.zhong;
+              {monthlyFortune.map((m: { fortune: string; month: string; level: string; lunar: string }, i: number) => {
+                const fc = FORTUNE_COLORS[m.fortune as keyof typeof FORTUNE_COLORS] || FORTUNE_COLORS.zhong;
                 return (
                   <div
                     key={i}

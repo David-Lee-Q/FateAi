@@ -161,14 +161,14 @@ export const ZODIAC_TEMPLATES: SystemTemplates = {
       heading: '### 事业运势',
       variants: [
         '水星的运行带来清晰的思维和流畅的表达。在工作中{careerAdvice1}，适合{careerAdvice2}。团队协作方面，{teamAdvice}。',
-        '事业宫位的能量显示{careerTrend}。近期{opportunity}方面值得关注，{action}能帮助您在职场中脱颖而出。',
+        '事业宫位的能量显示{careerTrend}。近期{opportunity}方面值得关注，{zodiac_action}能帮助您在职场中脱颖而出。',
       ],
     },
     {
       heading: '### 财运分析',
       variants: [
         '正财运{wealth1}，偏财运{wealth2}。适合在{timeWindow}做出{financeMove}的决策。幸运数字：{luckyNum}。',
-        '财务方面整体{trend}，{source}是主要的收入增长点。建议{tip}，避免{avoid}。理性规划让财富持续增长。',
+        '财务方面整体{wealth_trend}，{source}是主要的收入增长点。建议{tip}，避免{avoid}。理性规划让财富持续增长。',
       ],
     },
     {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Hexagon, Loader2, ChevronRight, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Hexagon, Loader2, MessageCircle } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 24个符文数据 */

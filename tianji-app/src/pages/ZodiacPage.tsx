@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sun, Loader2, ChevronRight } from 'lucide-react';
+import { Sun, Loader2 } from 'lucide-react';
 import { useFortune } from '@/hooks/useFortune';
 
 /** 星座数据 */

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, Clock, Sparkles, LayoutGrid, Flame,
-  Trash2, X, ArrowRight, ChevronRight, Zap,
-  Heart, Star, Award, Lightbulb, Scroll,
+  Search, Clock, Sparkles, Flame,
+  Trash2, ChevronRight, Award,
 } from 'lucide-react';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
 
@@ -105,7 +104,6 @@ export default function SearchPage() {
 
   /** 添加搜索历史并跳转到对应工具 */
   const handleToolClick = (tool: ToolItem) => {
-    const toolName = tool.name.replace(/占卜|算命/g, '');
     addHistory(tool.name, tool.path.replace('/', ''));
     navigate(tool.path);
   };

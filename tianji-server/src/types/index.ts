@@ -49,6 +49,12 @@ export interface BaziResult {
   hourPillar: BaziPillar;   // 时柱
   wuXingCount: Record<string, number>; // 五行统计
   summary: string;           // 总体概述
+  _naYin?: {
+    yearNaYin: string;
+    monthNaYin: string;
+    dayNaYin: string;
+    hourNaYin: string;
+  };
 }
 
 // ===================== 塔罗牌 =====================
@@ -113,6 +119,7 @@ export interface ZodiacResult {
 /** 解梦输入参数 */
 export interface DreamInputParams {
   keywords: string[];
+  description?: string;
 }
 
 /** 解梦词条 */
@@ -432,51 +439,30 @@ export interface PalmInputParams {
   image: string;              // Base64 编码的手掌图片
 }
 
-/** 铁板神数输入参数 */
-export interface TiebanInputParams {
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-  gender: 'male' | 'female';
-  question?: string;
-}
-
-/** 大六壬输入参数 */
-export interface DaliurenInputParams {
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-  gender: 'male' | 'female';
-  question?: string;
-}
-
-/** 手相主线结构 */
+/** 手相掌纹 */
 export interface PalmLine {
-  name: string;         // 线的名称
-  type: string;         // 线的类型（长/短/深/浅）
-  description: string;  // 描述
-  interpretation: string; // 解读
+  name: string;
+  type: string;
+  description: string;
+  interpretation: string;
 }
 
 /** 手相算命结果 */
-export interface PalmResult extends BaseFortuneResult {
+export interface PalmResult {
+  summary: string;
   details: {
-    palmType: string;         // 掌型（如：金型手、木型手、水型手、火型手、土型手）
-    palmTypeDesc: string;     // 掌型描述
-    wuXing: string;           // 五行属性
-    gender: string;           // 性别
-    lines: {                  // 三大主线
-      life: PalmLine;         // 生命线
-      heart: PalmLine;        // 感情线
-      mind: PalmLine;         // 智慧线
+    palmType: string;
+    palmTypeDesc: string;
+    wuXing: string;
+    gender: string;
+    lines: {
+      life: PalmLine;
+      heart: PalmLine;
+      mind: PalmLine;
     };
   };
 }
 
-// ===================== 铁板神数 =====================
-
 /** 铁板神数输入参数 */
 export interface TiebanInputParams {
   year: number;
@@ -484,6 +470,7 @@ export interface TiebanInputParams {
   day: number;
   hour: number;
   gender: 'male' | 'female';
+  question?: string;
   name?: string;
 }
 
@@ -497,24 +484,25 @@ export interface TiebanNumber {
 }
 
 /** 铁板神数结果 */
-export interface TiebanResult extends BaseFortuneResult {
-  details: {
-    birthTime: string;        // 出生时辰
-    ganZhiYear: string;       // 干支年
-    ganZhiMonth: string;      // 干支月
-    ganZhiDay: string;        // 干支日
-    ganZhiHour: string;       // 干支时
-    mainCode: number;         // 主码（铁板神数）
-    mainNumber: TiebanNumber; // 主数详情
-    subNumbers: TiebanNumber[]; // 附数列表（通常3个）
-    lifeFortune: string;      // 一生命运总论
-    careerFortune: string;    // 事业运势
-    loveFortune: string;      // 感情婚姻
-    healthFortune: string;    // 健康状况
+export interface TiebanResult {
+  mainNumber: number;
+  bazi: {
+    year: string;
+    month: string;
+    day: string;
+    hour: string;
   };
+  mingGong: string;
+  shenGong: string;
+  luckyNumbers: number[];
+  fortuneLevel: string;
+  characteristics: string;
+  lifetime: string;
+  liuqin: Record<string, string>;
+  careerFortune: string;
+  loveFortune: string;
+  yearlyFortune: string;
 }
-
-// ===================== 大六壬 =====================
 
 /** 大六壬输入参数 */
 export interface DaliurenInputParams {
@@ -550,20 +538,45 @@ export interface DaliurenTianPan {
 }
 
 /** 大六壬结果 */
-export interface DaliurenResult extends BaseFortuneResult {
-  details: {
-    date: string;            // 占卜日期
-    ganZhiDate: string;      // 干支纪日
-    hour: string;            // 占时
-    monthJiang: string;      // 月将
-    shen: string;            // 六壬神将（如：大吉、功曹、太冲等）
-    diPan: DaliurenDiPan;    // 地盘
-    tianPan: DaliurenTianPan; // 天盘
-    liuShen: Record<string, string>; // 六神（青龙、白虎、朱雀等对应地支）
-    chuan: DaliurenChuan[];  // 三传
-    overallJudgment: string; // 整体判断
-    question: string;        // 所问之事
+export interface DaliurenResult {
+  time: {
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
+    shichen: string;
+    yuejiang: string;
   };
+  ke: {
+    ke1: string;
+    ke2: string;
+    ke3: string;
+    ke4: string;
+  };
+  chuan: {
+    chuan1: string;
+    chuan2: string;
+    chuan3: string;
+    chuan1Desc: string;
+    chuan2Desc: string;
+    chuan3Desc: string;
+  };
+  shen: {
+    shen1: string;
+    shen2: string;
+    shen3: string;
+    shen4: string;
+  };
+  liuqin: string[];
+  tianpan: Record<string, string>;
+  dipan: Record<string, string>;
+  judgments: {
+    overall: string;
+    goodAspects: string[];
+    badAspects: string[];
+    fortune: string;
+  };
+  interpretation: string;
 }
 
 /** 统一查询结果 */

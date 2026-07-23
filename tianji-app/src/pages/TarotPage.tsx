@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, Loader2, ChevronRight, Send, Bookmark, Share2 } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 import { useFortune } from '@/hooks/useFortune';
 
 /** 牌阵配置 */

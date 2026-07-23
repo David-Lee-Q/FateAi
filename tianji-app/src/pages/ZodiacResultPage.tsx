@@ -64,7 +64,7 @@ function PlanetCard({ planet, emoji, sign, status, effect }: {
 }
 
 // AI 深度解读组件
-function AIDeepDive({ interpretation, system }: { interpretation: string; system: string }) {
+function AIDeepDive({ interpretation, resultId }: { interpretation: string; resultId: string }) {
   const [question, setQuestion] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -72,7 +72,7 @@ function AIDeepDive({ interpretation, system }: { interpretation: string; system
     if (!question.trim()) return;
     setSubmitting(true);
     try {
-      await submitFollowUp({ question, system });
+      await submitFollowUp(resultId, question);
       setQuestion('');
     } finally {
       setSubmitting(false);
@@ -143,8 +143,8 @@ export default function ZodiacResultPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getFortuneResult(id);
-        setResult(data);
+        const resp = await getFortuneResult(id);
+        setResult(resp.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载失败');
       } finally {
@@ -179,7 +179,7 @@ export default function ZodiacResultPage() {
     );
   }
 
-  const data = result.data || {};
+  const data = (result.data || {}) as Record<string, string>;
   const interpretation = result.interpretation || '';
 
   // 星座信息
@@ -198,7 +198,7 @@ export default function ZodiacResultPage() {
     双鱼座: { emoji: '♓', date: '2月19日 - 3月20日', element: '水象星座', symbol: '♓' },
   };
 
-  const signName = data.sign || result.input?.sign || '狮子座';
+  const signName = String(data.sign || result.input?.sign || '狮子座');
   const signInfo = signMap[signName] || signMap['狮子座'];
 
   // 五项评分
@@ -301,7 +301,7 @@ export default function ZodiacResultPage() {
               </defs>
             </svg>
             <div className="text-center">
-              <div className="text-4xl font-bold" style={{ color: 'var(--color-gold)' }}>{result.score || 85}</div>
+              <div className="text-4xl font-bold" style={{ color: 'var(--color-gold)' }}>{(data.score) || 85}</div>
               <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>综合评分</div>
             </div>
           </div>
@@ -318,7 +318,7 @@ export default function ZodiacResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive interpretation={interpretation} system="zodiac" />
+        <AIDeepDive interpretation={interpretation} resultId={result.id} />
       </main>
 
       {/* 固定底部操作栏 */}

@@ -330,6 +330,38 @@ export async function interpretFortune(
     return callAI(String(prompt));
   }
 
+  if (system === 'tarot') {
+    const tarotData = data as {
+      spread: string;
+      question: string;
+      cards: Array<{ name: string; position: string; isReversed: boolean }>;
+    };
+    const prompt = TAROT_PROMPT({
+      spread: tarotData.spread,
+      question: tarotData.question || (inputParams.question as string) || '当前运势',
+      cards: (tarotData.cards || []).map(c => ({
+        name: c.name, position: c.position, isReversed: c.isReversed,
+      })),
+    });
+    return callAI(String(prompt));
+  }
+
+  if (system === 'zodiac') {
+    const zodiacData = data as {
+      sign: string;
+      dateRange: string;
+      timeRange: string;
+      scores: { love: number; career: number; finance: number; health: number };
+    };
+    const prompt = ZODIAC_PROMPT({
+      sign: zodiacData.sign || (inputParams.sign as string) || '未知',
+      dateRange: zodiacData.dateRange || (inputParams.dateRange as string) || '',
+      timeRange: zodiacData.timeRange || (inputParams.timeRange as string) || '本周',
+      scores: zodiacData.scores || { love: 4, career: 4, finance: 3, health: 4 },
+    });
+    return callAI(String(prompt));
+  }
+
   // 系统名称映射
   const systemNames: Record<string, string> = {
     tarot: '塔罗牌', zodiac: '星座运势', dream: '周公解梦',
@@ -338,11 +370,36 @@ export async function interpretFortune(
     moonphase: '月相占卜', rune: '符文占卜', nametest: '姓名测试',
     shengxiao: '生肖运势', almanac: '每日黄历', drawlot: '求签解签',
     report: '综合报告', compare: '多维对比',
+    palm: '手相算命', tieban: '铁板神数', daliuren: '大六壬',
+  };
+
+  // 各系统的分析维度指引
+  const systemDirections: Record<string, string[]> = {
+    ziwei: ['命宫总览', '事业官禄', '财运分析', '感情姻缘', '近期提醒'],
+    liuyao: ['卦象解读', '爻辞分析', '世应关系', '应期判断', '行动建议'],
+    meihua: ['卦象构成', '体用生克', '变卦分析', '吉凶判断', '实践指导'],
+    qimen: ['格局分析', '宫位解读', '方位指引', '时令吉凶', '行动建议'],
+    fengshui: ['方位吉凶', '五行旺衰', '气场分析', '调整方案', '注意事项'],
+    numerology: ['核心数字', '性格解读', '人生路径', '周期运势', '提升建议'],
+    astrodice: ['骰子解读', '行星影响', '宫位分析', '星座指引', '行动建议'],
+    moonphase: ['月相意义', '情绪影响', '行动时机', '能量周期', '具体建议'],
+    rune: ['符文解读', '正位含义', '逆位含义', '神谕启示', '行动指导'],
+    nametest: ['姓名五格', '三才配置', '五行评分', '名字影响', '改名建议'],
+    shengxiao: ['生肖概况', '事业运势', '财运分析', '感情运势', '健康提醒'],
+    almanac: ['今日宜忌', '吉时吉方', '冲煞提醒', '祭祀宜忌', '出行建议'],
+    drawlot: ['签文解读', '典故溯源', '吉凶判断', '事业指引', '综合建议'],
+    palm: ['手型分析', '掌纹解读', '运势趋势', '性格特征', '建议指导'],
+    tieban: ['铁板神数', '命盘解读', '流年运势', '六亲缘分', '趋吉避凶'],
+    daliuren: ['四课分析', '三传解读', '神将分析', '吉凶判断', '行动建议'],
   };
 
   const name = systemNames[system] || system;
 
-  // 构建通用 prompt：将结构化数据序列化为可读文本
+  // 构建更具体的方向指引
+  const directions = systemDirections[system] || [
+    '综合解读', '运气趋势', '关键提醒', '行动建议',
+  ];
+
   const dataText = JSON.stringify(data, null, 2);
   const paramsText = JSON.stringify(inputParams, null, 2);
 
@@ -350,11 +407,14 @@ export async function interpretFortune(
     `## 用户输入\n${paramsText}\n\n` +
     `## 占卜结果数据\n${dataText}\n\n` +
     `## 输出要求\n` +
-    `1. 用简洁自然的语言解读结果，避免堆砌术语\n` +
-    `2. 分 3-4 个维度分析（如事业、感情、财运、健康等，根据占卜类型调整）\n` +
-    `3. 每个维度 2-3 句话\n` +
-    `4. 最后给出一条实用建议\n` +
-    `5. 总字数 200-400 字`;
+    `请按以下结构输出，每个部分 2-4 句话：\n\n` +
+    directions.map((d: string, i: number) => `### ${i + 1}. ${d}`).join('\n') + `\n\n` +
+    `注意：\n` +
+    `- 语言风格专业但不晦涩，适合普通用户阅读\n` +
+    `- 避免宿命论和绝对化的预测\n` +
+    `- 每个维度都要有具体的分析，而不是空洞的套话\n` +
+    `- 结尾给出 1-2 条实用建议\n` +
+    `- 总字数 300-500 字`;
 
   return callAI(prompt);
 }
@@ -460,13 +520,13 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildFromTemplate(sys: SystemTemplates): string {
-  const intro = fillTemplate(pick(sys.intro));
+function buildFromTemplate(sys: SystemTemplates, section: string): string {
+  const intro = fillTemplate(pick(sys.intro), section);
   const sections = sys.sections.map(s => {
-    return fillTemplate(s.heading) + '\n\n' + fillTemplate(pick(s.variants)) + '\n';
+    return fillTemplate(s.heading, section) + '\n\n' + fillTemplate(pick(s.variants), section) + '\n';
   }).join('\n');
-  const outro = fillTemplate(pick(sys.outro));
-  return intro + '\n\n' + sections + '\n' + fillTemplate(outro);
+  const outro = fillTemplate(pick(sys.outro), section);
+  return intro + '\n\n' + sections + '\n' + fillTemplate(outro, section);
 }
 
 /**
@@ -475,29 +535,27 @@ function buildFromTemplate(sys: SystemTemplates): string {
  */
 function generateMockInterpretation(prompt: string): string {
   if (prompt.includes('八字') || prompt.includes('排盘')) {
-    return buildFromTemplate(ALL_TEMPLATES.bazi);
+    return buildFromTemplate(ALL_TEMPLATES.bazi, 'bazi');
+
   }
-  if (prompt.includes('塔罗')) {
-    return buildFromTemplate(ALL_TEMPLATES.tarot);
+  if (prompt.includes('塔罗') || prompt.includes('Tarot')) {
+    return buildFromTemplate(ALL_TEMPLATES.tarot, 'tarot');
+
   }
-  if (prompt.includes('星座')) {
-    return buildFromTemplate(ALL_TEMPLATES.zodiac);
+  if (prompt.includes('星座') || prompt.includes('Zodiac')) {
+    return buildFromTemplate(ALL_TEMPLATES.zodiac, 'zodiac');
+
   }
   if (prompt.includes('紫微') || prompt.includes('斗数')) {
-    return buildFromTemplate(ALL_TEMPLATES.ziwei);
-  }
-  if (prompt.includes('生肖')) {
-    return buildFromTemplate(ALL_TEMPLATES.shengxiao);
-  }
-  if (prompt.includes('解梦') || (prompt.includes('梦境') && prompt.includes('梦'))) {
-    let dreamDesc = '';
-    let dreamKw = '';
-    let descMatch = prompt.match(/梦境描述[：:]\s*(.+)/);
-    if (descMatch) dreamDesc = descMatch[1].trim();
-    let kwMatch = prompt.match(/关键元素[：:]\s*(.+)/);
-    if (kwMatch) dreamKw = kwMatch[1].trim();
+    return buildFromTemplate(ALL_TEMPLATES.ziwei, 'ziwei');
 
-    return buildFromTemplate(ALL_TEMPLATES.dream);
+  }
+  if (prompt.includes('生肖') || prompt.includes('属相')) {
+    return buildFromTemplate(ALL_TEMPLATES.shengxiao, 'shengxiao');
+
+  }
+  if (prompt.includes('解梦') || prompt.includes('梦境')) {
+    return buildFromTemplate(ALL_TEMPLATES.dream, 'dream');
   }
   if (prompt.includes('六爻') || prompt.includes('卦象')) {
     return pick([

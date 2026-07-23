@@ -51,6 +51,9 @@ export function calculateBazi(
 
   // 6. 生成纳音信息
   const yearNaYin = NA_YIN[`${yearGZ.gan}${yearGZ.zhi}`] || '未知';
+  const monthNaYin = NA_YIN[`${monthGZ.gan}${monthGZ.zhi}`] || '未知';
+  const dayNaYin = NA_YIN[`${dayGZ.gan}${dayGZ.zhi}`] || '未知';
+  const hourNaYin = NA_YIN[`${hourGZ.gan}${hourGZ.zhi}`] || '未知';
 
   // 7. 生成总体概述
   const summary = generateBaziSummary(yearPillar, monthPillar, dayPillar, hourPillar, wuXingCount, yearNaYin, gender);
@@ -62,6 +65,12 @@ export function calculateBazi(
     hourPillar,
     wuXingCount,
     summary,
+    _naYin: {
+      yearNaYin,
+      monthNaYin,
+      dayNaYin,
+      hourNaYin,
+    },
   };
 }
 

@@ -160,10 +160,11 @@ function AIDeepDive({ resultId, interpretation }: { resultId: string; interpreta
 function getTabContent(text: string, activeTab: string): string {
   const tabKeywords: Record<string, string[]> = {
     '性格特征': ['性格', '人格', '个人特质'],
-    '事业财运': ['事业', '工作', '职业', '财运', '财富', '理财'],
+    '事业方向': ['事业', '工作', '职业', '行业', '职场'],
     '感情婚姻': ['感情', '爱情', '婚姻', '桃花', '恋爱'],
-    '健康养生': ['健康', '身体', '保健', '养生'],
-    '大运流年': ['大运', '流年', '近期', '运势'],
+    '财运分析': ['财运', '财富', '理财', '财星', '收入'],
+    '健康运势': ['健康', '身体', '保健', '养生', '体质'],
+    '近期提醒': ['大运', '流年', '近期', '运势', '提醒'],
   };
 
   const keywordList = tabKeywords[activeTab] || [];
@@ -222,21 +223,50 @@ export default function BaziResultPage() {
   const [activeTab, setActiveTab] = useState('性格特征');
   const [wuxing, setWuxing] = useState<Record<string, { percentage: number; strength: string }>>({});
 
+  // 生肖对应表
+  const ZODIAC: Record<string, string> = {
+    '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔',
+    '辰': '龙', '巳': '蛇', '午': '马', '未': '羊',
+    '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪',
+  };
+
   // 解析八字数据
   const parseBaziData = useCallback((data: Record<string, unknown>) => {
+    const getPillar = (key: string) => (data[key] as Record<string, string>) || {};
+    const yearP = getPillar('yearPillar');
+    const monthP = getPillar('monthPillar');
+    const dayP = getPillar('dayPillar');
+    const hourP = getPillar('hourPillar');
+
+    const naYinCache = (data._naYin as Record<string, string>) || {};
+    const yearGZ = `${yearP.gan || ''}${yearP.zhi || ''}`;
+    const monthGZ = `${monthP.gan || ''}${monthP.zhi || ''}`;
+    const dayGZ = `${dayP.gan || ''}${dayP.zhi || ''}`;
+    const hourGZ = `${hourP.gan || ''}${hourP.zhi || ''}`;
+
     const pillars = [
-      { pillar: '年柱', type: '祖上', tiangan: data.tiangan1 as string || '甲', dizhi: data.dizhi1 as string || '子', gainian: '纳音金', animal: '鼠' },
-      { pillar: '月柱', type: '父母', tiangan: data.tiangan2 as string || '丙', dizhi: data.dizhi2 as string || '寅', gainian: '纳音火', animal: '虎' },
-      { pillar: '日柱', type: '自身', tiangan: data.tiangan3 as string || '壬', dizhi: data.dizhi3 as string || '午', gainian: '纳音木', animal: '马' },
-      { pillar: '时柱', type: '子女', tiangan: data.tiangan4 as string || '庚', dizhi: data.dizhi4 as string || '子', gainian: '纳音金', animal: '鼠' },
+      { pillar: '年柱', type: '祖上', tiangan: yearP.gan || '--', dizhi: yearP.zhi || '--', gainian: naYinCache.yearNaYin || naYinCache[yearGZ] || '--', animal: ZODIAC[yearP.zhi || ''] || '--' },
+      { pillar: '月柱', type: '父母', tiangan: monthP.gan || '--', dizhi: monthP.zhi || '--', gainian: naYinCache.monthNaYin || naYinCache[monthGZ] || '--', animal: ZODIAC[monthP.zhi || ''] || '--' },
+      { pillar: '日柱', type: '自身', tiangan: dayP.gan || '--', dizhi: dayP.zhi || '--', gainian: naYinCache.dayNaYin || naYinCache[dayGZ] || '--', animal: ZODIAC[dayP.zhi || ''] || '--' },
+      { pillar: '时柱', type: '子女', tiangan: hourP.gan || '--', dizhi: hourP.zhi || '--', gainian: naYinCache.hourNaYin || naYinCache[hourGZ] || '--', animal: ZODIAC[hourP.zhi || ''] || '--' },
     ];
 
+    const wuXingCount = (data.wuXingCount as Record<string, number>) || {};
+    const total = 8; // 4 pillars × 2 (gan + zhi)
+    const getStrength = (count: number): string => {
+      if (count >= 4) return '旺';
+      if (count >= 3) return '强';
+      if (count >= 2) return '平';
+      if (count >= 1) return '弱';
+      return '缺';
+    };
+
     const wuxingData: Record<string, { percentage: number; strength: string }> = {
-      金: { percentage: parseInt(data.wuxing_metal as string) || 25, strength: '弱' },
-      木: { percentage: parseInt(data.wuxing_wood as string) || 25, strength: '弱' },
-      水: { percentage: parseInt(data.wuxing_water as string) || 25, strength: '弱' },
-      火: { percentage: parseInt(data.wuxing_fire as string) || 12, strength: '弱' },
-      土: { percentage: parseInt(data.wuxing_earth as string) || 13, strength: '弱' },
+      金: { percentage: Math.round(((wuXingCount['金'] || 0) / total) * 100), strength: getStrength(wuXingCount['金'] || 0) },
+      木: { percentage: Math.round(((wuXingCount['木'] || 0) / total) * 100), strength: getStrength(wuXingCount['木'] || 0) },
+      水: { percentage: Math.round(((wuXingCount['水'] || 0) / total) * 100), strength: getStrength(wuXingCount['水'] || 0) },
+      火: { percentage: Math.round(((wuXingCount['火'] || 0) / total) * 100), strength: getStrength(wuXingCount['火'] || 0) },
+      土: { percentage: Math.round(((wuXingCount['土'] || 0) / total) * 100), strength: getStrength(wuXingCount['土'] || 0) },
     };
 
     return { pillars, wuxingData };
@@ -467,7 +497,7 @@ export default function BaziResultPage() {
             详细分析报告
           </h2>
           <div className="flex flex-wrap gap-2 mb-6 border-b pb-4" style={{ borderColor: 'var(--color-border-light)' }}>
-            {['性格特征', '事业财运', '感情婚姻', '健康养生', '大运流年'].map((tab) => (
+            {['性格特征', '事业方向', '感情婚姻', '财运分析', '健康运势', '近期提醒'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}

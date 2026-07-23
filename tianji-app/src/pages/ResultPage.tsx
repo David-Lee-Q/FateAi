@@ -3349,7 +3349,6 @@ function SmartContentCard({
   if (data.lotNumber !== undefined) {
     const lotNumber = data.lotNumber as number;
     const luck = data.luck as string | undefined;
-    const luckColors: Record<string, string> = { 大吉: 'var(--state-success)', 上吉: 'var(--color-gold)', 中吉: 'var(--color-primary)', 下吉: 'var(--color-primary-lighter)', 凶: 'var(--color-error)' };
     return (
       <div className="mb-6">
         <div className="p-6 rounded-2xl text-center" style={{ background: 'var(--color-bg-elevated)' }}>
