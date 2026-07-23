@@ -1,8 +1,15 @@
 #!/bin/bash
 
-WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/a66b7037-23f3-4e15-920c-d83d77a3a017"
+# 飞书 Webhook 地址（优先从环境变量读取）
+WEBHOOK_URL="${WEBHOOK_URL:-https://open.feishu.cn/open-apis/bot/v2/hook/a66b7037-23f3-4e15-920c-d83d77a3a017}"
 CHECK_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 HOSTNAME=$(hostname)
+
+# 检查 python3 可用性
+HAS_PYTHON=false
+if command -v python3 &>/dev/null; then
+    HAS_PYTHON=true
+fi
 
 send_feishu() {
     local title="$1"
@@ -10,7 +17,13 @@ send_feishu() {
     local color="${3:-blue}"
 
     local content_json
-    content_json=$(echo "$content" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
+    if $HAS_PYTHON; then
+        content_json=$(echo "$content" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
+    else
+        # 纯 bash 回退：转义双引号和反斜杠
+        content_json="\"${content//\\/\\\\}\""
+        content_json="\"${content_json//\"/\\\"}\""
+    fi
 
     local payload
     payload=$(cat <<EOF

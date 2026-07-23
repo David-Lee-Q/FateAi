@@ -158,6 +158,9 @@ function AIDeepDive({ resultId, interpretation }: { resultId: string; interpreta
  * 按标题分割八字解读文本，提取指定 Tab 对应的内容
  */
 function getTabContent(text: string, activeTab: string): string {
+  if (!text) return '暂无分析内容，可尝试追问获取更多解读。';
+  if (!activeTab) return text;
+
   const tabKeywords: Record<string, string[]> = {
     '性格特征': ['性格', '人格', '个人特质'],
     '事业方向': ['事业', '工作', '职业', '行业', '职场'],

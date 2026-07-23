@@ -26,14 +26,14 @@ while true; do
 
     CURRENT_STATUS="$BACKEND_OK-$FRONTEND_OK"
     HEALTHY=false
-    if $BACKEND_OK && $FRONTEND_OK; then
+    if [ "$BACKEND_OK" = true ] && [ "$FRONTEND_OK" = true ]; then
         HEALTHY=true
     fi
 
     if [ "$CURRENT_STATUS" != "$LAST_STATUS" ]; then
         echo "[$(date '+%H:%M:%S')] 状态变更：后端=$BACKEND_OK 前端=$FRONTEND_OK"
 
-        if $HEALTHY; then
+        if [ "$HEALTHY" = true ]; then
             echo "[$(date '+%H:%M:%S')] 服务已恢复，发送正常报告..."
         else
             echo "[$(date '+%H:%M:%S')] 服务异常，发送告警报告..."

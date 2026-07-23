@@ -328,11 +328,15 @@ const WORD_BANK: Record<string, Record<string, string[]>> = {
 export function fillTemplate(template: string, section: string): string {
   const bank = WORD_BANK[section];
   if (!bank) {
+    console.warn(`[template-filler] 缺少词库分区: ${section}，占位符将保持原样`);
     return template.replace(/\{(\w+)\}/g, (_match, key) => `{${key}}`);
   }
   return template.replace(/\{(\w+)\}/g, (_match, key: string) => {
     const pool = bank[key];
-    if (!pool || pool.length === 0) return `{${key}}`;
+    if (!pool || pool.length === 0) {
+      console.warn(`[template-filler] 分区 ${section} 缺少词库键: ${key}`);
+      return `{${key}}`;
+    }
     return pick(pool);
   });
 }
