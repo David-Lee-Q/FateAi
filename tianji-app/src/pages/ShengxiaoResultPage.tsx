@@ -47,7 +47,7 @@ export default function ShengxiaoResultPage() {
     const loadData = async () => {
       try {
         const data = await fetchFortuneResult(id);
-        setResult(data);
+        setResult(data.data);
       } catch (err) {
         setError('获取结果失败，请稍后重试');
       } finally {
@@ -75,7 +75,7 @@ export default function ShengxiaoResultPage() {
     );
   }
 
-  const { zodiac, year, monthlyFortune, dimensions, aiscore, aiAnalysis, suggestions } = result.data || result;
+  const divData = (result.data || {}) as Record<string, unknown>;
 
   return (
     <div style={{ background: '#0a0e1a', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -119,20 +119,20 @@ export default function ShengxiaoResultPage() {
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center shrink-0"
               style={{ background: 'rgba(200,168,78,0.1)', border: '1px solid rgba(200,168,78,0.2)' }}
             >
-              <span style={{ fontSize: 48 }}>{ZODIAC_EMOJI[zodiac] || '🐴'}</span>
+              <span style={{ fontSize: 48 }}>{ZODIAC_EMOJI[divData.zodiac as string] || '🐴'}</span>
             </div>
 
             {/* 信息 */}
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#c8a84e', fontFamily: 'var(--font-display)' }}>
-                  {zodiac}年运势
+                  {divData.zodiac as string}年运势
                 </h1>
                 <span
                   className="px-3 py-1 rounded-full text-xs font-medium"
                   style={{ background: 'rgba(200,168,78,0.15)', color: '#c8a84e' }}
                 >
-                  {year}年
+                  {divData.year as string}年
                 </span>
               </div>
               <p className="text-sm" style={{ color: '#7a8599' }}>
@@ -144,7 +144,7 @@ export default function ShengxiaoResultPage() {
         </div>
 
         {/* 综合评分 */}
-        {aiscore && (
+        {divData.aiscore && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: '#111827', border: '1px solid rgba(30,39,64,0.8)' }}
@@ -153,7 +153,7 @@ export default function ShengxiaoResultPage() {
               <span style={{ color: '#c8a84e' }}>|</span> 综合运势评分
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {dimensions?.map((dim: any) => (
+              {(divData.dimensions as any[])?.map((dim: any) => (
                 <div key={dim.key} className="text-center">
                   <div
                     className="text-3xl font-bold mb-2"
@@ -183,7 +183,7 @@ export default function ShengxiaoResultPage() {
         )}
 
         {/* 每月运势 */}
-        {monthlyFortune && monthlyFortune.length > 0 && (
+        {(divData.monthlyFortune as any[]) && (divData.monthlyFortune as any[]).length > 0 && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: '#111827', border: '1px solid rgba(30,39,64,0.8)' }}
@@ -192,7 +192,7 @@ export default function ShengxiaoResultPage() {
               <span style={{ color: '#c8a84e' }}>|</span> 每月运势一览
             </h2>
             <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-              {monthlyFortune.map((m: { fortune: string; month: string; level: string; lunar: string }, i: number) => {
+              {(divData.monthlyFortune as any[]).map((m: { fortune: string; month: string; level: string; lunar: string }, i: number) => {
                 const fc = FORTUNE_COLORS[m.fortune as keyof typeof FORTUNE_COLORS] || FORTUNE_COLORS.zhong;
                 return (
                   <div
@@ -225,7 +225,7 @@ export default function ShengxiaoResultPage() {
         )}
 
         {/* AI 深度分析 */}
-        {aiAnalysis && (
+        {divData.aiAnalysis && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{
@@ -247,13 +247,13 @@ export default function ShengxiaoResultPage() {
             </div>
 
             <div className="prose prose-invert max-w-none" style={{ color: '#a0aac0' }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiAnalysis}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiAnalysis as string}</ReactMarkdown>
             </div>
           </div>
         )}
 
         {/* 开运建议 */}
-        {suggestions && suggestions.length > 0 && (
+        {(divData.suggestions as any[]) && (divData.suggestions as any[]).length > 0 && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: '#111827', border: '1px solid rgba(30,39,64,0.8)' }}
@@ -262,7 +262,7 @@ export default function ShengxiaoResultPage() {
               <span style={{ color: '#c8a84e' }}>|</span> 开运指南
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {suggestions.map((s: any, i: number) => (
+              {(divData.suggestions as any[]).map((s: any, i: number) => (
                 <div key={i} className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="text-xs font-medium mb-2" style={{ color: '#004baa' }}>{s.title}</div>
                   <p className="text-sm" style={{ color: '#a0aac0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>

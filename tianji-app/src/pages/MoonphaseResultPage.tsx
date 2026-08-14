@@ -80,12 +80,13 @@ export default function MoonphaseResultPage() {
     );
   }
 
-  const phaseKey = result.phase || 'full';
+  const data = (result.data || {}) as Record<string, unknown>;
+  const phaseKey = (data.phase as string) || 'full';
   const phaseData = MOON_PHASES[phaseKey] || MOON_PHASES['full'];
-  const question = result.question || '月相占卜';
+  const question = (data.question as string) || '月相占卜';
 
   // 分类运势
-  const energies = result.energies || [
+  const energies = (data.energies as Array<{ category: string; content: string; icon: string }>) || [
     { category: '爱情', content: '月光明亮，情感能量充沛。单身的你有机会遇到心动的邂逅，已有伴侣的则适合深度沟通。', icon: '💕' },
     { category: '事业', content: '月光照耀，适合开展新计划或进行商业谈判。月相能量增强决策直觉。', icon: '💼' },
     { category: '财运', content: '财务运势稳定，适合进行投资理财规划。但需谨慎大额支出。', icon: '💰' },
@@ -118,14 +119,14 @@ export default function MoonphaseResultPage() {
             <span style={{ fontSize: 80, lineHeight: 1 }}>{phaseData.icon}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {phaseData.name} · {result.meaning || '月相解读'}
+            {phaseData.name} · {(data.meaning as string) || '月相解读'}
           </h1>
           <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
             你的问题：{question}
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: 'rgba(200,168,78,0.15)', color: 'var(--color-gold)' }}>
             <Sparkles size={16} />
-            <span className="text-sm font-medium">{result.energy || '圆满能量'}</span>
+            <span className="text-sm font-medium">{(data.energy as string) || '圆满能量'}</span>
           </div>
         </section>
 
@@ -135,7 +136,7 @@ export default function MoonphaseResultPage() {
             <span>🌙</span>月相含义
           </h2>
           <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--color-text-secondary)' }}>
-            {result.phaseDesc || '月相占卜综合月亮周期与你的问题，为你提供深层的宇宙能量指引。'}
+            {(data.phaseDesc as string) || '月相占卜综合月亮周期与你的问题，为你提供深层的宇宙能量指引。'}
           </p>
           <div className="prose prose-invert max-w-none">
             <ReactMarkdown
@@ -145,7 +146,7 @@ export default function MoonphaseResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
               }}
             >
-              {result.content || result.interpretation || ''}
+              {(data.content as string) || result.interpretation || ''}
             </ReactMarkdown>
           </div>
         </section>
@@ -168,7 +169,7 @@ export default function MoonphaseResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        {result.aiAnalysis && (
+        {data.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(15,31,64,0.8) 0%, rgba(30,42,80,0.8) 100%)', border: '1px solid rgba(200,168,78,0.2)' }}>
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full" style={{ background: 'radial-gradient(circle, rgba(200,168,78,0.2) 0%, transparent 70%)' }}></div>
@@ -189,7 +190,7 @@ export default function MoonphaseResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#fbbf24' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {data.aiAnalysis as string}
                 </ReactMarkdown>
               </div>
             </div>

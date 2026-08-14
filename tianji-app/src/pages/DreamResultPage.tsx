@@ -87,9 +87,10 @@ export default function DreamResultPage() {
   }
 
   // 解析结果内容
-  const dreamContent = result.content || result.result || result.interpretation || '';
-  const dreamElements = result.elements || result.keywords || [];
-  const luckLevel = result.luck || result.fortune || '中吉';
+  const data = result.data || {};
+  const dreamContent = data.content || data.result || result.interpretation || '';
+  const dreamElements = data.elements || data.keywords || [];
+  const luckLevel = data.luck || data.fortune || '中吉';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -117,7 +118,7 @@ export default function DreamResultPage() {
                 <Moon size={14} />周公解梦
               </span>
               <h1 className="mt-4 text-2xl md:text-3xl font-bold" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-                梦境解析：{result.dream || result.title || '梦境解读'}
+                梦境解析：{data.dream || data.title || '梦境解读'}
               </h1>
               <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 基于《周公解梦》与 AI 心理学分析
@@ -169,17 +170,17 @@ export default function DreamResultPage() {
         </section>
 
         {/* 化解建议 */}
-        {result.suggestion && (
+        {data.suggestion && (
           <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
             <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
               <span>💡</span>化解建议
             </h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{result.suggestion}</p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{data.suggestion}</p>
           </section>
         )}
 
         {/* AI 深度分析 */}
-        {result.aiAnalysis && (
+        {data.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.03) 0%, rgba(149,117,205,0.05) 100%)' }}>
             <div className="absolute inset-0 pointer-events-none" style={{ padding: 1, background: 'linear-gradient(135deg, var(--color-primary-lighter), #9575cd)', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude', borderRadius: 'var(--radius-xl)' }} />
             <div className="relative">
@@ -198,7 +199,7 @@ export default function DreamResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {data.aiAnalysis}
                 </ReactMarkdown>
               </div>
             </div>

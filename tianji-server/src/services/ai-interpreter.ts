@@ -5,6 +5,7 @@
 
 import { ALL_TEMPLATES, SystemTemplates } from './mock-templates';
 import { fillTemplate } from './template-filler';
+import { selectKnowledgeChunks } from './knowledge.loader';
 
 // ============================================================
 // Prompt 模板
@@ -150,6 +151,193 @@ ${params.mood ? `- 梦境情绪：${params.mood}` : ''}
 - 不制造焦虑，对噩梦给出安慰性建议
 - 建议要具体可行`;
 
+/** 占星骰子 AI 解读 Prompt */
+export const ASTRODICE_PROMPT = (params: {
+  planet: string; sign: string; house: string;
+  question?: string;
+}) => `你是"天机"AI运势系统的占星骰子解读师。请基于以下骰子组合进行解读。
+
+## 骰子信息
+- 行星骰：${params.planet}
+- 星座骰：${params.sign}
+- 宫位骰：${params.house}
+${params.question ? `- 占卜问题：${params.question}` : ''}
+
+## 输出要求
+
+### 1. 行星骰解读
+解析${params.planet}在占星学中的核心含义及其作为本次占卜主导能量的意义。
+
+### 2. 星座骰解读
+解析${params.sign}如何影响${params.planet}的表达方式，星座特质带来的独特视角。
+
+### 3. 宫位骰解读
+分析${params.house}所代表的生活领域，以及行星与星座能量将如何在该领域展开。
+
+### 4. 综合解读
+整合三骰信息，揭示行星行经星座落入宫位的完整图景。分析当前能量态势和时机。
+
+### 5. 骰子建议
+基于骰面组合，给出2-3条具体可行的行动建议。
+
+注意：
+- 使用占星学的专业术语但做通俗解释
+- 骰子是象征而非算命，强调能量指引
+- 建议要具体可执行
+- 保持神秘而温暖的语调`;
+
+/** 月相占卜 AI 解读 Prompt */
+export const MOONPHASE_PROMPT = (params: {
+  currentPhase: string; birthPhase?: string;
+  moonAge?: number; illumination?: number;
+}) => `你是"天机"AI运势系统的月相分析师。请基于以下月相信息进行解读。
+
+## 月相信息
+- 当前月相：${params.currentPhase}
+${params.birthPhase ? `- 出生月相：${params.birthPhase}` : ''}
+${params.moonAge !== undefined ? `- 月龄：${String(params.moonAge)}天` : ''}
+${params.illumination !== undefined ? `- 月面亮度：${String(params.illumination)}%` : ''}
+
+## 输出要求
+
+### 1. 月相解读
+描述${params.currentPhase}的天文特征和象征意义，分析当前所处的月亮能量阶段。
+
+### 2. 情绪指引
+基于月相分析当前的情绪状态和内在感受，给出情绪管理的建议。
+
+### 3. 行动时机
+指出当前月相阶段适宜进行哪些活动，哪些活动宜暂缓。标注关键的时机窗口。
+
+### 4. 灵性指引
+从灵性与能量层面给出指导，包括适合的仪式、冥想方向和能量调频建议。
+
+### 5. 具体建议
+结合以上分析，给出3-4条在当前月相周期内可以实践的具体行动建议。
+
+注意：
+- 语言应柔和、富有诗意但不过于空灵
+- 将天文学事实与人文关怀相结合
+- 建议要接地气、可操作
+- 强调顺应自然节律而非对抗`;
+
+/** 符文石 AI 解读 Prompt */
+export const RUNE_PROMPT = (params: {
+  runes: Array<{ name: string; position: string; meaning: string; isReversed: boolean }>;
+  spread: string; question?: string;
+}) => `你是"天机"AI运势系统的卢恩符文解读师。请基于以下符文组合进行解读。
+
+## 符文信息
+- 符文阵型：${params.spread}
+${params.question ? `- 占卜问题：${params.question}` : ''}
+- 符文排列：
+${params.runes.map(r => `- ${r.position}：${r.name}（${r.meaning}，${r.isReversed ? '逆位' : '正位'}）`).join('\n')}
+
+## 输出要求
+
+### 1. 符文解析
+逐一解读每个符文的古老含义及其在${params.spread}中的位置意义。
+
+### 2. 正位含义
+分析正位符文传递的积极能量和机遇信号。
+
+### 3. 逆位含义
+分析逆位符文所提示的挑战、阻滞或内在功课。
+
+### 4. 神谕启示
+将符文与北欧神话背景结合，揭示深层的神谕信息。
+
+### 5. 实践指导
+将符文的智慧转化为日常生活中可执行的具体建议。
+
+注意：
+- 融入北欧神话背景但不生硬
+- 符文没有"好"与"坏"，只有能量的不同面向
+- 逆位符文强调的是内在功课而非厄运
+- 建议要神秘而实用，有仪式感但可落地`;
+
+/** 姓名测试 AI 解读 Prompt */
+export const NAMETEST_PROMPT = (params: {
+  fullName: string; surname: string; givenName: string;
+  strokes: { tian: number; ren: number; di: number; wai: number; zong: number };
+  wuxing: { tian: string; ren: string; di: string; wai: string; zong: string };
+  sancai: string; score: number;
+}) => `你是"天机"AI运势系统的命名分析师。请基于以下姓名信息进行解读。
+
+## 姓名信息
+- 姓氏：${params.surname}
+- 名字：${params.givenName}
+- 全名：${params.fullName}
+- 笔画：天格${String(params.strokes.tian)} 人格${String(params.strokes.ren)} 地格${String(params.strokes.di)} 外格${String(params.strokes.wai)} 总格${String(params.strokes.zong)}
+- 五行：天格${params.wuxing.tian} 人格${params.wuxing.ren} 地格${params.wuxing.di} 外格${params.wuxing.wai} 总格${params.wuxing.zong}
+- 三才：${params.sancai}
+- 评分：${String(params.score)}分
+
+## 输出要求
+
+### 1. 五格数理
+逐一分析天格、人格、地格、外格、总格的数理含义及其吉凶属性。
+
+### 2. 三才配置
+分析三才配置的五行生克关系，评估对整体运势的基础性影响。
+
+### 3. 五行分析
+分析名字中各字的五行属性及其与命主的匹配度，指出五行流转的优劣。
+
+### 4. 吉凶评分
+综合评估姓名得分，说明得分高低的命理依据，客观分析优势与不足。
+
+### 5. 优化建议
+针对姓名中的薄弱环节，给出具体可操作的优化建议（如改字、加字、调整用字方向等）。
+
+注意：
+- 客观公正，不过度夸大吉凶
+- 评分低时不制造焦虑，强调后天努力的重要性
+- 建议要具体，给出可选字的方向和五行属性
+- 强调姓名是辅助而非决定因素`;
+
+/** 每日黄历 AI 解读 Prompt */
+export const ALMANAC_PROMPT = (params: {
+  date: string; ganzhi: string; jianchu: string;
+  yi: string[]; ji: string[];
+  auspiciousHours: string[]; shensha: string[];
+  clash: string; directions: { caishen: string; xishen: string; fushen: string };
+}) => `你是"天机"AI运势系统的黄历分析师。请基于以下黄历信息生成今日宜忌解读。
+
+## 黄历信息
+- 日期：${params.date}
+- 干支：${params.ganzhi}
+- 值日神：${params.jianchu}
+- 宜：${params.yi.join('、')}
+- 忌：${params.ji.join('、')}
+- 吉时：${params.auspiciousHours.join('、')}
+- 神煞：${params.shensha.join('、')}
+- 冲煞：${params.clash}
+- 财神：${params.directions.caishen} 喜神：${params.directions.xishen} 福神：${params.directions.fushen}
+
+## 输出要求
+
+### 1. 今日宜忌
+解读今日宜忌的内在逻辑，结合干支和建除十二神分析今日的整体能量基调。
+
+### 2. 吉时吉方
+分析最佳行动时间和方位，标注需要把握的黄金窗口。
+
+### 3. 冲煞提醒
+解读今日冲煞信息，给出需要注意和避让的事项。
+
+### 4. 神煞分布
+解读值日神煞对各个生活领域的吉凶影响。
+
+### 5. 生活指南
+结合以上信息，给出今日的具体行动建议和注意事项。
+
+注意：
+- 语言风格接近通俗黄历解读，接地气
+- 宜忌分析要有理有据，不凭空臆断
+- 提供实用的生活建议
+- 不过度渲染迷信色彩，强调理性参考`;
+
 /** 综合运势报告 Prompt */
 export const REPORT_PROMPT = (params: {
   topic: string; systems: string[];
@@ -182,6 +370,395 @@ ${params.zodiacSummary ? `### 星座运势分析\n${params.zodiacSummary}\n` : '
 标注近期需要注意的重要时间点。
 
 注意：分歧点要如实说明，不要强行统一。建议要具体可执行。`;
+
+/** 求签解签 AI 解读 Prompt */
+export const DRAWLOT_PROMPT = (params: {
+  lotNumber: string; lotLevel: string; poem: string;
+  theme?: string; deity?: string;
+}) => `你是"天机"AI运势系统的灵签解签师。请基于以下签文信息进行解读。
+
+## 签文信息
+- 签号：${params.lotNumber}
+- 签等：${params.lotLevel}
+- 签诗：${params.poem}
+${params.theme ? `- 所求事项：${params.theme}` : ''}
+${params.deity ? `- 所属神明：${params.deity}` : ''}
+
+## 输出要求
+
+### 1. 签文宣读
+吟诵并初步解读签诗的字面含义。
+
+### 2. 典故溯源
+讲述此签对应的典故背景及其寓意。
+
+### 3. 吉凶判断
+综合签文信息给出整体吉凶判断。
+
+### 4. 事业指引
+结合签文智慧给出事业方面的建议。
+
+### 5. 综合建议
+给出 2-3 条具体可执行的行动建议。
+
+注意：
+- 语言庄重但不晦涩，保持对传统文化的尊重
+- 不做过度的鬼神之说，强调签文是智慧指引而非宿命判决
+- 建议要具体可执行`;
+
+/** 手相算命 AI 解读 Prompt */
+export const PALM_PROMPT = (params: {
+  handShape?: string; lifeLine?: string; headLine?: string;
+  heartLine?: string; fateLine?: string; features?: string[];
+}) => `你是"天机"AI运势系统的手相分析师。请基于以下手相信息进行解读。
+
+## 手相信息
+${params.handShape ? `- 手型：${params.handShape}` : ''}
+${params.lifeLine ? `- 生命线：${params.lifeLine}` : ''}
+${params.headLine ? `- 智慧线：${params.headLine}` : ''}
+${params.heartLine ? `- 感情线：${params.heartLine}` : ''}
+${params.fateLine ? `- 命运线：${params.fateLine}` : ''}
+${params.features ? `- 手相特征：${params.features.join('、')}` : ''}
+
+## 输出要求
+
+### 1. 手型分析
+基于手型判断基本性格和体质倾向。
+
+### 2. 三大主线
+逐一分析生命线、智慧线、感情线的含义。
+
+### 3. 辅线与特殊标记
+解读命运线及其他辅助纹路的信息。
+
+### 4. 运势趋势
+综合分析手相信息推断近期运势走向。
+
+### 5. 建议指导
+给出基于手相分析的生活和事业建议。
+
+注意：
+- 强调手相会随心态和行为改变而变化
+- 避免绝对的吉凶论断，强调后天努力的重要性
+- 建议实用且积极向上`;
+
+/** 铁板神数 AI 解读 Prompt */
+export const TIEBAN_PROMPT = (params: {
+  numbers: string; elements?: Record<string, string>;
+  gender?: string; birthInfo?: string;
+}) => `你是"天机"AI运势系统的铁板神数分析师。请基于以下神数信息进行解读。
+
+## 神数信息
+- 铁板数：${params.numbers}
+${params.gender ? `- 性别：${params.gender === 'male' ? '男' : '女'}` : ''}
+${params.birthInfo ? `- 出生信息：${params.birthInfo}` : ''}
+${params.elements ? `- 四柱信息：${JSON.stringify(params.elements)}` : ''}
+
+## 输出要求
+
+### 1. 铁板数理
+解析铁板数的数理含义和命理定位。
+
+### 2. 命途总论
+基于神数推演一生运势的基本走势。
+
+### 3. 六亲缘分
+分析父母、夫妻、子女等六亲缘分。
+
+### 4. 财运解析
+分析财运走向和财富积累建议。
+
+### 5. 趋吉避凶
+给出针对性的趋吉避凶建议。
+
+注意：
+- 保持对铁板神数这一古老算法的尊重
+- 避免过于量化的预测，强调趋势而非定数
+- 建议包含可操作的具体行动指导`;
+
+/** 大六壬 AI 解读 Prompt */
+export const DALIUREN_PROMPT = (params: {
+  lessonType: string;
+  fourLessons: Array<{ position: string; value: string }>;
+  threeTransmissions: Array<{ position: string; value: string }>;
+  shenJiang: Array<{ name: string; position: string }>;
+}) => `你是"天机"AI运势系统的大六壬分析师。请基于以下课盘信息进行解读。
+
+## 课盘信息
+- 课式：${params.lessonType}
+- 四课：
+${params.fourLessons.map(l => `  - ${l.position}：${l.value}`).join('\n')}
+- 三传：
+${params.threeTransmissions.map(t => `  - ${t.position}：${t.value}`).join('\n')}
+- 神将：
+${params.shenJiang.map(s => `  - ${s.name}在${s.position}位`).join('\n')}
+
+## 输出要求
+
+### 1. 四课分析
+分析四课的生克关系和基本格局。
+
+### 2. 三传解读
+解读初传、中传、末传的发展逻辑。
+
+### 3. 神将分析
+分析各神将的作用和相互影响。
+
+### 4. 吉凶判断
+综合课体、课传、神将给出整体判断。
+
+### 5. 行动建议
+基于课盘信息给出具体行动指引。
+
+注意：
+- 使用专业但不晦涩的壬学术语
+- 强调课盘反映的是时空能量而非绝对定数
+- 建议需结合具体时空条件给出`;
+
+/** 综合报告 AI 解读 Prompt */
+export const COMPREHENSIVE_REPORT_PROMPT = (params: {
+  topic: string; systems: Array<{ name: string; summary: string }>;
+  baziSummary?: string; tarotSummary?: string; zodiacSummary?: string;
+  ziweiSummary?: string; palmSummary?: string; tiebanSummary?: string;
+}) => `你是"天机"AI运势系统的综合分析师。请整合多个占卜体系的结果，生成一份跨维度的运势报告。
+
+## 报告主题
+${params.topic}
+
+## 各体系独立分析
+${params.systems.map(s => `### ${s.name}分析\n${s.summary}\n`).join('\n')}
+
+## 输出要求
+
+### 1. 报告概要
+一句话总结当前运势态势。
+
+### 2. 各体系分析
+逐一梳理每个体系的核心结论。
+
+### 3. 交叉验证
+分析各体系结论的共识点和分歧点。
+
+### 4. 综合建议
+给出短期、中期、长期的行动建议。
+
+### 5. 关键时间节点
+标注近期需要注意的重要时间点。
+
+注意：
+- 分歧点如实说明，不强行统一
+- 建议分短期（1-2周）、中期（1-3个月）、长期（半年以上）
+- 结尾给出总字数 500-800 字的量级指引`;
+
+/** 多维对比 AI 解读 Prompt */
+export const COMPARE_PROMPT = (params: {
+  dimensions: Array<{ name: string; score: number; level: string }>;
+  systems?: string[];
+  subjectA?: string; subjectB?: string;
+}) => `你是"天机"AI运势系统的多维对比分析师。请基于以下对比数据进行解读。
+
+## 对比信息
+${params.subjectA && params.subjectB ? `- 对比对象：${params.subjectA} vs ${params.subjectB}` : ''}
+${params.systems ? `- 使用体系：${params.systems.join('、')}` : ''}
+- 维度评分：
+${params.dimensions.map(d => `  - ${d.name}：${d.score}分（${d.level}）`).join('\n')}
+
+## 输出要求
+
+### 1. 综合匹配度
+基于各维度评分给出整体匹配度评估。
+
+### 2. 维度分析
+逐一分析各维度的得分含义。
+
+### 3. 优势互补
+分析双方的互补领域。
+
+### 4. 潜在风险
+指出需要关注的分歧和风险点。
+
+### 5. 合作建议
+给出具体的合作或相处建议。
+
+注意：
+- 客观中立，不偏袒任何一方
+- 差异点要如实说明，同时强调互补的可能性
+- 建议需具体且兼顾双方利益`;
+
+/** 六爻 AI 解读 Prompt */
+export const LIUYAO_PROMPT = (params: {
+  hexagram: { name: string; judgment: string };
+  lines: Array<{ position: string; meaning: string; isChanging: boolean }>;
+  shiYao: string; yingYao: string;
+  sixRelations: Record<string, string>;
+}) => `你是"天机"AI运势系统的六爻卦象分析师。请基于以下卦象信息进行专业解读。
+
+## 卦象数据
+- 主卦：${params.hexagram.name}（${params.hexagram.judgment}）
+- 世爻位置：${params.shiYao}
+- 应爻位置：${params.yingYao}
+- 六爻详情：
+${params.lines.map(l => `- ${l.position}：${l.meaning}（${l.isChanging ? '动爻' : '静爻'}）`).join('\n')}
+
+## 输出要求
+
+### 1. 卦象解读
+分析主卦的整体含义及其对占问事项的启示。
+
+### 2. 爻辞分析
+逐一解读关键爻位（尤其是动爻）的深层含义。
+
+### 3. 世应关系
+分析世爻与应爻之间的生克关系及其对占问事项的影响。
+
+### 4. 应期判断
+结合月建日辰分析事情发展的关键时间节点。
+
+### 5. 行动建议
+综合卦象信息给出具体可执行的行动指引。
+
+注意：语言风格专业但不晦涩，避免宿命论，强调卦象是能量参考而非命运判决。`;
+
+/** 梅花易数 AI 解读 Prompt */
+export const MEIHUA_PROMPT = (params: {
+  mainGua: { upper: string; lower: string; name: string };
+  tiGua: string; yongGua: string; tiYong: string;
+  huGua: { upper: string; lower: string };
+  bianGua: { upper: string; lower: string; name: string };
+  changingLine: number;
+  phenomenon?: string;
+}) => `你是"天机"AI运势系统的梅花易数分析师。请基于以下卦象信息进行专业解读。
+
+## 卦象数据
+- 主卦：${params.mainGua.upper}上${params.mainGua.lower}下，${params.mainGua.name}
+- 体卦：${params.tiGua}，用卦：${params.yongGua}，体用关系：${params.tiYong}
+- 互卦：${params.huGua.upper}上${params.huGua.lower}下
+- 变卦：${params.bianGua.upper}上${params.bianGua.lower}下，${params.bianGua.name}
+- 动爻：第${params.changingLine}爻
+${params.phenomenon ? `- 起卦外应：${params.phenomenon}` : ''}
+
+## 输出要求
+
+### 1. 卦象构成
+分析主卦、互卦、变卦三层卦象的结构与含义。
+
+### 2. 体用生克
+深入分析体卦与用卦之间的五行生克关系及吉凶判断。
+
+### 3. 变卦分析
+解读动爻变化带来的趋势转变与最终走向。
+
+### 4. 吉凶判断
+综合三卦信息给出整体吉凶评估。
+
+### 5. 实践指导
+给出具体的时间、方位与行动策略建议。
+
+注意：梅花易数贵在灵活变通，避免教条化的论断。强调心物感应的智慧。`;
+
+/** 奇门遁甲 AI 解读 Prompt */
+export const QIMEN_PROMPT = (params: {
+  yangDun: boolean; juNum: number;
+  palaceInfo: Array<{ palace: string; star: string; gate: string; deity: string; stem: string }>;
+  zhiFuPalace: string; currentSeason: string;
+  question?: string;
+}) => `你是"天机"AI运势系统的奇门遁甲分析师。请基于以下局盘信息进行专业解读。
+
+## 局盘数据
+- 遁局：${params.yangDun ? '阳遁' : '阴遁'}${params.juNum}局
+- 当前节令：${params.currentSeason}
+- 值符宫位：${params.zhiFuPalace}
+- 各宫分布：
+${params.palaceInfo.map(p => `- ${p.palace}：天盘${p.star}、${p.gate}、${p.deity}、${p.stem}`).join('\n')}
+${params.question ? `- 占问事项：${params.question}` : ''}
+
+## 输出要求
+
+### 1. 格局分析
+分析整体局盘的吉凶格局与核心特征。
+
+### 2. 宫位解读
+逐一分析关键宫位的星门神仪组合。
+
+### 3. 方位指引
+指出吉方与凶方，给出方位选择的建议。
+
+### 4. 时令吉凶
+结合当前节令分析天时对局盘的影响。
+
+### 5. 行动建议
+综合四盘信息给出具体的时间与方位行动指南。
+
+注意：奇门遁甲是时空选择之学，强调趋吉避凶的方法论，避免宿命论断。`;
+
+/** 风水罗盘 AI 解读 Prompt */
+export const FENGSHUI_PROMPT = (params: {
+  flyingStars: Array<{ palace: string; direction: string; star: string; element: string; status: string }>;
+  doorDirection: string; masterBedroom: string; kitchen: string;
+  period: string; externalFeatures?: string;
+}) => `你是"天机"AI运势系统的风水分析师。请基于以下玄空飞星数据进行分析。
+
+## 宅运数据
+- 元运：${params.period}
+- 大门朝向：${params.doorDirection}
+- 主卧位置：${params.masterBedroom}
+- 厨房位置：${params.kitchen}
+${params.externalFeatures ? `- 外部环境：${params.externalFeatures}` : ''}
+- 飞星分布：
+${params.flyingStars.map(s => `- ${s.palace}（${s.direction}）：${s.star}，属${s.element}，${s.status}`).join('\n')}
+
+## 输出要求
+
+### 1. 方位吉凶
+基于飞星分布分析各宫位的吉凶情况。
+
+### 2. 五行旺衰
+分析各方位五行属性的旺衰及其对居住者的影响。
+
+### 3. 气场分析
+结合内部格局与外部环境分析整体气场流通性。
+
+### 4. 调整方案
+给出具体的风水调理与化煞增吉方案。
+
+### 5. 注意事项
+指出日常维护中需要关注的关键点。
+
+注意：风水调理建议应实用可操作，避免夸张，强调人与环境的和谐共生。`;
+
+/** 数字能量 AI 解读 Prompt */
+export const NUMEROLOGY_PROMPT = (params: {
+  birthDate: string;
+  coreNumbers: { lifePath: number; expression: number; soulUrge: number; personality: number };
+  peaks: number[]; challenges: number[];
+  currentCycle: { year: number; number: number; theme: string };
+}) => `你是"天机"AI运势系统的数字能量分析师。请基于以下生命数字信息进行解读。
+
+## 数字数据
+- 出生日期：${params.birthDate}
+- 核心数字：生命道路${params.coreNumbers.lifePath}、表现数字${params.coreNumbers.expression}、灵魂渴望${params.coreNumbers.soulUrge}、人格数字${params.coreNumbers.personality}
+- 人生高峰：${params.peaks.join('、')}
+- 生命挑战：${params.challenges.join('、')}
+- 当前周期：个人年${params.currentCycle.number}（${params.currentCycle.theme}）
+
+## 输出要求
+
+### 1. 核心数字
+解读各核心数字的含义及其在整体数字图中的角色。
+
+### 2. 性格解读
+基于数字能量分析性格特质与天赋潜能。
+
+### 3. 人生路径
+结合高峰数字与挑战数字分析人生发展阶段。
+
+### 4. 周期运势
+基于当前个人年数字分析近期运势主题。
+
+### 5. 提升建议
+给出基于数字能量的个人成长与关系建议。
+
+注意：数字能量是自我认知的工具，强调发挥天赋优势同时觉察数字阴影面。`;
 
 /** 通用追问 Prompt */
 export const FOLLOW_UP_PROMPT = (params: {
@@ -281,6 +858,17 @@ export async function interpretFortune(
   data: Record<string, unknown>,
   inputParams: Record<string, unknown>
 ): Promise<string> {
+  // 注入该系统的专业知识库上下文（轻量 RAG：按系统分块加载）
+  const knowledgeCtx = selectKnowledgeChunks(system, '');
+  const withKnowledge = (prompt: string): Promise<string> => {
+    if (!knowledgeCtx) return callAI(prompt);
+    return callAI(
+      `以下是从本系统知识库中检索出的专业知识，请作为解读的事实依据，不要直接复述文档内容：\n\n` +
+      `===== 知识库资料 =====\n${knowledgeCtx}\n===== 知识库结束 =====\n\n` +
+      `${prompt}`
+    );
+  };
+
   if (system === 'bazi') {
     const baziData = data as {
       yearPillar: { gan: string; zhi: string };
@@ -301,7 +889,7 @@ export async function interpretFortune(
       wuxingCount: baziData.wuXingCount,
       gender,
     });
-    return callAI(String(prompt));
+    return withKnowledge(String(prompt));
   }
 
   if (system === 'dream') {
@@ -327,7 +915,7 @@ export async function interpretFortune(
         fortune: e.fortune,
       })),
     });
-    return callAI(String(prompt));
+    return withKnowledge(String(prompt));
   }
 
   if (system === 'tarot') {
@@ -343,7 +931,7 @@ export async function interpretFortune(
         name: c.name, position: c.position, isReversed: c.isReversed,
       })),
     });
-    return callAI(String(prompt));
+    return withKnowledge(String(prompt));
   }
 
   if (system === 'zodiac') {
@@ -359,7 +947,85 @@ export async function interpretFortune(
       timeRange: zodiacData.timeRange || (inputParams.timeRange as string) || '本周',
       scores: zodiacData.scores || { love: 4, career: 4, finance: 3, health: 4 },
     });
-    return callAI(String(prompt));
+    return withKnowledge(String(prompt));
+  }
+
+  if (system === 'astrodice') {
+    const ad = data as { planet: string; sign: string; house: string; question?: string };
+    const prompt = ASTRODICE_PROMPT({
+      planet: ad.planet || (inputParams.planet as string) || '太阳',
+      sign: ad.sign || (inputParams.sign as string) || '未知',
+      house: ad.house || (inputParams.house as string) || '未知',
+      question: ad.question || (inputParams.question as string),
+    });
+    return withKnowledge(String(prompt));
+  }
+
+  if (system === 'moonphase') {
+    const mp = data as { currentPhase: string; birthPhase?: string; moonAge?: number; illumination?: number };
+    const prompt = MOONPHASE_PROMPT({
+      currentPhase: mp.currentPhase || (inputParams.currentPhase as string) || '新月',
+      birthPhase: mp.birthPhase || (inputParams.birthPhase as string),
+      moonAge: mp.moonAge ?? (inputParams.moonAge as number),
+      illumination: mp.illumination ?? (inputParams.illumination as number),
+    });
+    return withKnowledge(String(prompt));
+  }
+
+  if (system === 'rune') {
+    const rd = data as {
+      spread: string;
+      question?: string;
+      runes: Array<{ name: string; position: string; meaning: string; isReversed: boolean }>;
+    };
+    const prompt = RUNE_PROMPT({
+      spread: rd.spread || '三符文阵',
+      question: rd.question || (inputParams.question as string),
+      runes: (rd.runes || []).map(r => ({
+        name: r.name, position: r.position, meaning: r.meaning, isReversed: r.isReversed,
+      })),
+    });
+    return withKnowledge(String(prompt));
+  }
+
+  if (system === 'nametest') {
+    const nt = data as {
+      fullName: string; surname: string; givenName: string;
+      strokes: { tian: number; ren: number; di: number; wai: number; zong: number };
+      wuxing: { tian: string; ren: string; di: string; wai: string; zong: string };
+      sancai: string; score: number;
+    };
+    const prompt = NAMETEST_PROMPT({
+      fullName: nt.fullName || (inputParams.fullName as string) || '',
+      surname: nt.surname || (inputParams.surname as string) || '',
+      givenName: nt.givenName || (inputParams.givenName as string) || '',
+      strokes: nt.strokes || { tian: 0, ren: 0, di: 0, wai: 0, zong: 0 },
+      wuxing: nt.wuxing || { tian: '', ren: '', di: '', wai: '', zong: '' },
+      sancai: nt.sancai || '',
+      score: nt.score || 0,
+    });
+    return withKnowledge(String(prompt));
+  }
+
+  if (system === 'almanac') {
+    const al = data as {
+      date: string; ganzhi: string; jianchu: string;
+      yi: string[]; ji: string[];
+      auspiciousHours: string[]; shensha: string[];
+      clash: string; directions: { caishen: string; xishen: string; fushen: string };
+    };
+    const prompt = ALMANAC_PROMPT({
+      date: al.date || (inputParams.date as string) || '今日',
+      ganzhi: al.ganzhi || (inputParams.ganzhi as string) || '',
+      jianchu: al.jianchu || (inputParams.jianchu as string) || '',
+      yi: al.yi || (inputParams.yi as string[]) || [],
+      ji: al.ji || (inputParams.ji as string[]) || [],
+      auspiciousHours: al.auspiciousHours || (inputParams.auspiciousHours as string[]) || [],
+      shensha: al.shensha || (inputParams.shensha as string[]) || [],
+      clash: al.clash || (inputParams.clash as string) || '',
+      directions: al.directions || (inputParams.directions as { caishen: string; xishen: string; fushen: string }) || { caishen: '', xishen: '', fushen: '' },
+    });
+    return withKnowledge(String(prompt));
   }
 
   // 系统名称映射
@@ -416,7 +1082,7 @@ export async function interpretFortune(
     `- 结尾给出 1-2 条实用建议\n` +
     `- 总字数 300-500 字`;
 
-  return callAI(prompt);
+  return withKnowledge(prompt);
 }
 
 /**
@@ -440,6 +1106,7 @@ export async function followUpInterpret(
     moonphase: '月相占卜', rune: '符文占卜', nametest: '姓名测试',
     shengxiao: '生肖运势', almanac: '每日黄历', drawlot: '求签解签',
     report: '综合报告', compare: '多维对比',
+    palm: '手相算命', tieban: '铁板神数', daliuren: '大六壬',
   };
 
   const name = systemNames[system] || system;
@@ -593,46 +1260,34 @@ function generateMockInterpretation(prompt: string): string {
     ]);
   }
   if (prompt.includes('月相')) {
-    return pick([
-      `### 月相解读\n\n月亮周期深刻影响着人类的情感与潜意识。新月象征新生与启程，上弦月代表成长与突破，满月寓意圆满与释放，下弦月暗示收尾与沉淀。您出生时的月相奠定了情感表达的基本模式。\n\n### 情感模式\n\n不同月相赋予人不同的情感特质。新月出生者富有开创精神，满月出生者情感丰沛而直觉敏锐。月球引力不仅影响潮汐，也微妙地调节着人类的情绪节律。了解自己的月相特质，有助于更好地管理情绪。\n\n### 月相应用\n\n在新月期许愿播种意念，在满月期感恩释放负担。月相周期是天然的自我调节节奏，顺应月相安排生活节奏，能让身心更加和谐。重要决策宜选在上弦月或满月期间，能量最为充沛。`,
-      `### 月亮智慧\n\n月亮是夜空中最明亮的指引，也是人类最早的计时工具之一。新月、上弦月、满月、下弦月四相循环不息，体现了生命不断更新的本质。您的阴历生日对应的月相，揭示了您潜意识中的情感密码。\n\n### 阴历密码\n\n阴历生日中的月相位置，对应着独特的性格倾向。月牙出生者含蓄内敛但后劲十足，半月出生者平衡而有张力，圆月出生者外放热情善于表达。日月之间的相位关系，进一步精准定位了情感特质。\n\n### 生活节奏\n\n将月相周期融入日常规划：新月期制定计划，上弦月期推进执行，满月期展览成果，下弦月期反思调整。与月亮共舞，而非逆月而行，生活的步伐会变得更加轻快自然。`,
-      `### 朔望之道\n\n月有阴晴圆缺，人有悲欢离合。月相占卜通过出生时的月相位置和当前的月相状态，分析情感运势的周期性变化。朔日至望日为能量上升通道，望日至晦日为能量下沉通道。\n\n### 直觉力开发\n\n月相与直觉力密切相关。满月期间直觉最为敏锐，适合进行冥想、灵性练习和创意工作。上弦月期间理性与感性平衡，适合做重要决策。培养对月相变化的觉察，可以逐步提升直觉力。\n\n### 情感调频\n\n如果感到情绪波动，不妨留意当天的月相。满月和新月期间最容易出现情绪起伏，这是自然的能量现象。知道了这一点，就能更从容地面对情绪波动，以观察者的姿态看待而非被情绪裹挟。`,
-    ]);
+    return buildFromTemplate(ALL_TEMPLATES.moonphase, 'moonphase');
   }
   if (prompt.includes('符文') || prompt.includes('rune')) {
-    return pick([
-      `### 符文解读\n\n古代北欧的卢恩符文承载着深邃的自然智慧。每个符文不仅是文字符号，更是宇宙能量的结晶。您抽出的符文分别对应过去的影响、当下的处境和未来的趋势，三者串联起一条完整的信息链。\n\n### 能量分析\n\n正立符文显示正向能量的流动，倒立符文则提醒需要注意或调整的方向。符文之间的空间关系暗示了事物发展的逻辑顺序。三符文牌阵中，中央符文往往是最关键的信息节点。\n\n### 指引建议\n\n符文占卜强调与内在力量的连接。在行动前感受符文传递的能量信息，倾听直觉的声音。符文不是命运的判决书，而是自我探索的一面镜子。相信自己的内心，它能比符文更准确地指引方向。`,
-      `### 卢恩智慧\n\n卢恩符文是北欧先民与自然对话的媒介。24个符文体系涵盖了人生的方方面面。符文占卜不是预测未来，而是帮助卜问者看清当下的能量状态，从而做出更明智的选择。\n\n### 牌阵解析\n\n不同的符文布局服务于不同的占卜目的。单符文适用于快速指引，三符文适用于过去现在未来分析，五符文适用于复杂问题的深入探讨。符文落位的正逆状态，极大地丰富了信息层次。\n\n### 心灵之镜\n\n符文最深刻的价值在于它是心灵的一面镜子。每个符文都对应着某种心理原型，抽到某个符文往往不是偶然，而是潜意识在借符号表达。深入理解符文含义的过程，也是深入了解自己的过程。`,
-      `### 符文之语\n\n北欧符文体系源远流长，与神话传说紧密相连。奥丁倒吊于世界树上九天九夜所获得的，正是符文的智慧。每个符文都有一段神话故事作为背景，理解了这些故事，才能真正读懂符文的深层含义。\n\n### 三时解读\n\n以三符文牌阵为例：第一符代表过去积累的能量与经验，第二符代表当前的关键课题，第三符代表未来的可能走向。三符之间的交互关系——相生、相克、相佐——决定了整体的解盘方向。\n\n### 知行合一\n\n符文提供的是能量层面的指引，行动则是将其落地的桥梁。建议在清晨抽一张符文作为当天的主题锚点，带着符文的智慧度过一天。日积月累，你会发现符文已成为生活中不可或缺的智慧伴侣。`,
-    ]);
+    return buildFromTemplate(ALL_TEMPLATES.rune, 'rune');
   }
   if (prompt.includes('姓名')) {
-    return pick([
-      `### 五行分析\n\n姓名中各字的五行属性与个人命理五行相互作用。金木水火土五行相生相克的平衡状态，直接影响了姓名对个人的助益程度。天格为先天、人格为自身、地格为根基、外格为社交、总格为终身运势。\n\n### 人格解读\n\n姓名的数理格局通过笔画数转化为五格数值，进而映射到五行属性。人格数理对性格塑造影响最大，外格数理决定对外形象，地格数理关乎早年运程。不同数理的五行属性各有吉凶含义。\n\n### 综合建议\n\n好姓名应当与命主五行相生相助，音韵和谐、寓意吉祥。如果姓名五行与命理五行不合，可通过日常使用偏旁部首调整能量。姓名对人命运有辅助作用，但核心仍在于个人的修为与努力。`,
-      `### 字义解析\n\n每个汉字都是形音义的统一体。姓名的字形结构暗含了天地人三才之道。名字的首字主外在表现，末字主内在气质，两字之间的搭配关系决定了性格的整体倾向。\n\n### 数理格局\n\n五格数理是姓名学的核心工具。1-81数各有吉凶属性和对应的五行归属。天格源于姓氏不可更改，人格是姓名学中最重要的指标，地格关乎青少年运，总格关乎中老年运。各格之间的生克关系构成了完整的命理图景。\n\n### 音律调和\n\n姓名的读音也有讲究。声母韵母的组合影响发音的流畅度，平仄起伏关乎音律之美。音律和谐的姓名如泉水叮咚，令人心生好感。反之，拗口难读的姓名在社交中可能产生无形的障碍。`,
-      `### 姓名之道\n\n姓名虽只有寥寥数字，却浓缩了父母的美好期望和长辈的殷切祝福。在传统命理学中，姓名被视为后天命运的调节器。好名如良药，能补先天五行之不足，扶命局之所偏。\n\n### 五格详解\n\n天格1-10数，人格1-20数，地格1-20数，外格1-20数，总格1-30数。各格的数理吉凶判读需结合五行流转和个人的命理组合。人格与外格的生克关系尤为重要，直接影响社交和职场运势。\n\n### 改名建议\n\n改名是调整运势的常用方法之一。但姓名的影响是一个潜移默化的过程，需长期使用方能见效。比改名更重要的是修心——内心强大、品行端正的人，无论叫什么名字都会散发出独特的魅力。`,
-    ]);
+    return buildFromTemplate(ALL_TEMPLATES.nametest, 'nametest');
   }
   if (prompt.includes('黄历') || prompt.includes('almanac')) {
-    return pick([
-      `### 宜忌分析\n\n今日黄历融合了天文历法与阴阳五行智慧，为我们提供了一套完整的时间使用指南。宜祭祀祈福则吉神当值，宜开工动土则需选择吉日。不同事项有专属的宜忌时间窗口，选择在宜日行事往往事半功倍。\n\n### 吉凶方位\n\n喜神方位宜前往祈福许愿，福神方位宜居家布置，财神方位宜商务谈判和投资决策。各方位今日的能量属性不同，了解这些信息有助于在出行和布局时做出更有利的选择。\n\n### 生活建议\n\n黄历是祖先留下的时间管理智慧。日常起居适度参考即可，大事择日建议咨询专业人士。黄历所示的是天时，做好人事同样重要。在宜日主动出击，在忌日稳守蓄力。`,
-      `### 今日黄历\n\n每一天都有其独特的天干地支组合，决定了当天的能量属性。建除十二神轮流值日，建日利开创、除日利扫除、满日利收获、平日利稳定。结合月令和节气，可以精准把握每一天的行动节奏。\n\n### 择日精要\n\n择日学是黄历应用的核心。嫁娶宜天德、月德吉日，动土宜黄道吉日，开业宜成日、开日。避开岁破、月破、四废等凶日。好的开始是成功的一半，在吉日启动重要事项有助于顺风顺水。\n\n### 日常应用\n\n黄历不只是一本老黄历，它蕴含的时间哲学至今仍有参考价值。早晨查看当日宜忌，合理规划一天的行动重点。但不必过于迷信——真正的运气来自于充分的准备和正确的选择。`,
-      `### 通书之妙\n\n黄历古称"通书"，意为通晓天地运行之书。它以干支纪年为基础，融合了二十八宿、十二建除、七十二候等多套时间系统。每日的宜忌判断，正是这些系统综合运算的结果。\n\n### 吉神凶煞\n\n天德、月德、天赦等为吉神，宜祈福、出行、嫁娶。劫煞、灾煞、月煞等为凶神，忌动土、远行、开张。吉神值日则百事顺遂，凶煞当值则需低调行事。但吉凶也是相对的，如凶煞日往往利于除旧布新。\n\n### 智慧使用\n\n黄历是古人留给我们的生活智慧结晶。把它当作一本"时间指南"而非"命运判决书"来使用，能获得最大的参考价值。知天命而尽人事，方为智者之道。`,
-    ]);
+    return buildFromTemplate(ALL_TEMPLATES.almanac, 'almanac');
   }
-  if (prompt.includes('签') || prompt.includes('求签')) {
-    return pick([
-      `### 签文解读\n\n签诗以古人的智慧道尽了事物发展的普遍规律。签文等级代表了所求之事的基本走势，上签主顺遂、中签主平常、下签主需留意。但签的吉凶更多是在提醒我们注意方式方法，而非绝对的命运判决。\n\n### 时运分析\n\n当前运势处于稳步发展的轨道上。签文中的隐喻暗示着前方有贵人相助的可能，但也提醒不可因急功近利而偏离了正道。踏实努力永远是获得好结果最可靠的途径。\n\n### 虔诚建议\n\n求签问事，心诚则灵。神明指引是照亮前路的灯盏，但脚下的路还需自己去走。将签文的智慧融入日常行动中，让灵性的指引落地为实际的努力，方能真正获福。`,
-      `### 签诗解析\n\n签诗往往以古典诗歌的形式呈现，寥寥数字却意味深长。每句签诗都是一个微型的人生寓言，需结合所问之事具体解读。签文的字面意义之下往往藏着更深层的寓意，需要用心灵去体会。\n\n### 时事结合\n\n将签文与当下所处境况相结合，才能得到最有价值的指引。同一支签对不同的人、不同的事，可能有截然不同的解读。解签贵在"契理契机"——既契签文之理，又契问者之机。\n\n### 实践指引\n\n求得签文后不宜急于求成。建议将签文抄录下来，放在案头时常看看。随着时间推移，你会发现签文的含义逐渐在心中清晰起来。求签的真正意义在于唤起内心的觉察和反思。`,
-      `### 灵签指南\n\n求签是传统文化中与神明沟通的仪式性方式。从摇签到读签，整个过程本身就蕴含着静心、诚意、反思的精神修炼。签筒中的每一支签都是一个可能性的世界，等待有缘人来汲取智慧。\n\n### 圣意解码\n\n签文的每一句都值得反复咀嚼。有些看似不吉的字眼，换个角度理解反而是善意的提醒；有些表面吉利的词句，也需要警惕其中暗藏的考验。签的神奇之处在于它总能在你最需要的时候给你最恰当的一句话。\n\n### 后续行动\n\n求得指引后最重要的是行动。签文给了方向，但地图需要自己走。保持感恩之心，做好力所能及的每一件事。如此，签的福报自然会转化为现实中的好运。`,
-    ]);
+  if (prompt.includes('占星骰子') || prompt.includes('astrodice')) {
+    return buildFromTemplate(ALL_TEMPLATES.astrodice, 'astrodice');
+  }
+  if (prompt.includes('签') || prompt.includes('求签') || prompt.includes('drawlot')) {
+    return buildFromTemplate(ALL_TEMPLATES.drawlot, 'drawlot');
   }
   if (prompt.includes('手相') || prompt.includes('palm')) {
-    return pick([
-      `### 掌纹解读\n\n生命线蜿蜒于掌心，诉说着生命力的强弱与健康的趋势。智慧线从食指与中指之间延伸，揭示着思维方式与学习能力。感情线横贯掌中，映照着情感世界的深度与广度。三条主线共同构成了手相分析的核心框架。\n\n### 丘格分析\n\n掌丘的饱满程度反映了各人生领域的能量状况。木星丘饱满者事业心强，土星丘发达者责任感重，金星丘丰隆者感情丰富且生命力旺盛。丘与纹的交汇之处，往往是生命中最重要的转折点。\n\n### 动态观察\n\n手相并非一成不变，它会随着心态和行为的改变而微妙变化。今天的手相是过往选择的投影，未来的手相则由当下的行动塑造。保持积极向上的心态，掌纹也会向好的方向悄然演变。`,
-      `### 三大主线\n\n生命线不直接代表寿命，而是反映了生命活力与健康走向。智慧线显示思维方式——长而深者逻辑力强，短而浅者直觉敏锐。感情线揭示情感模式——链状者情感细腻但易受伤，笔直者理性务实。\n\n### 辅线分析\n\n除了三大主线，成功线、财运线、婚姻线等辅线补充了更多细节信息。成功线与命运线交汇之处往往是人生的高光时刻。婚姻线的数量、长度和清晰度关乎感情关系的质量与数量。\n\n### 两手对照\n\n左手代表先天禀赋，右手反映后天成就。两手差异越大，说明后天努力对命运的改造越显著。定期观察两手的变化，是检视自我成长轨迹的一种方式。手相是参考书，行动才是答案。`,
-      `### 掌中乾坤\n\n手相学是一门通过观察手掌纹路、形态、色泽来判断运势与性格的古老学问。掌心柔软红润者为福相，干燥粗糙者需调养身体。掌形分为金木水火土五型，不同类型的掌形对应不同的基础体质和性格倾向。\n\n### 纹理密语\n\n每一条纹路的深浅、走向、分叉都有其特定含义。岛纹暗示着在某段时期可能遇到波折，方纹则是一种保护性的标记。十字纹、星纹等特殊标记，往往是天赋异禀或人生重要事件的指示器。\n\n### 修行之道\n\n手相真正的价值在于它是一个自我觉察的工具。通过了解手相所指出的先天倾向，可以有意识地扬长避短。手相学常说"相由心生"——内心修为的提升，终将在手上留下印记。`,
-    ]);
+    return buildFromTemplate(ALL_TEMPLATES.palm, 'palm');
+  }
+  if (prompt.includes('铁板') || prompt.includes('tieban')) {
+    return buildFromTemplate(ALL_TEMPLATES.tieban, 'tieban');
+  }
+  if (prompt.includes('六壬') || prompt.includes('daliuren')) {
+    return buildFromTemplate(ALL_TEMPLATES.daliuren, 'daliuren');
+  }
+  if (prompt.includes('占星骰子') || prompt.includes('astrodice')) {
+    return buildFromTemplate(ALL_TEMPLATES.astrodice, 'astrodice');
   }
   if (prompt.includes('骰子')) {
     return pick([

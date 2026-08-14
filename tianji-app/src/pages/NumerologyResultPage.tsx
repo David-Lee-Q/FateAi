@@ -68,8 +68,9 @@ export default function NumerologyResultPage() {
     );
   }
 
-  const mainNumber = result.number || result.mainNumber || result.lifePath || '1';
-  const analysisType = result.type || result.analysisType || '生命灵数';
+  const data = result.data || {};
+  const mainNumber = data.number || data.mainNumber || data.lifePath || '1';
+  const analysisType = data.type || data.analysisType || '生命灵数';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -97,7 +98,7 @@ export default function NumerologyResultPage() {
             <span className="text-7xl font-bold" style={{ fontFamily: "'Noto Serif SC', serif", color: 'var(--color-gold)', textShadow: '0 0 40px rgba(200,168,78,0.3)' }}>{mainNumber}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {result.numberMeaning || result.title || `生命灵数 ${mainNumber}`}
+            {data.numberMeaning || data.title || `生命灵数 ${mainNumber}`}
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             分析类型：{analysisType}
@@ -110,8 +111,8 @@ export default function NumerologyResultPage() {
             <span>🔢</span>核心数字解读
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
-            <NumberCard number={mainNumber} title={result.numberTitle || '生命灵数'} description={result.numberDesc || '代表你的人生旅程和核心使命'} />
-            <NumberCard number={result.destiny || '9'} title={result.destinyTitle || '命运数字'} description={result.destinyDesc || '预示你的人生目标和最终归宿'} />
+            <NumberCard number={mainNumber} title={data.numberTitle || '生命灵数'} description={data.numberDesc || '代表你的人生旅程和核心使命'} />
+            <NumberCard number={data.destiny || '9'} title={data.destinyTitle || '命运数字'} description={data.destinyDesc || '预示你的人生目标和最终归宿'} />
           </div>
         </section>
 
@@ -128,7 +129,7 @@ export default function NumerologyResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-primary-lighter)' }}>{children}</strong>,
               }}
             >
-              {result.content || result.personality || result.interpretation || ''}
+              {data.content || data.personality || result.interpretation || ''}
             </ReactMarkdown>
           </div>
         </section>
@@ -137,23 +138,23 @@ export default function NumerologyResultPage() {
         <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
           <h2 className="text-lg font-bold mb-4">详细分析</h2>
           <div className="space-y-4">
-            {result.love && (
+            {data.love && (
               <div className="p-4 rounded-lg" style={{ background: 'rgba(236,72,153,0.08)', border: '1px solid rgba(236,72,153,0.2)' }}>
                 <h3 className="text-sm font-medium mb-2" style={{ color: '#ec4899' }}>💕 爱情运势</h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{result.love}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{data.love}</p>
               </div>
             )}
-            {result.career && (
+            {data.career && (
               <div className="p-4 rounded-lg" style={{ background: 'rgba(0,75,170,0.08)', border: '1px solid rgba(0,75,170,0.2)' }}>
                 <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--color-primary)' }}>💼 事业方向</h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{result.career}</p>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{data.career}</p>
               </div>
             )}
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        {result.aiAnalysis && (
+        {data.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -171,7 +172,7 @@ export default function NumerologyResultPage() {
                     strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {data.aiAnalysis}
                 </ReactMarkdown>
               </div>
             </div>

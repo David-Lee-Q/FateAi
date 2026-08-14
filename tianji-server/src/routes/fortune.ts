@@ -41,6 +41,7 @@ import type {
   PalmInputParams,
   TiebanInputParams,
   DaliurenInputParams,
+  SearchResult, TrendResult, ReportResult, CompareResult,
 } from '../types';
 import { resultStorage } from '../utils/storage';
 import { interpretFortune, followUpInterpret } from '../services/ai-interpreter';
@@ -71,7 +72,7 @@ router.post('/query', async (req: Request, res: Response) => {
       'ziwei', 'liuyao', 'meihua', 'qimen', 'tieban', 'daliuren', 'fengshui',
       'numerology', 'astrodice', 'moonphase', 'rune',
       'nametest', 'shengxiao', 'almanac', 'drawlot', 'palm',
-      'report', 'compare',
+      'report', 'compare', 'search', 'trend',
     ];
     if (!validSystems.includes(system)) {
       res.status(400).json({ success: false, message: `不支持的占卜系统：${system}` });
@@ -285,6 +286,42 @@ router.post('/query', async (req: Request, res: Response) => {
       }
 
       // ========== 综合功能 ==========
+      case 'search': {
+        const params = inputParams as { keyword: string };
+        const keyword = params.keyword || '';
+        data = {
+          keyword,
+          results: keyword ? [
+            { title: `${keyword}相关解读`, type: 'bazi', desc: '八字命理中与此相关的分析...' },
+            { title: `${keyword}星象指引`, type: 'zodiac', desc: '星座运势中与此相关的提示...' },
+            { title: `${keyword}塔罗启示`, type: 'tarot', desc: '塔罗牌中与此相关的象征意义...' },
+          ] : [],
+          totalCount: keyword ? 3 : 0,
+        } as SearchResult;
+        break;
+      }
+
+      case 'trend': {
+        const params = inputParams as { source: string; dimension: string; days: number };
+        const days = params.days || 7;
+        const points = Array.from({ length: days }, (_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (days - 1 - i));
+          return {
+            date: d.toISOString().split('T')[0],
+            score: Math.floor(Math.random() * 30) + 60,
+          };
+        });
+        data = {
+          system: params.source || 'bazi',
+          dimension: params.dimension || 'overall',
+          days,
+          data: points,
+          summary: '近期运势总体平稳，有小幅波动。',
+        } as TrendResult;
+        break;
+      }
+
       case 'report': {
         // 综合报告：接收 birthDate + gender，调用多个系统生成综合结果
         const params = inputParams as { birthDate: string; gender: string; systems?: string[] };
@@ -310,7 +347,7 @@ router.post('/query', async (req: Request, res: Response) => {
             zodiac: zodiacData,
             generatedAt: new Date().toISOString(),
           },
-        } as unknown as FortuneResult['data'];
+        } as ReportResult;
         break;
       }
 
@@ -338,7 +375,7 @@ router.post('/query', async (req: Request, res: Response) => {
             },
             advice: score >= 80 ? '两人运势高度匹配，相处融洽。' : '两人运势较为互补，需多沟通理解。',
           },
-        } as unknown as FortuneResult['data'];
+        } as CompareResult;
         break;
       }
 
@@ -368,6 +405,7 @@ router.post('/query', async (req: Request, res: Response) => {
       createdAt: new Date().toISOString(),
       status: 'completed',
       interpretation: aiText,
+      input: inputParams as unknown as Record<string, unknown>,
       data,
     };
     resultStorage.set(result.id, result);

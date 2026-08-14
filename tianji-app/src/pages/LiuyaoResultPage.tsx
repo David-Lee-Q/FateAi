@@ -84,11 +84,12 @@ export default function LiuyaoResultPage() {
   }
 
   // 解析卦象数据
-  const guaName = result.guaName || result.name || '卦象';
-  const question = result.question || '六爻占卜';
+  const data = result.data || {};
+  const guaName = data.guaName || data.name || '卦象';
+  const question = data.question || '六爻占卜';
 
   // 六爻列表
-  const yaoList = result.yaoList || [
+  const yaoList = data.yaoList || [
     { yao: '---', type: '初九', description: '潜龙勿用，阳在地下，未可施为' },
     { yao: '---', type: '九二', description: '见龙在田，利见大人，崭露头角' },
     { yao: 'x', type: '六三', description: '君子终日乾乾，夕惕若厉，谨言慎行' },
@@ -127,10 +128,10 @@ export default function LiuyaoResultPage() {
           <p className="text-sm text-center mb-4" style={{ color: 'var(--color-text-secondary)' }}>
             问事：{question}
           </p>
-          {result.fortune && (
+          {data.fortune && (
             <div className="flex justify-center">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #1a8a5c 0%, #10b981 100%)', color: '#fff', boxShadow: '0 4px 16px rgba(16,185,129,0.3)' }}>
-                {result.fortune}
+                {data.fortune}
               </div>
             </div>
           )}
@@ -166,23 +167,23 @@ export default function LiuyaoResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
               }}
             >
-              {result.content || result.guaCi || result.interpretation || ''}
+              {data.content || data.guaCi || result.interpretation || ''}
             </ReactMarkdown>
           </div>
         </section>
 
         {/* 动变分析 */}
-        {result.bianGua && (
+        {data.bianGua && (
           <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
             <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
               <span>🔄</span>动变分析
             </h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{result.bianGua}</p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{data.bianGua}</p>
           </section>
         )}
 
         {/* AI 深度解读 */}
-        {result.aiAnalysis && (
+        {data.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -200,7 +201,7 @@ export default function LiuyaoResultPage() {
                     strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {data.aiAnalysis}
                 </ReactMarkdown>
               </div>
             </div>

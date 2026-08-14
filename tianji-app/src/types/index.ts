@@ -2,7 +2,7 @@
  *  天机 AI 运势查询工具 — 类型定义
  * ================================================================ */
 
-/** 占卜系统标识（23 种，与后端保持一致） */
+/** 占卜系统标识（25 种，与后端保持一致） */
 export type FortuneSystem =
   | 'bazi'
   | 'tarot'
@@ -25,8 +25,9 @@ export type FortuneSystem =
   | 'tieban'
   | 'daliuren'
   | 'report'
+  | 'compare'
   | 'trend'
-  | 'compare';
+  | 'search';
 
 /** 运势分类 */
 export type FortuneCategory = 'eastern' | 'western' | 'folk' | 'ai';

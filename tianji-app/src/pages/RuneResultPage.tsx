@@ -66,7 +66,7 @@ export default function RuneResultPage() {
     const loadData = async () => {
       try {
         const data = await fetchFortuneResult(id);
-        setResult(data);
+        setResult(data.data);
       } catch (err) {
         setError('获取结果失败，请稍后重试');
       } finally {
@@ -90,8 +90,8 @@ export default function RuneResultPage() {
     );
   }
 
-  const { runes, spreadType, aiInterpretation, question: originalQuestion, guidance } = result.data || result;
-  const spreadLabels = SPREAD_LABELS[spreadType] || [];
+  const divData = (result.data || {}) as Record<string, unknown>;
+  const spreadLabels = SPREAD_LABELS[divData.spreadType as string] || [];
 
   return (
     <div style={{ background: 'linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -116,12 +116,12 @@ export default function RuneResultPage() {
             符文已显
           </h1>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {spreadType === 'single' ? '单符文解读' : spreadType === 'three' ? '三符文：过去·现在·未来' : '奥丁之眼：五符文全面解读'}
+            {divData.spreadType === 'single' ? '单符文解读' : divData.spreadType === 'three' ? '三符文：过去·现在·未来' : '奥丁之眼：五符文全面解读'}
           </p>
 
           {/* 符文卡片 */}
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            {runes?.map((runeKey: string, i: number) => {
+            {(divData.runes as any[])?.map((runeKey: string, i: number) => {
               const rune = RUNE_NAMES[runeKey] || { symbol: '?', name: 'Unknown', nameCn: '未知', meaning: '' };
               return (
                 <div
@@ -160,7 +160,7 @@ export default function RuneResultPage() {
         </div>
 
         {/* AI 解读 */}
-        {aiInterpretation && (
+        {divData.aiInterpretation && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{
@@ -182,27 +182,27 @@ export default function RuneResultPage() {
               </div>
             </div>
 
-            {originalQuestion && (
+            {divData.question && (
               <div className="mb-4 p-4 rounded-xl" style={{ background: 'rgba(200,168,78,0.05)', border: '1px solid rgba(200,168,78,0.1)' }}>
                 <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-gold)' }}>您的问题</p>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{originalQuestion}</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{divData.question}</p>
               </div>
             )}
 
             <div className="prose prose-invert max-w-none" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8 }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiInterpretation}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiInterpretation as string}</ReactMarkdown>
             </div>
           </div>
         )}
 
         {/* 行动指引 */}
-        {guidance && guidance.length > 0 && (
+        {(divData.guidance as any[]) && (divData.guidance as any[]).length > 0 && (
           <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
             <h2 className="text-lg font-semibold mb-4" style={{ color: '#e8ecf4' }}>
               <span style={{ color: 'var(--color-gold)' }}>|</span> 行动指引
             </h2>
             <div className="space-y-3">
-              {guidance.map((g: string, i: number) => (
+              {(divData.guidance as any[]).map((g: string, i: number) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: '#0a0f2e' }}>
                   <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
                     {i + 1}

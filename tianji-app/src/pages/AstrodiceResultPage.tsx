@@ -34,7 +34,7 @@ export default function AstrodiceResultPage() {
     const loadData = async () => {
       try {
         const data = await fetchFortuneResult(id);
-        setResult(data);
+        setResult(data.data);
       } catch (err) {
         setError('获取结果失败，请稍后重试');
       } finally {
@@ -62,7 +62,7 @@ export default function AstrodiceResultPage() {
     );
   }
 
-  const { planet, zodiac, house, aiInterpretation, theme, guidance, question: originalQuestion } = result.data || result;
+  const divData = (result.data || {}) as Record<string, unknown>;
 
   return (
     <div style={{ background: 'linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -102,7 +102,7 @@ export default function AstrodiceResultPage() {
                 style={{ background: 'linear-gradient(145deg, #c0392b 0%, #962d22 40%, #7a2519 100%)', boxShadow: '0 8px 32px rgba(150,45,34,0.4)', border: '2px solid rgba(255,200,180,0.2)' }}
               >
                 <span style={{ fontSize: 48, lineHeight: 1 }}>&#x2648;</span>
-                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{zodiac || '白羊座'}</span>
+                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{divData.zodiac || '白羊座'}</span>
               </div>
               <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>行动力与开创</p>
             </div>
@@ -115,7 +115,7 @@ export default function AstrodiceResultPage() {
                 style={{ background: 'linear-gradient(145deg, #2e86c1 0%, #2471a3 40%, #1a5276 100%)', boxShadow: '0 8px 32px rgba(36,113,163,0.4)', border: '2px solid rgba(180,220,255,0.2)' }}
               >
                 <span style={{ fontSize: 48, lineHeight: 1 }}>&#x2609;</span>
-                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{planet || '太阳'}</span>
+                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{divData.planet || '太阳'}</span>
               </div>
               <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>自我意志与光芒</p>
             </div>
@@ -128,9 +128,9 @@ export default function AstrodiceResultPage() {
                 style={{ background: 'linear-gradient(145deg, #27ae60 0%, #1e8449 40%, #196f3d 100%)', boxShadow: '0 8px 32px rgba(30,132,73,0.4)', border: '2px solid rgba(180,255,200,0.2)' }}
               >
                 <span className="font-bold" style={{ fontFamily: 'var(--font-display)', fontSize: 52, lineHeight: 1, color: '#fff' }}>
-                  {house ? parseInt(house.replace(/[^0-9]/g, '')) || 1 : 1}
+                  {divData.house ? parseInt((divData.house as string).replace(/[^0-9]/g, '')) || 1 : 1}
                 </span>
-                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{house || '第一宫'}</span>
+                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{divData.house || '第一宫'}</span>
               </div>
               <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>命运领域</p>
             </div>
@@ -138,7 +138,7 @@ export default function AstrodiceResultPage() {
         </div>
 
         {/* 组合分析 */}
-        {theme && (
+        {divData.theme && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(200,168,78,0.1)' }}
@@ -147,13 +147,13 @@ export default function AstrodiceResultPage() {
               <h2 className="text-lg font-semibold" style={{ color: 'var(--color-gold-light)' }}>组合解读</h2>
             </div>
             <p className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8 }}>
-              {planet}在{zodiac}进入{house}，{theme}
+              {divData.planet}在{divData.zodiac}进入{divData.house}，{divData.theme}
             </p>
           </div>
         )}
 
         {/* AI 解读 */}
-        {aiInterpretation && (
+        {divData.aiInterpretation && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{
@@ -182,21 +182,21 @@ export default function AstrodiceResultPage() {
             </div>
 
             {/* 原始问题 */}
-            {originalQuestion && (
+            {divData.question && (
               <div className="mb-4 p-4 rounded-xl" style={{ background: 'rgba(0,75,170,0.1)', border: '1px solid rgba(0,75,170,0.15)' }}>
                 <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-primary-lighter)' }}>您的问题</p>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{originalQuestion}</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{divData.question}</p>
               </div>
             )}
 
             <div className="prose prose-invert max-w-none" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8 }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiInterpretation}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiInterpretation as string}</ReactMarkdown>
             </div>
           </div>
         )}
 
         {/* 行动指引 */}
-        {guidance && guidance.length > 0 && (
+        {(divData.guidance as any[]) && (divData.guidance as any[]).length > 0 && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}
@@ -205,7 +205,7 @@ export default function AstrodiceResultPage() {
               <span style={{ color: 'var(--color-gold)' }}>|</span> 行动指引
             </h2>
             <div className="space-y-3">
-              {guidance.map((g: string, i: number) => (
+              {(divData.guidance as any[]).map((g: string, i: number) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: '#0a0f2e' }}>
                   <div
                     className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"

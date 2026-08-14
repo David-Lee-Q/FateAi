@@ -116,20 +116,21 @@ export default function AlmanacResultPage() {
   }
 
   // 解析黄历数据
-  const lunarDate = result.lunar || result.lunarDate || '农历日期';
-  const ganZhi = result.ganZhi || result.ganZhiFull || '干支';
-  const jieqi = result.jieqi || '节气';
-  const star = result.star || '值日星宿';
+  const divData = (result.data || {}) as Record<string, unknown>;
+  const lunarDate = divData.lunar || divData.lunarDate || '农历日期';
+  const ganZhi = divData.ganZhi || divData.ganZhiFull || '干支';
+  const jieqi = divData.jieqi || '节气';
+  const star = divData.star || '值日星宿';
 
-  const yiList = result.yi || ['嫁娶', '出行', '开业', '动土', '祈福'];
-  const jiList = result.ji || ['开仓', '安葬', '破土'];
-  const goodGods = result.goodGods || ['天德', '月德', '天恩'];
-  const badGods = result.badGods || ['五虚', '朱雀'];
-  const chong = result.chong || '冲鼠';
-  const sha = result.sha || '煞东';
+  const yiList = divData.yi || ['嫁娶', '出行', '开业', '动土', '祈福'];
+  const jiList = divData.ji || ['开仓', '安葬', '破土'];
+  const goodGods = divData.goodGods || ['天德', '月德', '天恩'];
+  const badGods = divData.badGods || ['五虚', '朱雀'];
+  const chong = divData.chong || '冲鼠';
+  const sha = divData.sha || '煞东';
 
   // 十二时辰
-  const hours = result.hours || [
+  const hours = divData.hours || [
     { name: '子时', time: '23:00-01:00', status: '吉' as const },
     { name: '丑时', time: '01:00-03:00', status: '平' as const },
     { name: '寅时', time: '03:00-05:00', status: '吉' as const },
@@ -169,7 +170,7 @@ export default function AlmanacResultPage() {
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {result.date || '今日'} · {lunarDate}
+            {divData.date || '今日'} · {lunarDate}
           </h1>
           {/* 农历信息行 */}
           <div className="flex flex-wrap justify-center gap-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
@@ -326,7 +327,7 @@ export default function AlmanacResultPage() {
         </section>
 
         {/* AI 解读 */}
-        {result.aiAnalysis && (
+        {divData.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -344,7 +345,7 @@ export default function AlmanacResultPage() {
                     strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {divData.aiAnalysis}
                 </ReactMarkdown>
               </div>
             </div>

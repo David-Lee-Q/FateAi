@@ -67,13 +67,13 @@ export default function QimenResultPage() {
     );
   }
 
-  const question = result.question || result.data?.question || '奇门占卜';
-  const details = result.details || result.data?.details || {};
-  // AI 解读从多个可能的位置获取
-  const aiContent = result.aiInterpretation
-    || result.aiAnalysis
-    || result.data?.aiInterpretation
-    || result.data?.suggestion
+  const data = (result.data || {}) as Record<string, unknown>;
+  const question = (data.question as string) || '奇门占卜';
+  const details = (data.details as Record<string, unknown>) || {};
+  const aiContent = result.interpretation
+    || (data.aiAnalysis as string)
+    || (data.aiInterpretation as string)
+    || (data.suggestion as string)
     || '';
 
   // 九宫方位映射
@@ -132,10 +132,10 @@ export default function QimenResultPage() {
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
             问事：{question}
           </p>
-          {result.fortune && (
+          {data.fortune && (
             <div className="flex justify-center mt-4">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: '#fff', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-                {result.fortune}
+                {data.fortune as string}
               </div>
             </div>
           )}
@@ -165,7 +165,7 @@ export default function QimenResultPage() {
             <span>⚡</span>吉凶格局
           </h2>
           <div className="space-y-3">
-            {result.patterns || [
+            {data.patterns || [
               { type: '吉', title: '三奇得使', content: '乙丙丁三奇配合六仪，利出行、交易、求财。' },
               { type: '吉', title: '开门吉位', content: '西北乾宫开门，临九天，适合事业发展。' },
               { type: '注意', title: '白虎凶动', content: '正东震宫白虎临位，谨言慎行，避免冲突。' },
@@ -189,7 +189,7 @@ export default function QimenResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        {(aiContent || result.suggestion) && (
+        {(aiContent || data.suggestion) && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.06), rgba(168,85,247,0.04))', border: '1px solid rgba(124,58,237,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -207,7 +207,7 @@ export default function QimenResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#c4b5fd' }}>{children}</strong>,
                   }}
                 >
-                  {aiContent || result.suggestion || ''}
+                  {aiContent || (data.suggestion as string) || ''}
                 </ReactMarkdown>
               </div>
             </div>

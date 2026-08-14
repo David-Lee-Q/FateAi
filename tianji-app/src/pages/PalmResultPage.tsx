@@ -40,7 +40,7 @@ export default function PalmResultPage() {
     const loadData = async () => {
       try {
         const data = await fetchFortuneResult(id);
-        setResult(data);
+        setResult(data.data);
       } catch (err) {
         setError('获取结果失败，请稍后重试');
       } finally {
@@ -64,10 +64,10 @@ export default function PalmResultPage() {
     );
   }
 
-  const { palmType, gender, lines, palmTypeAnalysis, lifeLine, loveLine, wisdomLine, aiAnalysis, suggestions } = result.data || result;
+  const divData = (result.data || {}) as Record<string, unknown>;
 
   // 查找掌型样式
-  const currentPalmType = PALM_TYPES.find(p => p.name === palmType) || PALM_TYPES[0];
+  const currentPalmType = PALM_TYPES.find(p => p.name === (divData.palmType as string)) || PALM_TYPES[0];
 
   return (
     <div style={{ background: 'linear-gradient(180deg, #1a0a2e 0%, #0a0e1a 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -112,65 +112,65 @@ export default function PalmResultPage() {
                   手相分析报告
                 </h1>
                 <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ background: currentPalmType.color, color: currentPalmType.iconColor }}>
-                  {palmType || '金型手'}
+                  {divData.palmType || '金型手'}
                 </span>
               </div>
               <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                {gender === 'male' ? '男性' : '女性'} · 掌型分析 · 三大主线解读
+                {divData.gender === 'male' ? '男性' : '女性'} · 掌型分析 · 三大主线解读
               </p>
             </div>
           </div>
         </div>
 
         {/* 掌型分析 */}
-        {palmTypeAnalysis && (
+        {divData.palmTypeAnalysis && (
           <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
               <Hand size={20} style={{ color: currentPalmType.iconColor }} />
               掌型特征分析
             </h2>
-            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{palmTypeAnalysis}</p>
+            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{divData.palmTypeAnalysis}</p>
           </div>
         )}
 
         {/* 三大主线 */}
-        {(lifeLine || loveLine || wisdomLine) && (
+        {(divData.lifeLine || divData.loveLine || divData.wisdomLine) && (
           <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
               <Activity size={20} style={{ color: 'var(--color-gold)' }} />
               三大主线解读
             </h2>
             <div className="space-y-4">
-              {lifeLine && (
+              {divData.lifeLine && (
                 <div className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: '#c43a3a' }} />
                     <span className="text-sm font-semibold" style={{ color: '#e8ecf4' }}>生命线</span>
                   </div>
                   <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {lifeLine}
+                    {divData.lifeLine}
                   </p>
                 </div>
               )}
-              {loveLine && (
+              {divData.loveLine && (
                 <div className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: '#e88a8a' }} />
                     <span className="text-sm font-semibold" style={{ color: '#e8ecf4' }}>感情线</span>
                   </div>
                   <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {loveLine}
+                    {divData.loveLine}
                   </p>
                 </div>
               )}
-              {wisdomLine && (
+              {divData.wisdomLine && (
                 <div className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: '#004baa' }} />
                     <span className="text-sm font-semibold" style={{ color: '#e8ecf4' }}>智慧线</span>
                   </div>
                   <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {wisdomLine}
+                    {divData.wisdomLine}
                   </p>
                 </div>
               )}
@@ -179,7 +179,7 @@ export default function PalmResultPage() {
         )}
 
         {/* AI 深度分析 */}
-        {aiAnalysis && (
+        {divData.aiAnalysis && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.05), rgba(200,168,78,0.03))', border: '1px solid rgba(200,168,78,0.1)' }}
@@ -194,20 +194,20 @@ export default function PalmResultPage() {
               </div>
             </div>
             <div className="prose prose-invert max-w-none" style={{ color: '#a0aac0', lineHeight: 1.8 }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiAnalysis}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiAnalysis as string}</ReactMarkdown>
             </div>
           </div>
         )}
 
         {/* 开运建议 */}
-        {suggestions && suggestions.length > 0 && (
+        {(divData.suggestions as any[]) && (divData.suggestions as any[]).length > 0 && (
           <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
               <Wind size={20} style={{ color: '#22c55e' }} />
               开运建议
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {suggestions.map((s: string, i: number) => (
+              {(divData.suggestions as any[]).map((s: string, i: number) => (
                 <div key={i} className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <p className="text-sm" style={{ color: '#a0aac0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {s}

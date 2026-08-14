@@ -70,8 +70,9 @@ export default function MeihuaResultPage() {
     );
   }
 
-  const guaName = result.guaName || result.name || '卦象';
-  const question = result.question || '梅花易数占卜';
+  const data = result.data || {};
+  const guaName = data.guaName || data.name || '卦象';
+  const question = data.question || '梅花易数占卜';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -111,21 +112,21 @@ export default function MeihuaResultPage() {
             <span>🌸</span>本卦卦象
           </h2>
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-            <GuaCard name={result.upperGua || '上卦'} meaning={result.upperMeaning || '上卦含义'} type="上卦" />
+            <GuaCard name={data.upperGua || '上卦'} meaning={data.upperMeaning || '上卦含义'} type="上卦" />
             <div className="flex items-center justify-center">
               <span className="text-4xl" style={{ color: 'var(--color-gold)' }}>＋</span>
             </div>
-            <GuaCard name={result.lowerGua || '下卦'} meaning={result.lowerMeaning || '下卦含义'} type="下卦" />
+            <GuaCard name={data.lowerGua || '下卦'} meaning={data.lowerMeaning || '下卦含义'} type="下卦" />
           </div>
-          {result.bianGua && (
+          {data.bianGua && (
             <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
               <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>变卦</h3>
               <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-                <GuaCard name={result.bianUpperGua || '上卦'} meaning="" type="上卦" />
+                <GuaCard name={data.bianUpperGua || '上卦'} meaning="" type="上卦" />
                 <div className="flex items-center justify-center">
                   <span className="text-4xl" style={{ color: 'var(--color-gold)' }}>→</span>
                 </div>
-                <GuaCard name={result.bianLowerGua || '下卦'} meaning="" type="下卦" />
+                <GuaCard name={data.bianLowerGua || '下卦'} meaning="" type="下卦" />
               </div>
             </div>
           )}
@@ -144,13 +145,13 @@ export default function MeihuaResultPage() {
                 strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
               }}
             >
-              {result.content || result.interpretation || result.guaYi || ''}
+              {data.content || result.interpretation || data.guaYi || ''}
             </ReactMarkdown>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        {result.aiAnalysis && (
+        {data.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(0,75,170,0.04))', border: '1px solid rgba(16,185,129,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -168,7 +169,7 @@ export default function MeihuaResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {data.aiAnalysis}
                 </ReactMarkdown>
               </div>
             </div>

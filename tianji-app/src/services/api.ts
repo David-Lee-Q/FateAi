@@ -204,7 +204,7 @@ export async function getCompare(
       '/fortune/query',
       {
         system: 'compare',
-        inputParams: { params1, params2 },
+        inputParams: { person1: params1, person2: params2 },
       }
     );
     return response.data;

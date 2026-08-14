@@ -69,7 +69,8 @@ export default function NametestResultPage() {
     );
   }
 
-  const fullName = result.name || `${result.surname || ''}${result.givenName || ''}`.trim() || '姓名';
+  const data = (result.data || {}) as Record<string, unknown>;
+  const fullName = (data.name as string) || `${data.surname || ''}${data.givenName || ''}`.trim() || '姓名';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -99,12 +100,12 @@ export default function NametestResultPage() {
             {fullName}
           </h1>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            {result.sancai || '天格/地格/人格三才配置'}
+            {(data.sancai as string) || '天格/地格/人格三才配置'}
           </p>
-          {result.score && (
+          {data.score && (
             <div className="flex justify-center mt-4">
               <div className="px-6 py-3 rounded-full text-center" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.15), rgba(139,92,246,0.15))', border: '1px solid rgba(0,75,170,0.2)' }}>
-                <span className="text-2xl font-bold" style={{ color: 'var(--color-primary-lighter)' }}>{result.score}</span>
+                <span className="text-2xl font-bold" style={{ color: 'var(--color-primary-lighter)' }}>{data.score as number}</span>
                 <span className="text-sm ml-1" style={{ color: 'var(--color-text-secondary)' }}>分</span>
               </div>
             </div>
@@ -117,12 +118,12 @@ export default function NametestResultPage() {
             <span>📊</span>五格剖象
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <WugeCard name="天格" score={result.tianGe || 85} meaning={result.tianMeaning || '祖先留下的运势影响'} />
-            <WugeCard name="人格" score={result.renGe || 78} meaning={result.renMeaning || '主性格、事业、财运'} />
-            <WugeCard name="地格" score={result.diGe || 82} meaning={result.diMeaning || '影响早年运势'} />
-            <WugeCard name="外格" score={result.waiGe || 70} meaning={result.waiMeaning || '社交能力和人缘'} />
-            <WugeCard name="总格" score={result.zongGe || 88} meaning={result.zongMeaning || '一生总运势'} />
-            <WugeCard name="三才" score={result.sancaiScore || 80} meaning={result.sancaiMeaning || '天地人三才配置'} />
+            <WugeCard name="天格" score={(data.tianGe as number) || 85} meaning={(data.tianMeaning as string) || '祖先留下的运势影响'} />
+            <WugeCard name="人格" score={(data.renGe as number) || 78} meaning={(data.renMeaning as string) || '主性格、事业、财运'} />
+            <WugeCard name="地格" score={(data.diGe as number) || 82} meaning={(data.diMeaning as string) || '影响早年运势'} />
+            <WugeCard name="外格" score={(data.waiGe as number) || 70} meaning={(data.waiMeaning as string) || '社交能力和人缘'} />
+            <WugeCard name="总格" score={(data.zongGe as number) || 88} meaning={(data.zongMeaning as string) || '一生总运势'} />
+            <WugeCard name="三才" score={(data.sancaiScore as number) || 80} meaning={(data.sancaiMeaning as string) || '天地人三才配置'} />
           </div>
         </section>
 
@@ -137,19 +138,19 @@ export default function NametestResultPage() {
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold mb-1"
                   style={{
-                    background: result.wuxing === element ? 'rgba(200,168,78,0.2)' : 'var(--color-bg-inset)',
-                    border: result.wuxing === element ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
-                    color: result.wuxing === element ? 'var(--color-gold)' : 'var(--color-text-secondary)',
+                    background: (data.wuxing as string) === element ? 'rgba(200,168,78,0.2)' : 'var(--color-bg-inset)',
+                    border: (data.wuxing as string) === element ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
+                    color: (data.wuxing as string) === element ? 'var(--color-gold)' : 'var(--color-text-secondary)',
                   }}
                 >
                   {element}
                 </div>
-                {result.wuxing === element && <span className="text-xs" style={{ color: 'var(--color-gold)' }}>主</span>}
+                {(data.wuxing as string) === element && <span className="text-xs" style={{ color: 'var(--color-gold)' }}>主</span>}
               </div>
             ))}
           </div>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            {result.wuxing || '金'}属性姓名，五行平衡有利于运势发展
+            {(data.wuxing as string) || '金'}属性姓名，五行平衡有利于运势发展
           </p>
         </section>
 
@@ -166,13 +167,13 @@ export default function NametestResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-primary-lighter)' }}>{children}</strong>,
               }}
             >
-              {result.content || result.interpretation || result.analysis || ''}
+              {(data.content as string) || result.interpretation || (data.analysis as string) || ''}
             </ReactMarkdown>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        {result.aiAnalysis && (
+        {data.aiAnalysis && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(139,92,246,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -190,7 +191,7 @@ export default function NametestResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#a78bfa' }}>{children}</strong>,
                   }}
                 >
-                  {result.aiAnalysis}
+                  {data.aiAnalysis as string}
                 </ReactMarkdown>
               </div>
             </div>

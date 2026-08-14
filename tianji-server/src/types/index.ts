@@ -8,7 +8,7 @@ export type FortuneSystem = 'bazi' | 'tarot' | 'zodiac' | 'dream'
   | 'ziwei' | 'liuyao' | 'meihua' | 'qimen' | 'fengshui'
   | 'numerology' | 'astrodice' | 'moonphase' | 'rune'
   | 'nametest' | 'shengxiao' | 'almanac' | 'drawlot' | 'palm'
-  | 'tieban' | 'daliuren' | 'report' | 'compare';
+  | 'tieban' | 'daliuren' | 'report' | 'compare' | 'search' | 'trend';
 
 /** 占卜查询请求参数 */
 export interface FortuneQueryRequest {
@@ -579,6 +579,54 @@ export interface DaliurenResult {
   interpretation: string;
 }
 
+/** 综合报告结果 */
+export interface ReportResult {
+  summary: string;
+  details: {
+    bazi: BaziResult;
+    zodiac: ZodiacResult;
+    generatedAt: string;
+  };
+}
+
+/** 多维对比结果 */
+export interface CompareResult {
+  summary: string;
+  details: {
+    score: number;
+    dimensions: {
+      baziMatch: number;
+      zodiacMatch: number;
+      elementMatch: number;
+      overallMatch: number;
+    };
+    advice: string;
+  };
+}
+
+/** 搜索查询结果 */
+export interface SearchResult {
+  keyword: string;
+  results: Array<{
+    title: string;
+    type: string;
+    desc: string;
+  }>;
+  totalCount: number;
+}
+
+/** 趋势分析结果 */
+export interface TrendResult {
+  system: string;
+  dimension: string;
+  days: number;
+  data: Array<{
+    date: string;
+    score: number;
+  }>;
+  summary: string;
+}
+
 /** 统一查询结果 */
 export interface FortuneResult {
   id: string;
@@ -586,9 +634,11 @@ export interface FortuneResult {
   createdAt: string;
   status: 'completed' | 'pending';
   interpretation?: string; // AI 解读文本
+  input?: Record<string, unknown>; // 用户输入参数
   data: BaziResult | TarotResult | ZodiacResult | DreamResult
     | ZiweiResult | LiuyaoResult | MeihuaResult | QimenResult | FengshuiResult
     | NumerologyResult | AstrodiceResult | MoonphaseResult | RuneResult
     | NametestResult | ShengxiaoResult | AlmanacResult | DrawlotResult
-    | PalmResult | TiebanResult | DaliurenResult;
+    | PalmResult | TiebanResult | DaliurenResult
+    | ReportResult | CompareResult | SearchResult | TrendResult;
 }

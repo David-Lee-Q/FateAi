@@ -83,9 +83,10 @@ export default function DaliurenResultPage() {
     );
   }
 
-  const question = result.question || result.data?.question || '大六壬占卜';
-  const details = result.details || result.data?.details || {};
-  const aiContent = result.aiInterpretation || result.aiAnalysis || result.data?.aiInterpretation || result.data?.suggestion || '';
+  const data = (result.data || {}) as Record<string, unknown>;
+  const question = (data.question as string) || '大六壬占卜';
+  const details = (data.details as Record<string, unknown>) || {};
+  const aiContent = result.interpretation || (data.aiAnalysis as string) || (data.aiInterpretation as string) || (data.suggestion as string) || '';
 
   const keInfo = details.ke || { ke1: '子', ke2: '丑', ke3: '寅', ke4: '卯' };
   const shenInfo = details.shen || { shen1: '贵神', shen2: '腾蛇', shen3: '太阴', shen4: '六合' };
@@ -129,10 +130,10 @@ export default function DaliurenResultPage() {
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
             问事：{question}
           </p>
-          {result.fortune && (
+          {data.fortune && (
             <div className="flex justify-center mt-4">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', color: '#0a0e1a', boxShadow: '0 4px 16px rgba(245,158,11,0.3)' }}>
-                {result.fortune}
+                {data.fortune as string}
               </div>
             </div>
           )}
@@ -160,7 +161,7 @@ export default function DaliurenResultPage() {
             <span>⚡</span>吉凶判断
           </h2>
           <div className="space-y-3">
-            {(result.patterns || [
+            {(data.patterns || [
               { type: '吉', title: '贵神当权', content: '课象得贵神相助，诸事顺遂，贵人扶持。' },
               { type: '吉', title: '吉神入课', content: '青龙、白虎等吉神入课，财运事业皆有助力。' },
               { type: '注意', title: '细审时机', content: '注意流年流月变化，选择有利时机行动。' },
@@ -176,7 +177,7 @@ export default function DaliurenResultPage() {
           </div>
         </section>
 
-        {(aiContent || result.suggestion) && (
+        {(aiContent || data.suggestion) && (
           <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(245,158,11,0.15)' }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
@@ -187,7 +188,7 @@ export default function DaliurenResultPage() {
             </div>
             <div className="prose prose-invert max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {aiContent || result.suggestion || ''}
+                {aiContent || (data.suggestion as string) || ''}
               </ReactMarkdown>
             </div>
           </section>

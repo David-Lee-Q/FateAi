@@ -76,9 +76,10 @@ export default function TiebanResultPage() {
     );
   }
 
-  const question = result.question || result.data?.question || '铁板神数测算';
-  const details = result.details || result.data?.details || {};
-  const aiContent = result.aiInterpretation || result.aiAnalysis || result.data?.aiInterpretation || result.data?.suggestion || '';
+  const data = (result.data || {}) as Record<string, unknown>;
+  const question = (data.question as string) || '铁板神数测算';
+  const details = (data.details as Record<string, unknown>) || {};
+  const aiContent = result.interpretation || (data.aiAnalysis as string) || (data.aiInterpretation as string) || (data.suggestion as string) || '';
 
   // 获取四柱信息
   const baziInfo = details.bazi || {
@@ -126,10 +127,10 @@ export default function TiebanResultPage() {
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
             问事：{question}
           </p>
-          {result.fortune && (
+          {data.fortune && (
             <div className="flex justify-center mt-4">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: '#fff', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-                {result.fortune}
+                {data.fortune as string}
               </div>
             </div>
           )}
@@ -176,7 +177,7 @@ export default function TiebanResultPage() {
             <span>⚡</span>吉凶判断
           </h2>
           <div className="space-y-3">
-            {result.patterns || [
+            {data.patterns || [
               { type: '吉', title: '数字大吉', content: '主数运势旺盛，财运事业皆有助力。' },
               { type: '吉', title: '幸运相助', content: '幸运数字与命格相合，多有贵人相助。' },
               { type: '注意', title: '注意时节', content: '注意流年变化，适时调整策略。' },
@@ -200,7 +201,7 @@ export default function TiebanResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        {(aiContent || result.suggestion) && (
+        {(aiContent || data.suggestion) && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.06), rgba(168,85,247,0.04))', border: '1px solid rgba(124,58,237,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -218,7 +219,7 @@ export default function TiebanResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#c4b5fd' }}>{children}</strong>,
                   }}
                 >
-                  {aiContent || result.suggestion || ''}
+                  {aiContent || (data.suggestion as string) || ''}
                 </ReactMarkdown>
               </div>
             </div>

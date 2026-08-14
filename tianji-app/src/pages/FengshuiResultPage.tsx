@@ -122,7 +122,8 @@ export default function FengshuiResultPage() {
   }
 
   // 解析九宫飞星数据
-  const flyingStars = result.flyingStars || {
+  const data = result.data || {};
+  const flyingStars = data.flyingStars || {
     '东南': { star: '五黄', name: '廉贞星' },
     '正南': { star: '九紫', name: '右弼星' },
     '西南': { star: '一白', name: '贪狼星' },
@@ -135,7 +136,7 @@ export default function FengshuiResultPage() {
   };
 
   // 解析诊断建议
-  const diagnoses = result.diagnoses || [
+  const diagnoses = data.diagnoses || [
     { type: '吉位', title: '正南方', content: '九紫右弼星临位，利文昌、桃花，宜摆放红色饰品增强运势。' },
     { type: '需注意', title: '东南方', content: '五黄廉贞星临位，主是非疾病，宜摆放金属物品或绿色植物化解。' },
     { type: '吉位', title: '东北方', content: '八白左辅星临位，主财帛、利创业，宜保持整洁明亮。' },
@@ -169,18 +170,18 @@ export default function FengshuiResultPage() {
                 <Home size={14} />风水堪舆
               </span>
               <h1 className="mt-4 text-2xl md:text-3xl font-bold">
-                {result.direction || '坐北朝南'} · {result.pattern || '旺宅格局'}
+                {data.direction || '坐北朝南'} · {data.pattern || '旺宅格局'}
               </h1>
               <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                {result.address ? `分析地址：${result.address}` : '环境方位综合分析'}
+                {data.address ? `分析地址：${data.address}` : '环境方位综合分析'}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
-                {result.facing || '坐山'}
+                {data.facing || '坐山'}
               </span>
               <span className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}>
-                {result.xiangshou || '向首'}
+                {data.xiangshou || '向首'}
               </span>
               <span className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'rgba(200,168,78,0.15)', color: 'var(--color-gold)', border: '1px solid rgba(200,168,78,0.3)' }}>
                 元运
@@ -249,7 +250,7 @@ export default function FengshuiResultPage() {
                   strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
                 }}
               >
-                {result.content || result.analysis || result.aiInterpretation || ''}
+                {data.content || data.analysis || data.aiInterpretation || ''}
               </ReactMarkdown>
             </div>
             <div className="flex items-center gap-3 mt-6">
