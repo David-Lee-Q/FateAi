@@ -1286,9 +1286,6 @@ function generateMockInterpretation(prompt: string): string {
   if (prompt.includes('六壬') || prompt.includes('daliuren')) {
     return buildFromTemplate(ALL_TEMPLATES.daliuren, 'daliuren');
   }
-  if (prompt.includes('占星骰子') || prompt.includes('astrodice')) {
-    return buildFromTemplate(ALL_TEMPLATES.astrodice, 'astrodice');
-  }
   if (prompt.includes('骰子')) {
     return pick([
       `### 骰子占卜\n\n骰子占卜是一种古老而直接的占卜方式。数字的点数与方位蕴含着天地间的随机智慧。骰子落下的一瞬，宇宙的能量通过最简单的数字符号传达给您。\n\n### 数字密码\n\n点数1至6各有其五行属性和吉凶含义。点数组合的奇偶、大小、单双等属性揭示着事物发展的不同面向。骰子占卜的独特之处在于其简洁直接——无需复杂的排盘，答案就在点数的排列之中。\n\n### 综合解读\n\n骰子虽小，却能映照大千世界。骰子所示并非定数，而是随机的可能性空间。将点数信息与所问之事相结合，往往能获得出人意料的清晰指引。`,

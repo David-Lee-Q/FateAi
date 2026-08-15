@@ -101,6 +101,16 @@ export function listKnowledgeSystems(): string[] {
     .map(f => f.replace(/\.md$/, ''));
 }
 
+/**
+ * 预热知识库缓存：服务启动时一次性读入全部知识库，
+ * 运行时 loadKnowledge 全部命中缓存，避免同步磁盘 IO 阻塞事件循环。
+ */
+export function warmupKnowledgeCache(): string[] {
+  const systems = listKnowledgeSystems();
+  for (const sys of systems) loadKnowledge(sys);
+  return systems;
+}
+
 /** 简单的关键词/TF 相关度评分 */
 function scoreSection(queryTerms: string[], text: string): number {
   const lower = text.toLowerCase();
@@ -120,13 +130,13 @@ function scoreSection(queryTerms: string[], text: string): number {
 /**
  * 按系统选择知识块并拼接为注入文本（轻量 RAG）
  * @param system 系统标识
- * @param query 检索词（为空则返回全部章节）
- * @param topN 注入章节数上限（为空则全部）
+ * @param query 检索词（为空则取核心章节前 topN）
+ * @param topN 注入章节数上限（默认 5，防止 Prompt 超长）
  */
 export function selectKnowledgeChunks(
   system: string,
   query = '',
-  topN?: number
+  topN = 5
 ): string {
   const doc = loadKnowledge(system);
   if (!doc) return '';
@@ -142,7 +152,7 @@ export function selectKnowledgeChunks(
       .map(x => x.s);
   }
 
-  if (topN && topN > 0) selected = selected.slice(0, topN);
+  selected = selected.slice(0, topN);
 
   const metaLine = doc.meta['领域']
     ? `（领域：${doc.meta['领域']}｜${doc.meta['系统'] || system}）`

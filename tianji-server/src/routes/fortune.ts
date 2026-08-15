@@ -303,10 +303,10 @@ router.post('/query', async (req: Request, res: Response) => {
 
       case 'trend': {
         const params = inputParams as { source: string; dimension: string; days: number };
-        const days = params.days || 7;
-        const points = Array.from({ length: days }, (_, i) => {
+        const safeDays = Math.min(90, Math.max(1, Math.floor(params.days) || 7));
+        const points = Array.from({ length: safeDays }, (_, i) => {
           const d = new Date();
-          d.setDate(d.getDate() - (days - 1 - i));
+          d.setDate(d.getDate() - (safeDays - 1 - i));
           return {
             date: d.toISOString().split('T')[0],
             score: Math.floor(Math.random() * 30) + 60,
@@ -315,7 +315,7 @@ router.post('/query', async (req: Request, res: Response) => {
         data = {
           system: params.source || 'bazi',
           dimension: params.dimension || 'overall',
-          days,
+          days: safeDays,
           data: points,
           summary: '近期运势总体平稳，有小幅波动。',
         } as TrendResult;
@@ -388,10 +388,15 @@ router.post('/query', async (req: Request, res: Response) => {
     let aiText = '';
     try {
       aiText = await interpretFortune(system, data as unknown as Record<string, unknown>, inputParams as Record<string, unknown>);
-      // 将 AI 解读附加到 result.data 中（兼容两种字段名）
-      if (data && typeof data === 'object') {
-        (data as unknown as Record<string, unknown>).aiInterpretation = aiText;
-        (data as unknown as Record<string, unknown>).interpretation = aiText;
+      // 将 AI 解读附加到 result.data 中（兼容两种字段名），并注入用户问题供结果页展示
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        const record = data as unknown as Record<string, unknown>;
+        record.aiInterpretation = aiText;
+        record.interpretation = aiText;
+        const rawInput = inputParams as Record<string, unknown>;
+        if (typeof rawInput.question === 'string' && rawInput.question) {
+          record.question = rawInput.question;
+        }
       }
     } catch (aiError) {
       // AI 调用失败不阻塞结果返回，打印日志即可

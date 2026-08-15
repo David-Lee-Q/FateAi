@@ -8,8 +8,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import fortuneRouter from './routes/fortune';
 import configRouter from './routes/config';
+import { warmupKnowledgeCache } from './services/knowledge.loader';
 
 dotenv.config();
+
+// 预热知识库缓存，避免运行时同步磁盘 IO 阻塞事件循环
+const warmedSystems = warmupKnowledgeCache();
 
 const app = express();
 
@@ -40,4 +44,5 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/health             - 健康检查`);
   console.log(`  GET  /api/config/ai          - 获取AI配置`);
   console.log(`  PUT  /api/config/ai          - 保存AI配置`);
+  console.log(`  知识库已加载 ${warmedSystems.length} 个系统: ${warmedSystems.join(', ')}`);
 });
