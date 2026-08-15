@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Dices, Loader2, ChevronRight, RefreshCw, MessageCircle, ArrowRight } from 'lucide-react';
+import { Dices, Loader2, MessageCircle, ArrowRight } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 12星座 */

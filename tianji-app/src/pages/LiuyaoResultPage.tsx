@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Heart, Share2, Bookmark, Send, Coins, Sparkles, BookOpen } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { Coins, BookOpen, Bookmark, Share2, Heart, Sparkles, Send, ChevronLeft } from 'lucide-react';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 卦爻卡片组件 */
 function GuaYaoCard({ yao, type, description }: { yao: string; type: string; description: string }) {
@@ -35,29 +35,10 @@ function GuaYaoCard({ yao, type, description }: { yao: string; type: string; des
 
 /** 六爻结果页 */
 export default function LiuyaoResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, details, interpretation, question, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -75,6 +56,9 @@ export default function LiuyaoResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/liuyao')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回六爻
           </button>
@@ -83,20 +67,31 @@ export default function LiuyaoResultPage() {
     );
   }
 
-  // 解析卦象数据
-  const data = result.data || {};
-  const guaName = data.guaName || data.name || '卦象';
-  const question = data.question || '六爻占卜';
+  // 解析卦象数据（真实排盘）
+  const originalGua = (details.originalGua && typeof details.originalGua === 'object')
+    ? (details.originalGua as { name?: string; symbol?: string })
+    : {};
+  const changedGua = (details.changedGua && typeof details.changedGua === 'object')
+    ? (details.changedGua as { name?: string; symbol?: string })
+    : {};
+  const guaName = originalGua.name || '卦象';
+  const questionText = question || '六爻占卜';
+  const worldResponse = (details.worldResponse && typeof details.worldResponse === 'object')
+    ? (details.worldResponse as { world?: number; response?: number })
+    : {};
+  const naJia = Array.isArray(details.naJia) ? (details.naJia as string[]) : [];
 
-  // 六爻列表
-  const yaoList = data.yaoList || [
-    { yao: '---', type: '初九', description: '潜龙勿用，阳在地下，未可施为' },
-    { yao: '---', type: '九二', description: '见龙在田，利见大人，崭露头角' },
-    { yao: 'x', type: '六三', description: '君子终日乾乾，夕惕若厉，谨言慎行' },
-    { yao: '---', type: '九四', description: '或跃在渊，进退有度，伺机而动' },
-    { yao: 'o', type: '九五', description: '飞龙在天，大展宏图，功成名就' },
-    { yao: '---', type: '上九', description: '亢龙有悔，知进退存亡，不失其正' },
-  ];
+  // 六爻列表（真实排盘）
+  const sixLines = Array.isArray(details.sixLines)
+    ? details.sixLines as { position?: number; yao?: string; yinYang?: string }[]
+    : [];
+  const yaoList = sixLines.length > 0
+    ? sixLines.map((l) => ({
+        yao: l.yinYang === '阳' ? '---' : '--',
+        type: ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'][(l.position || 1) - 1] || `第${l.position || 1}爻`,
+        description: l.yao || '爻象解读',
+      }))
+    : [];
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -126,15 +121,15 @@ export default function LiuyaoResultPage() {
             {guaName}
           </h1>
           <p className="text-sm text-center mb-4" style={{ color: 'var(--color-text-secondary)' }}>
-            问事：{question}
+            问事：{questionText}
           </p>
-          {data.fortune && (
+          {worldResponse.world ? (
             <div className="flex justify-center">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #1a8a5c 0%, #10b981 100%)', color: '#fff', boxShadow: '0 4px 16px rgba(16,185,129,0.3)' }}>
-                {data.fortune}
+                世爻{worldResponse.world}位 · 应爻{worldResponse.response}位
               </div>
             </div>
-          )}
+          ) : null}
         </section>
 
         {/* 卦象展示 */}
@@ -167,23 +162,29 @@ export default function LiuyaoResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
               }}
             >
-              {data.content || data.guaCi || result.interpretation || ''}
+              {interpretation || (typeof data.summary === 'string' ? data.summary : '') || '卦象已排定，可尝试追问获取更详细解读。'}
             </ReactMarkdown>
           </div>
         </section>
 
-        {/* 动变分析 */}
-        {data.bianGua && (
+        {/* 变卦分析 */}
+        {changedGua.name && (
           <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
             <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
               <span>🔄</span>动变分析
             </h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{data.bianGua}</p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+              本卦 {originalGua.name}，动爻变化后为变卦「{changedGua.name}」。
+              {changedGua.symbol ? <span className="block mt-2 whitespace-pre-line" style={{ color: 'var(--color-gold)', fontFamily: "'Noto Serif SC', serif" }}>{changedGua.symbol}</span> : null}
+            </p>
+            {naJia.length > 0 && (
+              <p className="mt-3 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>纳甲：{naJia.join('、')}</p>
+            )}
           </section>
         )}
 
         {/* AI 深度解读 */}
-        {data.aiAnalysis && (
+        {interpretation && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -201,7 +202,7 @@ export default function LiuyaoResultPage() {
                     strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
                   }}
                 >
-                  {data.aiAnalysis}
+                  {interpretation}
                 </ReactMarkdown>
               </div>
             </div>

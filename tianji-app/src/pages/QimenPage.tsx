@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Compass, Calendar, Type, Loader2, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Compass, Loader2 } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 起局方式 */

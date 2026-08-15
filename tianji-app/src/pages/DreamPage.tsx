@@ -98,24 +98,10 @@ export default function DreamPage() {
   // 收藏状态
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  /** 切换关键词选择状态 */
-  const toggleKeyword = (keyword: string) => {
-    setSelectedKeywords((prev) =>
-      prev.includes(keyword)
-        ? prev.filter((k) => k !== keyword)
-        : [...prev, keyword]
-    );
-  };
-
   /** 将关键词追加到梦境描述文本 */
   const addKeywordToText = (keyword: string) => {
     if (dreamText.includes(keyword)) return;
     setDreamText((prev) => (prev ? `${prev}，${keyword}` : keyword));
-  };
-
-  /** 清除所有已选关键词 */
-  const clearKeywords = () => {
-    setSelectedKeywords([]);
   };
 
   /** 移除单个已选关键词 */
@@ -142,19 +128,12 @@ export default function DreamPage() {
   const canSubmit = dreamText.trim().length > 0 || selectedKeywords.length > 0;
 
   /** 浅色主题色值（覆盖全局深色主题） */
-  const lightBg = '#0a0e1a';
-  const lightBgElevated = '#111827';
-  const lightBgInset = '#0d1220';
   const lightText = '#e8ecf4';
   const lightTextSecondary = '#a0aac0';
   const lightTextTertiary = '#6b7590';
   const lightBorder = '#1e2740';
-  const lightBorderLight = '#161e35';
   const primaryBg = 'rgba(0, 75, 170, 0.06)';
   const primaryBgStrong = 'rgba(0, 75, 170, 0.12)';
-  const primary = 'var(--color-primary)';
-  const primaryLight = 'var(--color-primary-light)';
-  const primaryLighter = 'var(--color-primary-lighter)';
   const successColor = '#1a8a5c';
 
   return (

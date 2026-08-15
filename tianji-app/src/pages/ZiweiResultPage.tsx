@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   Share2, Loader2, ChevronLeft, Send, RefreshCw, Heart, FileText, ChevronRight,
 } from 'lucide-react';
-import type { FortuneResult } from '@/types';
-import { getFortuneResult, submitFollowUp } from '@/services/api';
+import { submitFollowUp } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 // 命盘宫位卡片组件
 function PalaceCard({ name, stars, isHighlight }: {
@@ -137,30 +137,8 @@ function AIDeepDive({ interpretation, resultId }: { interpretation: string; resu
 
 // 紫微斗数结果页面
 export default function ZiweiResultPage() {
-  const { id } = useParams<{ id: string }>();
-  const [result, setResult] = useState<FortuneResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, details, interpretation, loading, error, retry } = useFortuneResult();
   const [activeTab, setActiveTab] = useState('命宫详解');
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await getFortuneResult(id);
-        setResult(resp.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '加载失败');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
 
   if (loading) {
     return (
@@ -178,6 +156,9 @@ export default function ZiweiResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-error)' }}>{error || '数据加载失败'}</p>
+          <button onClick={retry} className="mt-4 mr-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <Link to="/ziwei" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             <ChevronLeft className="w-4 h-4" /> 返回重新测算
           </Link>
@@ -186,28 +167,34 @@ export default function ZiweiResultPage() {
     );
   }
 
-  const data = result.data || {};
-  const interpretation = result.interpretation || '';
+  const mdInterpretation = interpretation || '';
 
-  // 命盘十二宫数据
-  const palaces = [
-    { name: '命宫', stars: data.palace1 as string || '天机星·巨门星', isHighlight: true },
-    { name: '父母宫', stars: data.palace2 as string || '太阳星·文昌' },
-    { name: '福德宫', stars: data.palace3 as string || '太阴星' },
-    { name: '田宅宫', stars: data.palace4 as string || '武曲星·铃星' },
-    { name: '兄弟宫', stars: data.palace5 as string || '天同星·天梁' },
-    { name: '奴仆宫', stars: data.palace6 as string || '天相星' },
-    { name: '官禄宫', stars: data.palace7 as string || '贪狼星·火星' },
-    { name: '迁移宫', stars: data.palace8 as string || '七杀星' },
-  ];
+  // 命盘十二宫数据（真实排盘）
+  const twelvePalaces = Array.isArray(details.twelvePalaces)
+    ? details.twelvePalaces as { palace: string; mainStar: string; subStars: string[] }[]
+    : [];
+  const palaces = twelvePalaces.length > 0
+    ? twelvePalaces.map((p) => ({
+        name: p.palace,
+        stars: [p.mainStar, ...(p.subStars || [])].filter(Boolean).join('·') || '空宫',
+        isHighlight: p.palace.includes('命'),
+      }))
+    : [];
 
-  // 主要星曜
-  const mainStars = [
-    { name: '紫微星', emoji: '🌟', position: '帝座·中天', meaning: '领导力、尊贵' },
-    { name: '天机星', emoji: '⚙️', position: '善星·南斗', meaning: '智慧、谋略' },
-    { name: '太阳星', emoji: '☀️', position: '日星·中天', meaning: '事业、光芒' },
-    { name: '太阴星', emoji: '🌙', position: '月星·中天', meaning: '财禄、温柔' },
-  ];
+  // 主要星曜：以四化信息呈现（真实数据）
+  const siHua = (details.siHua && typeof details.siHua === 'object') ? details.siHua as Record<string, string> : {};
+  const mainStars = Object.entries(siHua).map(([position, name]) => ({
+    name,
+    emoji: '✨',
+    position: `四化 · ${position}`,
+    meaning: '紫微斗数四化飞星',
+  }));
+
+  const mingGong = (details.mingGong && typeof details.mingGong === 'object')
+    ? (details.mingGong as { palace?: string; star?: string })
+    : {};
+  const birthInfo = (typeof details.birthInfo === 'string' ? details.birthInfo : '');
+  const wuXingJu = (typeof details.wuXingJu === 'string' ? details.wuXingJu : '');
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
@@ -255,10 +242,10 @@ export default function ZiweiResultPage() {
                 紫微斗数
               </span>
               <h1 className="mt-4 text-2xl md:text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
-                {data.mainStar as string || '天机星'} · 命宫
+                {mingGong.star || '命宫无主星'} · {mingGong.palace || '命宫'}
               </h1>
               <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                出生日期：{result.input ? `${result.input.year}年${result.input.month}月${result.input.day}日` : '2026年7月10日'} | 农历
+                出生日期：{result.input ? `${result.input.year}年${result.input.month}月${result.input.day}日` : ''} | {wuXingJu || '农历'}
               </p>
             </div>
             {/* 星曜预览 */}
@@ -287,10 +274,9 @@ export default function ZiweiResultPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* 左列 */}
             <div className="space-y-3">
-              <PalaceCard name="命宫" stars={palaces[0].stars} isHighlight />
-              <PalaceCard name="父母宫" stars={palaces[1].stars} />
-              <PalaceCard name="福德宫" stars={palaces[2].stars} />
-              <PalaceCard name="田宅宫" stars={palaces[3].stars} />
+              {palaces.slice(0, 6).map((p) => (
+                <PalaceCard key={p.name} name={p.name} stars={p.stars} isHighlight={p.isHighlight} />
+              ))}
             </div>
             {/* 中间：命盘图 */}
             <div className="flex items-center justify-center">
@@ -315,10 +301,9 @@ export default function ZiweiResultPage() {
             </div>
             {/* 右列 */}
             <div className="space-y-3">
-              <PalaceCard name="兄弟宫" stars={palaces[4].stars} />
-              <PalaceCard name="奴仆宫" stars={palaces[5].stars} />
-              <PalaceCard name="官禄宫" stars={palaces[6].stars} />
-              <PalaceCard name="迁移宫" stars={palaces[7].stars} />
+              {palaces.slice(6).map((p) => (
+                <PalaceCard key={p.name} name={p.name} stars={p.stars} isHighlight={p.isHighlight} />
+              ))}
             </div>
           </div>
         </section>
@@ -332,9 +317,11 @@ export default function ZiweiResultPage() {
             主要星曜
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mainStars.map((star, idx) => (
+            {mainStars.length > 0 ? mainStars.map((star, idx) => (
               <StarCard key={idx} {...star} />
-            ))}
+            )) : (
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{wuXingJu || '紫微斗数'} 命盘排定，十二宫主星详见上方命盘。</p>
+            )}
           </div>
         </section>
 
@@ -358,7 +345,7 @@ export default function ZiweiResultPage() {
           </div>
           <div className="space-y-4">
             <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text)' }}>
-              紫微星入命宫，天机星同度，主人聪明机谋，应变力强。命主思路敏捷，善于思考分析，有谋略且具开创精神。
+              {mingGong.star ? `${mingGong.star}入${mingGong.palace || '命宫'}，` : ''}{wuXingJu ? `命局属${wuXingJu}，` : ''}{birthInfo ? `生于${birthInfo}。` : ''}十二宫主星与四化分布见上方命盘，可结合 AI 深度解读综合参考。
             </p>
             <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--color-bg-inset)', border: '1px solid var(--color-border)' }}>
               <div className="flex items-center gap-2 mb-2">
@@ -368,14 +355,16 @@ export default function ZiweiResultPage() {
                 <span className="text-sm font-medium" style={{ color: 'var(--color-gold)' }}>命理建议</span>
               </div>
               <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                紫微天府星系组合，宜从事管理、行政类工作。天机星动，善于变化，适合创意策划领域。命带文昌文曲，学业运势佳，宜持续学习提升。
+                {typeof data.summary === 'string' && data.summary
+                  ? (data.summary.length > 120 ? `${data.summary.slice(0, 120)}…` : data.summary)
+                  : '四化与宫位主星详见命盘，结合 AI 解读综合参考。'}
               </p>
             </div>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive interpretation={interpretation} resultId={result.id} />
+        <AIDeepDive interpretation={mdInterpretation} resultId={result.id} />
       </main>
 
       {/* 固定底部操作栏 */}

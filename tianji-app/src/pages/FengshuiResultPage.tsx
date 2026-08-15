@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Heart, Share2, Bookmark, Send, Brain, Sparkles, Home } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, Heart, Share2, Bookmark, Send, Home } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 九宫飞星宫位组件 */
-function FlyingStarCell({ position, star, name, direction, isCenter = false }: {
-  position: string;
+function FlyingStarCell({ star, name, direction, isCenter = false }: {
   star: string;
   name: string;
   direction: string;
@@ -73,29 +72,10 @@ function FengshuiDiagnosisCard({ type, title, content }: {
 
 /** 风水堪舆结果页 */
 export default function FengshuiResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -113,6 +93,9 @@ export default function FengshuiResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/fengshui')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回风水
           </button>
@@ -122,8 +105,16 @@ export default function FengshuiResultPage() {
   }
 
   // 解析九宫飞星数据
-  const data = result.data || {};
-  const flyingStars = data.flyingStars || {
+  const details = (data.details && typeof data.details === 'object' ? data.details : {}) as Record<string, unknown>;
+  const summary = (typeof data.summary === 'string' && data.summary) || '';
+  const direction = (typeof details.direction === 'string' && details.direction) || '坐北朝南';
+  const buildingType = (typeof details.buildingType === 'string' && details.buildingType) || '';
+  const wuXing = (typeof details.wuXing === 'string' && details.wuXing) || '';
+  const favorableAreas = (Array.isArray(details.favorableAreas) ? details.favorableAreas : []) as string[];
+  const unfavorableAreas = (Array.isArray(details.unfavorableAreas) ? details.unfavorableAreas : []) as string[];
+  const layoutAdvice = (Array.isArray(details.layoutAdvice) ? details.layoutAdvice : []) as string[];
+
+  const flyingStars = {
     '东南': { star: '五黄', name: '廉贞星' },
     '正南': { star: '九紫', name: '右弼星' },
     '西南': { star: '一白', name: '贪狼星' },
@@ -135,13 +126,11 @@ export default function FengshuiResultPage() {
     '西北': { star: '四绿', name: '文昌星' },
   };
 
-  // 解析诊断建议
-  const diagnoses = data.diagnoses || [
-    { type: '吉位', title: '正南方', content: '九紫右弼星临位，利文昌、桃花，宜摆放红色饰品增强运势。' },
-    { type: '需注意', title: '东南方', content: '五黄廉贞星临位，主是非疾病，宜摆放金属物品或绿色植物化解。' },
-    { type: '吉位', title: '东北方', content: '八白左辅星临位，主财帛、利创业，宜保持整洁明亮。' },
-    { type: '建议', title: '西北方', content: '四绿文昌星临位，利学业、仕途，可摆放文昌塔或富贵竹。' },
-  ];
+  // 由真实排盘数据构建诊断建议
+  const diagnoses: { type: '吉位' | '需注意' | '建议'; title: string; content: string }[] = [];
+  for (const area of favorableAreas) diagnoses.push({ type: '吉位', title: area, content: `${area}为吉利方位，主财运事业顺遂，宜布置财位。` });
+  for (const area of unfavorableAreas) diagnoses.push({ type: '需注意', title: area, content: `${area}为不利方位，宜保持整洁并放置化解之物。` });
+  for (const advice of layoutAdvice) diagnoses.push({ type: '建议', title: '布局建议', content: advice });
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -170,21 +159,18 @@ export default function FengshuiResultPage() {
                 <Home size={14} />风水堪舆
               </span>
               <h1 className="mt-4 text-2xl md:text-3xl font-bold">
-                {data.direction || '坐北朝南'} · {data.pattern || '旺宅格局'}
+                {direction} · {buildingType || '旺宅格局'}
               </h1>
               <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                {data.address ? `分析地址：${data.address}` : '环境方位综合分析'}
+                {summary || '环境方位综合分析'}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>
-                {data.facing || '坐山'}
+                五行属{wuXing || '—'}
               </span>
               <span className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}>
-                {data.xiangshou || '向首'}
-              </span>
-              <span className="px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'rgba(200,168,78,0.15)', color: 'var(--color-gold)', border: '1px solid rgba(200,168,78,0.3)' }}>
-                元运
+                坐{direction}向
               </span>
             </div>
           </div>
@@ -199,23 +185,24 @@ export default function FengshuiResultPage() {
             九宫飞星
           </h2>
           <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
-            <FlyingStarCell direction={flyingStars['东南']?.direction || '东南'} star={flyingStars['东南']?.star || '五黄'} name={flyingStars['东南']?.name || '廉贞星'} />
-            <FlyingStarCell direction={flyingStars['正南']?.direction || '正南'} star={flyingStars['正南']?.star || '九紫'} name={flyingStars['正南']?.name || '右弼星'} />
-            <FlyingStarCell direction={flyingStars['西南']?.direction || '西南'} star={flyingStars['西南']?.star || '一白'} name={flyingStars['西南']?.name || '贪狼星'} />
-            <FlyingStarCell direction={flyingStars['正东']?.direction || '正东'} star={flyingStars['正东']?.star || '三碧'} name={flyingStars['正东']?.name || '禄存星'} />
-            <FlyingStarCell direction={flyingStars['中宫']?.direction || '中央'} star={flyingStars['中宫']?.star || '二黑'} name={flyingStars['中宫']?.name || '巨门星'} isCenter />
-            <FlyingStarCell direction={flyingStars['正西']?.direction || '正西'} star={flyingStars['正西']?.star || '七赤'} name={flyingStars['正西']?.name || '破军星'} />
-            <FlyingStarCell direction={flyingStars['东北']?.direction || '东北'} star={flyingStars['东北']?.star || '八白'} name={flyingStars['东北']?.name || '左辅星'} />
-            <FlyingStarCell direction={flyingStars['正北']?.direction || '正北'} star={flyingStars['正北']?.star || '六白'} name={flyingStars['正北']?.name || '武曲星'} />
-            <FlyingStarCell direction={flyingStars['西北']?.direction || '西北'} star={flyingStars['西北']?.star || '四绿'} name={flyingStars['西北']?.name || '文昌星'} />
+            <FlyingStarCell direction="东南" star={flyingStars['东南']?.star || '五黄'} name={flyingStars['东南']?.name || '廉贞星'} />
+            <FlyingStarCell direction="正南" star={flyingStars['正南']?.star || '九紫'} name={flyingStars['正南']?.name || '右弼星'} />
+            <FlyingStarCell direction="西南" star={flyingStars['西南']?.star || '一白'} name={flyingStars['西南']?.name || '贪狼星'} />
+            <FlyingStarCell direction="正东" star={flyingStars['正东']?.star || '三碧'} name={flyingStars['正东']?.name || '禄存星'} />
+            <FlyingStarCell direction="中宫" star={flyingStars['中宫']?.star || '二黑'} name={flyingStars['中宫']?.name || '巨门星'} isCenter />
+            <FlyingStarCell direction="正西" star={flyingStars['正西']?.star || '七赤'} name={flyingStars['正西']?.name || '破军星'} />
+            <FlyingStarCell direction="东北" star={flyingStars['东北']?.star || '八白'} name={flyingStars['东北']?.name || '左辅星'} />
+            <FlyingStarCell direction="正北" star={flyingStars['正北']?.star || '六白'} name={flyingStars['正北']?.name || '武曲星'} />
+            <FlyingStarCell direction="西北" star={flyingStars['西北']?.star || '四绿'} name={flyingStars['西北']?.name || '文昌星'} />
           </div>
         </section>
 
         {/* 风水诊断 */}
+        {diagnoses.length > 0 && (
         <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
           <h2 className="text-lg font-bold mb-6">风水诊断</h2>
           <div className="grid md:grid-cols-2 gap-4">
-            {diagnoses.map((item: any, idx: number) => (
+            {diagnoses.map((item, idx: number) => (
               <FengshuiDiagnosisCard
                 key={idx}
                 type={item.type}
@@ -225,8 +212,10 @@ export default function FengshuiResultPage() {
             ))}
           </div>
         </section>
+        )}
 
         {/* AI 深度解读 */}
+        {interpretation && (
         <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #047857 100%)' }}>
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full" style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.3) 0%, transparent 70%)' }}></div>
@@ -250,7 +239,7 @@ export default function FengshuiResultPage() {
                   strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
                 }}
               >
-                {data.content || data.analysis || data.aiInterpretation || ''}
+                {interpretation}
               </ReactMarkdown>
             </div>
             <div className="flex items-center gap-3 mt-6">
@@ -270,6 +259,8 @@ export default function FengshuiResultPage() {
             </div>
           </div>
         </section>
+        )}
+
       </div>
 
       {/* 底部工具栏 */}

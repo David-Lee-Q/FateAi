@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import {
   BookOpen, ScrollText, MessageCircle, Bookmark, Share2,
-  Sparkles, Lightbulb, RotateCw, Loader2,
+  Sparkles, Lightbulb, RotateCw,
 } from 'lucide-react';
-import { submitFortuneQuery } from '@/services/api';
 
 /* ==============================
    浅色主题变量覆盖（设计稿 light theme）
@@ -338,7 +337,6 @@ export default function DrawlotPage() {
   const [drawnLot, setDrawnLot] = useState<typeof LOT_POEMS[0] | null>(null);
   const [lotLevel, setLotLevel] = useState<typeof LOT_LEVELS[0] | null>(null);
   const [question, setQuestion] = useState('');
-  const [loading, setLoading] = useState(false);
 
   /** 获取当前选中的签类型名称 */
   const activeTypeName = LOT_TYPES.find((t) => t.id === activeType)?.name ?? '观音灵签';
@@ -355,24 +353,6 @@ export default function DrawlotPage() {
       setLotLevel(LOT_LEVELS[levelIdx]);
       setShaking(false);
     }, 1500);
-  };
-
-  /** 提交求签结果，跳转详情 */
-  const handleSubmit = async () => {
-    if (!drawnLot || !lotLevel) return;
-    setLoading(true);
-    try {
-      const result = await submitFortuneQuery('drawlot', {
-        lotNumber: drawnLot.number,
-        lotTitle: drawnLot.title,
-        lotLevel: lotLevel.level,
-      });
-      navigate(`/result/drawlot/${result.data.id}`);
-    } catch {
-      alert('求签失败，请稍后重试');
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (

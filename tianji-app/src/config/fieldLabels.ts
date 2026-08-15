@@ -400,7 +400,9 @@ export function getFieldLabel(system: string, field: string): string {
  */
 export function getUnmappedFields(system: string, data: Record<string, unknown>): string[] {
   const mappedFields = new Set(Object.keys(FIELD_LABELS[system] || {}));
-  mappedFields.add(...Object.keys(COMMON_FIELDS));
+  for (const key of Object.keys(COMMON_FIELDS)) {
+    mappedFields.add(key);
+  }
   
   const unmapped: string[] = [];
   

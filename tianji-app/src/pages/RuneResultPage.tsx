@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, MessageCircle, RefreshCw } from 'lucide-react';
-import { fetchFortuneResult } from '@/services/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 符文名称映射 */
 const RUNE_NAMES: Record<string, { symbol: string; name: string; nameCn: string; meaning: string }> = {
@@ -54,27 +54,9 @@ function PageLoading() {
 
 /** 符文结果页 */
 export default function RuneResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [question, setQuestion] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadData = async () => {
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [id]);
+  const { result, data, interpretation, question, loading, error, retry } = useFortuneResult();
+  const [followUpText, setFollowUpText] = useState('');
 
   if (loading) return <PageLoading />;
   if (error || !result) {
@@ -82,6 +64,9 @@ export default function RuneResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-primary-darker)' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mt-4 mr-2 px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/rune')} className="mt-4 px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
             返回重新测试
           </button>
@@ -90,8 +75,13 @@ export default function RuneResultPage() {
     );
   }
 
-  const divData = (result.data || {}) as Record<string, unknown>;
-  const spreadLabels = SPREAD_LABELS[divData.spreadType as string] || [];
+  const divData = (data || {}) as Record<string, unknown>;
+  const details = (divData.details && typeof divData.details === 'object' ? divData.details : {}) as Record<string, unknown>;
+  const aiText = interpretation;
+  const runeList = (Array.isArray(details.runes) ? details.runes : []) as { name?: string; symbol?: string; meaning?: string; reversed?: boolean; position?: string }[];
+  const spreadName = (typeof details.spread === 'string' && details.spread) || '';
+  const spreadLabels = SPREAD_LABELS[runeList.length === 1 ? 'single' : runeList.length === 3 ? 'three' : 'single'] || [];
+  const summary = (typeof divData.summary === 'string' && divData.summary) || '';
 
   return (
     <div style={{ background: 'linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -116,16 +106,21 @@ export default function RuneResultPage() {
             符文已显
           </h1>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {divData.spreadType === 'single' ? '单符文解读' : divData.spreadType === 'three' ? '三符文：过去·现在·未来' : '奥丁之眼：五符文全面解读'}
+            {spreadName || (runeList.length === 1 ? '单符文解读' : runeList.length === 3 ? '三符文：过去·现在·未来' : '符文解读')}
           </p>
+          {summary && (
+            <p className="text-xs mt-3 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>{summary}</p>
+          )}
 
           {/* 符文卡片 */}
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            {(divData.runes as any[])?.map((runeKey: string, i: number) => {
-              const rune = RUNE_NAMES[runeKey] || { symbol: '?', name: 'Unknown', nameCn: '未知', meaning: '' };
+            {runeList.map((rune, i) => {
+              const nameCn = (rune.name && RUNE_NAMES[rune.name.toLowerCase()]?.nameCn) || rune.name || '未知';
+              const symbol = rune.symbol || RUNE_NAMES[rune.name?.toLowerCase() || '']?.symbol || '?';
+              const meaning = rune.meaning || RUNE_NAMES[rune.name?.toLowerCase() || '']?.meaning || '';
               return (
                 <div
-                  key={runeKey}
+                  key={i}
                   className="relative rounded-2xl p-6 text-center"
                   style={{
                     background: 'linear-gradient(135deg, rgba(200,168,78,0.08), rgba(0,75,170,0.04))',
@@ -134,24 +129,24 @@ export default function RuneResultPage() {
                   }}
                 >
                   {/* 位置标签 */}
-                  {spreadLabels[i] && (
+                  {(spreadLabels[i] || rune.position) && (
                     <span
                       className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-medium"
                       style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}
                     >
-                      {spreadLabels[i]}
+                      {rune.position || spreadLabels[i]}
                     </span>
                   )}
                   {/* 符文符号 */}
                   <span className="block text-5xl mb-3" style={{ fontFamily: 'Cinzel, serif', color: 'var(--color-gold-light)' }}>
-                    {rune.symbol}
+                    {symbol}
                   </span>
                   {/* 符文名称 */}
-                  <div className="font-semibold mb-1" style={{ color: '#e8ecf4' }}>{rune.nameCn}</div>
-                  <div className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>{rune.name}</div>
+                  <div className="font-semibold mb-1" style={{ color: '#e8ecf4' }}>{nameCn}</div>
+                  <div className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>{rune.name}{rune.reversed ? '（逆位）' : ''}</div>
                   {/* 含义 */}
                   <div className="text-xs mt-3 pt-3" style={{ color: 'rgba(255,255,255,0.6)', borderTop: '1px solid rgba(200,168,78,0.1)' }}>
-                    {rune.meaning}
+                    {meaning}
                   </div>
                 </div>
               );
@@ -160,7 +155,7 @@ export default function RuneResultPage() {
         </div>
 
         {/* AI 解读 */}
-        {divData.aiInterpretation && (
+        {aiText && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{
@@ -182,34 +177,15 @@ export default function RuneResultPage() {
               </div>
             </div>
 
-            {divData.question && (
+            {question && (
               <div className="mb-4 p-4 rounded-xl" style={{ background: 'rgba(200,168,78,0.05)', border: '1px solid rgba(200,168,78,0.1)' }}>
                 <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-gold)' }}>您的问题</p>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{divData.question}</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{question}</p>
               </div>
             )}
 
             <div className="prose prose-invert max-w-none" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8 }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiInterpretation as string}</ReactMarkdown>
-            </div>
-          </div>
-        )}
-
-        {/* 行动指引 */}
-        {(divData.guidance as any[]) && (divData.guidance as any[]).length > 0 && (
-          <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
-            <h2 className="text-lg font-semibold mb-4" style={{ color: '#e8ecf4' }}>
-              <span style={{ color: 'var(--color-gold)' }}>|</span> 行动指引
-            </h2>
-            <div className="space-y-3">
-              {(divData.guidance as any[]).map((g: string, i: number) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: '#0a0f2e' }}>
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
-                    {i + 1}
-                  </div>
-                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{g}</p>
-                </div>
-              ))}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiText}</ReactMarkdown>
             </div>
           </div>
         )}
@@ -224,8 +200,8 @@ export default function RuneResultPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                value={followUpText}
+                onChange={(e) => setFollowUpText(e.target.value)}
                 placeholder="对符文有更多疑问？"
                 className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
                 style={{ background: '#0a0f2e', border: '1px solid rgba(30,39,64,0.8)', color: '#e8ecf4' }}

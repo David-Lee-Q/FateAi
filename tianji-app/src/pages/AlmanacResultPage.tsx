@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Sparkles, Calendar, Star, Clock, Compass } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 黄历宜忌标签组件 */
 function YiJiTag({ text, type }: { text: string; type: 'yi' | 'ji' }) {
@@ -67,29 +67,10 @@ function HourCard({ name, time, status }: { name: string; time: string; status: 
 
 /** 黄历结果页 */
 export default function AlmanacResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -107,6 +88,9 @@ export default function AlmanacResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/almanac')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回黄历
           </button>
@@ -116,34 +100,31 @@ export default function AlmanacResultPage() {
   }
 
   // 解析黄历数据
-  const divData = (result.data || {}) as Record<string, unknown>;
-  const lunarDate = divData.lunar || divData.lunarDate || '农历日期';
-  const ganZhi = divData.ganZhi || divData.ganZhiFull || '干支';
-  const jieqi = divData.jieqi || '节气';
-  const star = divData.star || '值日星宿';
+  const divData = (data || {}) as Record<string, unknown>;
+  const details = (divData.details && typeof divData.details === 'object' ? divData.details : {}) as Record<string, unknown>;
+  const aiText = interpretation;
+  const date = (typeof details.date === 'string' && details.date) || '今日';
+  const lunarDate = (typeof details.lunarDate === 'string' && details.lunarDate) || '农历日期';
+  const ganZhiObj = (details.ganZhi && typeof details.ganZhi === 'object') ? (details.ganZhi as Record<string, string>) : {};
+  const ganZhi = `${ganZhiObj.year || ''}年 ${ganZhiObj.month || ''}月 ${ganZhiObj.day || ''}日`;
 
-  const yiList = divData.yi || ['嫁娶', '出行', '开业', '动土', '祈福'];
-  const jiList = divData.ji || ['开仓', '安葬', '破土'];
-  const goodGods = divData.goodGods || ['天德', '月德', '天恩'];
-  const badGods = divData.badGods || ['五虚', '朱雀'];
-  const chong = divData.chong || '冲鼠';
-  const sha = divData.sha || '煞东';
+  const yiList = (Array.isArray(details.yi) ? details.yi : []) as string[];
+  const jiList = (Array.isArray(details.ji) ? details.ji : []) as string[];
+  const goodGods = (Array.isArray(details.jiShen) ? details.jiShen : []) as string[];
+  const badGods = (Array.isArray(details.xiongShen) ? details.xiongShen : []) as string[];
+  const chongSha = (typeof details.chongSha === 'string' && details.chongSha) || '';
+  const chong = chongSha.split('煞')[0]?.replace('冲', '') || '';
+  const sha = chongSha.split('煞')[1] || '';
 
-  // 十二时辰
-  const hours = divData.hours || [
-    { name: '子时', time: '23:00-01:00', status: '吉' as const },
-    { name: '丑时', time: '01:00-03:00', status: '平' as const },
-    { name: '寅时', time: '03:00-05:00', status: '吉' as const },
-    { name: '卯时', time: '05:00-07:00', status: '平' as const },
-    { name: '辰时', time: '07:00-09:00', status: '吉' as const },
-    { name: '巳时', time: '09:00-11:00', status: '凶' as const },
-    { name: '午时', time: '11:00-13:00', status: '平' as const },
-    { name: '未时', time: '13:00-15:00', status: '吉' as const },
-    { name: '申时', time: '15:00-17:00', status: '平' as const },
-    { name: '酉时', time: '17:00-19:00', status: '吉' as const },
-    { name: '戌时', time: '19:00-21:00', status: '平' as const },
-    { name: '亥时', time: '21:00-23:00', status: '凶' as const },
-  ];
+  // 十二时辰（后端 shiChenLuck: { name, luck }）
+  const shiChenLuck = (Array.isArray(details.shiChenLuck) ? details.shiChenLuck : []) as { name?: string; luck?: string }[];
+  const hours = shiChenLuck.length > 0
+    ? shiChenLuck.map((h) => ({
+        name: h.name || '子时',
+        time: '—',
+        status: (h.luck === '吉' || h.luck === '凶' ? h.luck : '平') as '吉' | '凶' | '平',
+      }))
+    : [];
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -170,23 +151,21 @@ export default function AlmanacResultPage() {
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {divData.date || '今日'} · {lunarDate}
+            {date} · {lunarDate}
           </h1>
           {/* 农历信息行 */}
+          {ganZhi.trim() !== '年  月  日' && (
           <div className="flex flex-wrap justify-center gap-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             <span className="flex items-center gap-1">
               <Star size={14} style={{ color: 'var(--color-gold)' }} />
               {ganZhi}
             </span>
             <span className="flex items-center gap-1">
-              <Clock size={14} style={{ color: 'var(--color-primary)' }} />
-              {jieqi}
-            </span>
-            <span className="flex items-center gap-1">
               <Compass size={14} style={{ color: 'var(--color-text-tertiary)' }} />
-              {star}
+              {chongSha || '冲煞'}
             </span>
           </div>
+          )}
         </section>
 
         {/* 宜忌主区域 */}
@@ -327,7 +306,7 @@ export default function AlmanacResultPage() {
         </section>
 
         {/* AI 解读 */}
-        {divData.aiAnalysis && (
+        {aiText && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -345,7 +324,7 @@ export default function AlmanacResultPage() {
                     strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
                   }}
                 >
-                  {divData.aiAnalysis}
+                  {aiText}
                 </ReactMarkdown>
               </div>
             </div>

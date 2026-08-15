@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  User, Clock, Settings, Database, Award, Edit3, Download,
+  Clock, Settings, Database, Award, Edit3, Download,
   Trash2, Brain, Eye, EyeOff, Save, Check, AlertCircle,
   UserCircle, FileJson, Search,
 } from 'lucide-react';
@@ -266,7 +266,7 @@ export default function ProfilePage() {
                 <button style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
-                  cursor: 'pointer', whiteSpace: 'nowrap', border: 'none',
+                  cursor: 'pointer', whiteSpace: 'nowrap',
                   background: 'transparent', color: 'var(--color-gold)',
                   border: '1px solid rgba(200, 168, 78, 0.3)', flexShrink: 0,
                 }}>

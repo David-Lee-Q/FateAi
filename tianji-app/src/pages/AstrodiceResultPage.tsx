@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, MessageCircle, RefreshCw } from 'lucide-react';
-import { fetchFortuneResult } from '@/services/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 加载占位组件 */
 function PageLoading() {
@@ -22,27 +22,9 @@ function PageLoading() {
 
 /** 占星骰子结果页 */
 export default function AstrodiceResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [question, setQuestion] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadData = async () => {
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [id]);
+  const { result, details, interpretation, question, loading, error, retry } = useFortuneResult();
+  const [followUpText, setFollowUpText] = useState('');
 
   if (loading) return <PageLoading />;
   if (error || !result) {
@@ -50,6 +32,13 @@ export default function AstrodiceResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-primary-darker)' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-state-error)' }}>{error || '未找到结果'}</p>
+          <button
+            onClick={retry}
+            className="mt-4 mr-2 px-6 py-2 rounded-lg text-sm"
+            style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}
+          >
+            重试
+          </button>
           <button
             onClick={() => navigate('/astrodice')}
             className="mt-4 px-6 py-2 rounded-lg text-sm"
@@ -62,7 +51,31 @@ export default function AstrodiceResultPage() {
     );
   }
 
-  const divData = (result.data || {}) as Record<string, unknown>;
+  const aiText = interpretation;
+  const divDetails = (details && typeof details === 'object' ? details : {}) as Record<string, unknown>;
+
+  // 三颗骰子（后端返回 dice1/dice2/dice3，按 type 区分星座/行星/宫位）
+  const dices = [divDetails.dice1, divDetails.dice2, divDetails.dice3]
+    .filter((d): d is Record<string, unknown> => !!d && typeof d === 'object');
+  const diceByType: Record<string, Record<string, unknown>> = {};
+  for (const d of dices) {
+    const t = typeof d.type === 'string' ? d.type : '';
+    if (t && !diceByType[t]) diceByType[t] = d;
+  }
+  const nameOf = (d: Record<string, unknown> | undefined, fallback: string) =>
+    (d && typeof d.name === 'string' && d.name) || fallback;
+  const meaningOf = (d: Record<string, unknown> | undefined, fallback: string) =>
+    (d && typeof d.meaning === 'string' && d.meaning) || fallback;
+  const houseNumOf = (d: Record<string, unknown> | undefined) => {
+    if (!d) return 1;
+    const n = parseInt(String(d.name ?? '').replace(/[^0-9]/g, ''), 10);
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  };
+
+  const zodiacDice = diceByType['zodiac'];
+  const planetDice = diceByType['planet'];
+  const houseDice = diceByType['house'];
+  const theme = (typeof divDetails.interpretation === 'string' && divDetails.interpretation) || '';
 
   return (
     <div style={{ background: 'linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -102,9 +115,9 @@ export default function AstrodiceResultPage() {
                 style={{ background: 'linear-gradient(145deg, #c0392b 0%, #962d22 40%, #7a2519 100%)', boxShadow: '0 8px 32px rgba(150,45,34,0.4)', border: '2px solid rgba(255,200,180,0.2)' }}
               >
                 <span style={{ fontSize: 48, lineHeight: 1 }}>&#x2648;</span>
-                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{divData.zodiac || '白羊座'}</span>
+                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{nameOf(zodiacDice, '白羊座')}</span>
               </div>
-              <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>行动力与开创</p>
+              <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{meaningOf(zodiacDice, '行动力与开创')}</p>
             </div>
 
             {/* 行星骰 */}
@@ -115,9 +128,9 @@ export default function AstrodiceResultPage() {
                 style={{ background: 'linear-gradient(145deg, #2e86c1 0%, #2471a3 40%, #1a5276 100%)', boxShadow: '0 8px 32px rgba(36,113,163,0.4)', border: '2px solid rgba(180,220,255,0.2)' }}
               >
                 <span style={{ fontSize: 48, lineHeight: 1 }}>&#x2609;</span>
-                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{divData.planet || '太阳'}</span>
+                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{nameOf(planetDice, '太阳')}</span>
               </div>
-              <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>自我意志与光芒</p>
+              <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{meaningOf(planetDice, '自我意志与光芒')}</p>
             </div>
 
             {/* 宫位骰 */}
@@ -128,17 +141,17 @@ export default function AstrodiceResultPage() {
                 style={{ background: 'linear-gradient(145deg, #27ae60 0%, #1e8449 40%, #196f3d 100%)', boxShadow: '0 8px 32px rgba(30,132,73,0.4)', border: '2px solid rgba(180,255,200,0.2)' }}
               >
                 <span className="font-bold" style={{ fontFamily: 'var(--font-display)', fontSize: 52, lineHeight: 1, color: '#fff' }}>
-                  {divData.house ? parseInt((divData.house as string).replace(/[^0-9]/g, '')) || 1 : 1}
+                  {houseNumOf(houseDice)}
                 </span>
-                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{divData.house || '第一宫'}</span>
+                <span className="text-sm font-semibold mt-2" style={{ color: 'rgba(255,255,255,0.9)' }}>{nameOf(houseDice, '第一宫')}</span>
               </div>
-              <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>命运领域</p>
+              <p className="text-sm mt-3 font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{meaningOf(houseDice, '命运领域')}</p>
             </div>
           </div>
         </div>
 
         {/* 组合分析 */}
-        {divData.theme && (
+        {theme && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(200,168,78,0.1)' }}
@@ -147,13 +160,13 @@ export default function AstrodiceResultPage() {
               <h2 className="text-lg font-semibold" style={{ color: 'var(--color-gold-light)' }}>组合解读</h2>
             </div>
             <p className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8 }}>
-              {divData.planet}在{divData.zodiac}进入{divData.house}，{divData.theme}
+              {nameOf(planetDice, '未知')}在{nameOf(zodiacDice, '未知')}进入{nameOf(houseDice, '未知宫')}
             </p>
           </div>
         )}
 
         {/* AI 解读 */}
-        {divData.aiInterpretation && (
+        {aiText && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{
@@ -182,21 +195,21 @@ export default function AstrodiceResultPage() {
             </div>
 
             {/* 原始问题 */}
-            {divData.question && (
+            {question && (
               <div className="mb-4 p-4 rounded-xl" style={{ background: 'rgba(0,75,170,0.1)', border: '1px solid rgba(0,75,170,0.15)' }}>
                 <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-primary-lighter)' }}>您的问题</p>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{divData.question}</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{question}</p>
               </div>
             )}
 
             <div className="prose prose-invert max-w-none" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8 }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiInterpretation as string}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiText}</ReactMarkdown>
             </div>
           </div>
         )}
 
         {/* 行动指引 */}
-        {(divData.guidance as any[]) && (divData.guidance as any[]).length > 0 && (
+        {theme && (
           <div
             className="rounded-2xl p-6 mb-8"
             style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}
@@ -205,17 +218,15 @@ export default function AstrodiceResultPage() {
               <span style={{ color: 'var(--color-gold)' }}>|</span> 行动指引
             </h2>
             <div className="space-y-3">
-              {(divData.guidance as any[]).map((g: string, i: number) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: '#0a0f2e' }}>
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-                    style={{ background: 'var(--color-primary)', color: '#fff' }}
-                  >
-                    {i + 1}
-                  </div>
-                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{g}</p>
+              <div className="flex items-start gap-3 p-3 rounded-lg" style={{ background: '#0a0f2e' }}>
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                  style={{ background: 'var(--color-primary)', color: '#fff' }}
+                >
+                  1
                 </div>
-              ))}
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{theme}</p>
+              </div>
             </div>
           </div>
         )}
@@ -234,8 +245,8 @@ export default function AstrodiceResultPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                value={followUpText}
+                onChange={(e) => setFollowUpText(e.target.value)}
                 placeholder="进一步了解..."
                 className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
                 style={{ background: '#0a0f2e', border: '1px solid rgba(30,39,64,0.8)', color: '#e8ecf4' }}

@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles,
-  CheckCircle, XCircle, Search,
+  CalendarDays, ChevronLeft, ChevronRight, Sparkles,
+  CheckCircle, XCircle,
 } from 'lucide-react';
 
 /* ============ 模拟农历数据 ============ */
@@ -66,7 +65,7 @@ const CSS = {
     paddingLeft: 24,
     paddingRight: 24,
   } as React.CSSProperties,
-  breadcrumb: (c: string) => ({
+  breadcrumb: (_c: string) => ({
     color: 'var(--color-text-tertiary)',
     fontSize: 'var(--text-sm)',
     textDecoration: 'none',
@@ -144,7 +143,6 @@ const CSS = {
 
 /* ============ 页面组件 ============ */
 export default function CalendarPage() {
-  const navigate = useNavigate();
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
@@ -152,7 +150,6 @@ export default function CalendarPage() {
   const [zeiriQuery, setZeiriQuery] = useState('');
 
   const fortunes = generateMonthFortune(year, month);
-  const daysInMonth = new Date(year, month, 0).getDate();
   const firstDayWeek = new Date(year, month - 1, 1).getDay();
   const prevMonthDays = getPrevMonthDays(year, month);
   const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];

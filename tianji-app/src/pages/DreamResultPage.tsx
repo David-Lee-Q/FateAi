@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Brain, Sparkles, Moon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 梦境元素解读卡片组件 */
 function DreamElementCard({ element, meaning, luck }: { element: string; meaning: string; luck: '吉' | '凶' | '中吉' | '中凶' }) {
@@ -38,29 +38,10 @@ function DreamElementCard({ element, meaning, luck }: { element: string; meaning
 
 /** 周公解梦结果页 */
 export default function DreamResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -78,6 +59,9 @@ export default function DreamResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/dream')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回解梦
           </button>
@@ -87,10 +71,10 @@ export default function DreamResultPage() {
   }
 
   // 解析结果内容
-  const data = result.data || {};
-  const dreamContent = data.content || data.result || result.interpretation || '';
-  const dreamElements = data.elements || data.keywords || [];
-  const luckLevel = data.luck || data.fortune || '中吉';
+  const dreamContent = (typeof data.overallInterpretation === 'string' && data.overallInterpretation) || interpretation || '';
+  const dreamTitle = (Array.isArray(data.keywords) ? (data.keywords as string[]).join('、') : '') || '梦境解读';
+  const dreamElements = (Array.isArray(data.entries) ? data.entries : []) as { keyword?: string; symbol?: string; fortune?: string; interpretation?: string }[];
+  const luckLevel = dreamElements.find((e) => e.fortune)?.fortune || '';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -118,17 +102,19 @@ export default function DreamResultPage() {
                 <Moon size={14} />周公解梦
               </span>
               <h1 className="mt-4 text-2xl md:text-3xl font-bold" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-                梦境解析：{data.dream || data.title || '梦境解读'}
+                梦境解析：{dreamTitle}
               </h1>
               <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 基于《周公解梦》与 AI 心理学分析
               </p>
             </div>
+            {luckLevel && (
             <div className="flex items-center gap-2">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #1a8a5c 0%, #2ecc71 100%)', color: '#fff', boxShadow: '0 4px 16px rgba(26,138,92,0.3)' }}>
                 {luckLevel}
               </div>
             </div>
+            )}
           </div>
         </section>
 
@@ -139,12 +125,12 @@ export default function DreamResultPage() {
               <span>✨</span>元素解读
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
-              {dreamElements.slice(0, 6).map((item: any, idx: number) => (
+              {dreamElements.slice(0, 6).map((item, idx: number) => (
                 <DreamElementCard
                   key={idx}
-                  element={typeof item === 'string' ? item : item.name || item.element}
-                  meaning={typeof item === 'string' ? '象征变化与智慧' : item.meaning || item.symbol || '待解读'}
-                  luck={typeof item === 'string' ? '中吉' : item.luck || item.fortune || '中吉'}
+                  element={item.keyword || '梦境元素'}
+                  meaning={item.interpretation || '象征变化与智慧'}
+                  luck={(item.fortune === '吉' || item.fortune === '凶' || item.fortune === '中吉' || item.fortune === '中凶' ? item.fortune : '中吉') as '吉' | '凶' | '中吉' | '中凶'}
                 />
               ))}
             </div>
@@ -152,6 +138,7 @@ export default function DreamResultPage() {
         )}
 
         {/* 心理暗示 */}
+        {dreamContent && (
         <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
           <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
             <span>🧠</span>心理暗示
@@ -168,19 +155,10 @@ export default function DreamResultPage() {
             </ReactMarkdown>
           </div>
         </section>
-
-        {/* 化解建议 */}
-        {data.suggestion && (
-          <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
-            <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
-              <span>💡</span>化解建议
-            </h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{data.suggestion}</p>
-          </section>
         )}
 
         {/* AI 深度分析 */}
-        {data.aiAnalysis && (
+        {interpretation && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.03) 0%, rgba(149,117,205,0.05) 100%)' }}>
             <div className="absolute inset-0 pointer-events-none" style={{ padding: 1, background: 'linear-gradient(135deg, var(--color-primary-lighter), #9575cd)', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude', borderRadius: 'var(--radius-xl)' }} />
             <div className="relative">
@@ -199,7 +177,7 @@ export default function DreamResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
                   }}
                 >
-                  {data.aiAnalysis}
+                  {interpretation}
                 </ReactMarkdown>
               </div>
             </div>

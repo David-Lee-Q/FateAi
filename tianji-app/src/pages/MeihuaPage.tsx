@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Flower2, Hash, Clock, Type, Sparkles, Loader2, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Flower2, Hash, Clock, Type, Sparkles, Loader2 } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 起卦方式 */

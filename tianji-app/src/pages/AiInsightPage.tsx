@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import {
   ArrowRight, Brain, Zap,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import type { JSX } from 'react';
 
 /** ==================== 自定义 SVG 图标 ==================== */

@@ -17,7 +17,6 @@ import {
   Star,
   ScrollText,
   Loader2,
-  MessageSquare,
 } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 

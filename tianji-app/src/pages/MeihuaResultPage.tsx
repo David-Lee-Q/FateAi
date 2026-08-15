@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Flower2, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 卦象卡片组件 */
 function GuaCard({ name, meaning, type }: { name: string; meaning: string; type: '上卦' | '下卦' | '变卦' }) {
@@ -22,29 +22,10 @@ function GuaCard({ name, meaning, type }: { name: string; meaning: string; type:
 
 /** 梅花易数结果页 */
 export default function MeihuaResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, details, interpretation, question, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -62,6 +43,9 @@ export default function MeihuaResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/meihua')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回梅花
           </button>
@@ -70,9 +54,21 @@ export default function MeihuaResultPage() {
     );
   }
 
-  const data = result.data || {};
-  const guaName = data.guaName || data.name || '卦象';
-  const question = data.question || '梅花易数占卜';
+  // 解析卦象数据（真实排盘）
+  const gua = (key: string) => {
+    const g = details[key] && typeof details[key] === 'object' ? details[key] as { name?: string; symbol?: string } : {};
+    return { name: g.name || '', symbol: g.symbol || '' };
+  };
+  const upperGua = gua('upperGua');
+  const lowerGua = gua('lowerGua');
+  const mainGua = gua('mainGua');
+  const huGua = gua('huGua');
+  const guaName = mainGua.name || '卦象';
+  const questionText = question || '梅花易数占卜';
+  const method = typeof details.method === 'string' ? details.method : '';
+  const tiYong = (details.tiYong && typeof details.tiYong === 'object')
+    ? (details.tiYong as { ti?: string; yong?: string })
+    : {};
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -102,7 +98,7 @@ export default function MeihuaResultPage() {
             {guaName}
           </h1>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            问事：{question}
+            问事：{questionText} · {method || '起卦法'}
           </p>
         </section>
 
@@ -112,21 +108,24 @@ export default function MeihuaResultPage() {
             <span>🌸</span>本卦卦象
           </h2>
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-            <GuaCard name={data.upperGua || '上卦'} meaning={data.upperMeaning || '上卦含义'} type="上卦" />
+            <GuaCard name={upperGua.name || '上卦'} meaning={upperGua.symbol || '上卦卦象'} type="上卦" />
             <div className="flex items-center justify-center">
               <span className="text-4xl" style={{ color: 'var(--color-gold)' }}>＋</span>
             </div>
-            <GuaCard name={data.lowerGua || '下卦'} meaning={data.lowerMeaning || '下卦含义'} type="下卦" />
+            <GuaCard name={lowerGua.name || '下卦'} meaning={lowerGua.symbol || '下卦卦象'} type="下卦" />
           </div>
-          {data.bianGua && (
+          {(huGua.name || tiYong.ti) && (
             <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
-              <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>变卦</h3>
+              <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>互卦与体用</h3>
               <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-                <GuaCard name={data.bianUpperGua || '上卦'} meaning="" type="上卦" />
-                <div className="flex items-center justify-center">
-                  <span className="text-4xl" style={{ color: 'var(--color-gold)' }}>→</span>
+                <GuaCard name={huGua.name || '互卦'} meaning={huGua.symbol || ''} type="变卦" />
+                <div className="flex items-center justify-center flex-col gap-1">
+                  <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>体用</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{tiYong.ti || '—'}</span>
+                  <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>vs</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{tiYong.yong || '—'}</span>
                 </div>
-                <GuaCard name={data.bianLowerGua || '下卦'} meaning="" type="下卦" />
+                <GuaCard name={mainGua.name || '本卦'} meaning={mainGua.symbol || ''} type="下卦" />
               </div>
             </div>
           )}
@@ -145,13 +144,13 @@ export default function MeihuaResultPage() {
                 strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
               }}
             >
-              {data.content || result.interpretation || data.guaYi || ''}
+              {interpretation || '卦象已排定，可尝试追问获取更详细解读。'}
             </ReactMarkdown>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        {data.aiAnalysis && (
+        {interpretation && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(0,75,170,0.04))', border: '1px solid rgba(16,185,129,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -169,7 +168,7 @@ export default function MeihuaResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#6ee7b7' }}>{children}</strong>,
                   }}
                 >
-                  {data.aiAnalysis}
+                  {interpretation}
                 </ReactMarkdown>
               </div>
             </div>

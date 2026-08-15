@@ -20,11 +20,6 @@ const SHICHEN_OPTIONS = [
   { value: '11', label: '亥时 21:00 - 23:00' },
 ];
 
-/** 生成年份选项（1940-2030） */
-const YEAR_OPTIONS = Array.from({ length: 91 }, (_, i) => 1940 + i);
-const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAY_OPTIONS = Array.from({ length: 31 }, (_, i) => i + 1);
-
 /** 省份选项 */
 const PROVINCE_OPTIONS = [
   { value: '', label: '请选择' },
@@ -75,7 +70,7 @@ export default function BaziPage() {
   const { loading, error, query } = useFortune('bazi');
   const [birthDate, setBirthDate] = useState({ year: '', month: '', day: '' });
   const [hour, setHour] = useState('');
-  const [gender, setGender] = useState<'male' | 'female'>('');
+  const [gender, setGender] = useState<'' | 'male' | 'female'>('');
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [province, setProvince] = useState('');

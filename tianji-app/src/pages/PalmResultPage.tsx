@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Activity, Hand, Wind, Sparkles, MessageCircle, RefreshCw } from 'lucide-react';
-import { fetchFortuneResult } from '@/services/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 五行掌型数据 */
 const PALM_TYPES = [
@@ -28,27 +28,9 @@ function PageLoading() {
 
 /** 手相结果页 */
 export default function PalmResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [question, setQuestion] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadData = async () => {
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [id]);
+  const { result, data, interpretation, question, loading, error, retry } = useFortuneResult();
+  const [followUpText, setFollowUpText] = useState('');
 
   if (loading) return <PageLoading />;
   if (error || !result) {
@@ -56,6 +38,9 @@ export default function PalmResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0e1a' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mt-4 mr-2 px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/palm')} className="mt-4 px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
             返回重新分析
           </button>
@@ -64,10 +49,20 @@ export default function PalmResultPage() {
     );
   }
 
-  const divData = (result.data || {}) as Record<string, unknown>;
+  const divData = (data || {}) as Record<string, unknown>;
+  const details = (divData.details && typeof divData.details === 'object' ? divData.details : {}) as Record<string, unknown>;
+  const aiText = interpretation;
+  const summary = (typeof divData.summary === 'string' && divData.summary) || '';
+  const lines = (details.lines && typeof details.lines === 'object') ? (details.lines as Record<string, { name?: string; interpretation?: string }>) : {};
 
   // 查找掌型样式
-  const currentPalmType = PALM_TYPES.find(p => p.name === (divData.palmType as string)) || PALM_TYPES[0];
+  const currentPalmType = PALM_TYPES.find(p => p.name === (details.palmType as string)) || PALM_TYPES[0];
+
+  const lifeLine = lines.life?.interpretation || '';
+  const loveLine = lines.heart?.interpretation || '';
+  const wisdomLine = lines.mind?.interpretation || '';
+  const genderText = (typeof details.gender === 'string' && details.gender) || '';
+  const palmTypeDesc = (typeof details.palmTypeDesc === 'string' && details.palmTypeDesc) || '';
 
   return (
     <div style={{ background: 'linear-gradient(180deg, #1a0a2e 0%, #0a0e1a 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -112,65 +107,76 @@ export default function PalmResultPage() {
                   手相分析报告
                 </h1>
                 <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ background: currentPalmType.color, color: currentPalmType.iconColor }}>
-                  {divData.palmType || '金型手'}
+                  {currentPalmType.name}
                 </span>
               </div>
               <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                {divData.gender === 'male' ? '男性' : '女性'} · 掌型分析 · 三大主线解读
+                {genderText ? `${genderText} · 掌型分析 · 三大主线解读` : '掌型分析 · 三大主线解读'}
               </p>
             </div>
           </div>
         </div>
 
+        {/* 综合概述 */}
+        {summary && (
+          <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
+              <Wind size={20} style={{ color: currentPalmType.iconColor }} />
+              综合概述
+            </h2>
+            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{summary}</p>
+          </div>
+        )}
+
         {/* 掌型分析 */}
-        {divData.palmTypeAnalysis && (
+        {palmTypeDesc && (
           <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
               <Hand size={20} style={{ color: currentPalmType.iconColor }} />
               掌型特征分析
             </h2>
-            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{divData.palmTypeAnalysis}</p>
+            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{palmTypeDesc}</p>
           </div>
         )}
 
         {/* 三大主线 */}
-        {(divData.lifeLine || divData.loveLine || divData.wisdomLine) && (
+        {(lifeLine || loveLine || wisdomLine) && (
           <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
               <Activity size={20} style={{ color: 'var(--color-gold)' }} />
               三大主线解读
             </h2>
             <div className="space-y-4">
-              {divData.lifeLine && (
+              {lifeLine && (
                 <div className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: '#c43a3a' }} />
                     <span className="text-sm font-semibold" style={{ color: '#e8ecf4' }}>生命线</span>
                   </div>
                   <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {divData.lifeLine}
+                    {lifeLine}
                   </p>
                 </div>
               )}
-              {divData.loveLine && (
+              {loveLine && (
                 <div className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: '#e88a8a' }} />
                     <span className="text-sm font-semibold" style={{ color: '#e8ecf4' }}>感情线</span>
                   </div>
                   <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {divData.loveLine}
+                    {loveLine}
                   </p>
                 </div>
               )}
-              {divData.wisdomLine && (
+              {wisdomLine && (
                 <div className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: '#004baa' }} />
                     <span className="text-sm font-semibold" style={{ color: '#e8ecf4' }}>智慧线</span>
                   </div>
                   <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {divData.wisdomLine}
+                    {wisdomLine}
                   </p>
                 </div>
               )}
@@ -179,7 +185,7 @@ export default function PalmResultPage() {
         )}
 
         {/* AI 深度分析 */}
-        {divData.aiAnalysis && (
+        {aiText && (
           <div
             className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"
             style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.05), rgba(200,168,78,0.03))', border: '1px solid rgba(200,168,78,0.1)' }}
@@ -193,27 +199,14 @@ export default function PalmResultPage() {
                 <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>基于掌纹特征的综合解读</p>
               </div>
             </div>
+            {question && (
+              <div className="mb-4 p-4 rounded-xl" style={{ background: 'rgba(0,75,170,0.1)', border: '1px solid rgba(0,75,170,0.15)' }}>
+                <p className="text-xs font-medium mb-1" style={{ color: '#a0ccf0' }}>您的问题</p>
+                <p className="text-sm" style={{ color: '#e8ecf4' }}>{question}</p>
+              </div>
+            )}
             <div className="prose prose-invert max-w-none" style={{ color: '#a0aac0', lineHeight: 1.8 }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{divData.aiAnalysis as string}</ReactMarkdown>
-            </div>
-          </div>
-        )}
-
-        {/* 开运建议 */}
-        {(divData.suggestions as any[]) && (divData.suggestions as any[]).length > 0 && (
-          <div className="rounded-2xl p-6 mb-8" style={{ background: 'rgba(17,24,39,0.8)', border: '1px solid rgba(30,39,64,0.6)' }}>
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#e8ecf4' }}>
-              <Wind size={20} style={{ color: '#22c55e' }} />
-              开运建议
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(divData.suggestions as any[]).map((s: string, i: number) => (
-                <div key={i} className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
-                  <p className="text-sm" style={{ color: '#a0aac0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {s}
-                  </p>
-                </div>
-              ))}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiText}</ReactMarkdown>
             </div>
           </div>
         )}
@@ -228,8 +221,8 @@ export default function PalmResultPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                value={followUpText}
+                onChange={(e) => setFollowUpText(e.target.value)}
                 placeholder="想了解更多手相知识？"
                 className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
                 style={{ background: '#0a0e1a', border: '1px solid rgba(30,39,64,0.8)', color: '#e8ecf4' }}

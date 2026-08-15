@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Moon, Loader2, ChevronRight, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Moon, Loader2, MessageCircle } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 月相数据 */

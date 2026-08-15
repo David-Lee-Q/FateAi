@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Hash, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 数字能量解读卡片 */
 function NumberCard({ number, title, description }: { number: string; title: string; description: string }) {
@@ -20,29 +20,10 @@ function NumberCard({ number, title, description }: { number: string; title: str
 
 /** 数字能量结果页 */
 export default function NumerologyResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -60,6 +41,9 @@ export default function NumerologyResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/numerology')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回数字能量
           </button>
@@ -68,9 +52,21 @@ export default function NumerologyResultPage() {
     );
   }
 
-  const data = result.data || {};
-  const mainNumber = data.number || data.mainNumber || data.lifePath || '1';
-  const analysisType = data.type || data.analysisType || '生命灵数';
+  const details = (data.details && typeof data.details === 'object' ? data.details : {}) as Record<string, unknown>;
+  const mainNumber = String(details.lifePathNumber ?? details.lifePathNumber ?? '1');
+  const numberMeaning = (typeof details.lifePathMeaning === 'string' && details.lifePathMeaning) || `生命灵数 ${mainNumber}`;
+  const analysisType = '生命灵数';
+  const aiText = interpretation;
+  const summary = (typeof data.summary === 'string' && data.summary) || '';
+
+  const detailNumbers: { label: string; value: string; desc: string }[] = [
+    { label: '生日数字', value: String(details.birthdayNumber ?? ''), desc: '出生日的数字能量' },
+    { label: '个人年', value: String(details.personalYear ?? ''), desc: (typeof details.personalYearMeaning === 'string' && details.personalYearMeaning) || '当前流年运势' },
+    { label: '表达数字', value: String(details.expressionNumber ?? ''), desc: '天赋与才能的展现' },
+    { label: '灵魂数字', value: String(details.soulNumber ?? ''), desc: '内心深处的渴望' },
+    { label: '人格数字', value: String(details.personalityNumber ?? ''), desc: '外在表现与他人印象' },
+    { label: '成熟数字', value: String(details.maturityNumber ?? ''), desc: '人生后期的发展方向' },
+  ].filter((d) => d.value && d.value !== 'undefined');
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -98,21 +94,25 @@ export default function NumerologyResultPage() {
             <span className="text-7xl font-bold" style={{ fontFamily: "'Noto Serif SC', serif", color: 'var(--color-gold)', textShadow: '0 0 40px rgba(200,168,78,0.3)' }}>{mainNumber}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {data.numberMeaning || data.title || `生命灵数 ${mainNumber}`}
+            {numberMeaning}
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             分析类型：{analysisType}
           </p>
+          {summary && (
+            <p className="text-sm mt-3 mx-auto max-w-lg" style={{ color: 'var(--color-text-secondary)' }}>{summary}</p>
+          )}
         </section>
 
         {/* 核心数字解读 */}
         <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
           <h2 className="text-lg font-bold flex items-center gap-2 mb-6">
-            <span>🔢</span>核心数字解读
+            <span>🔢</span>数字能量解读
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <NumberCard number={mainNumber} title={data.numberTitle || '生命灵数'} description={data.numberDesc || '代表你的人生旅程和核心使命'} />
-            <NumberCard number={data.destiny || '9'} title={data.destinyTitle || '命运数字'} description={data.destinyDesc || '预示你的人生目标和最终归宿'} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {detailNumbers.map((d) => (
+              <NumberCard key={d.label} number={d.value} title={d.label} description={d.desc} />
+            ))}
           </div>
         </section>
 
@@ -129,32 +129,13 @@ export default function NumerologyResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-primary-lighter)' }}>{children}</strong>,
               }}
             >
-              {data.content || data.personality || result.interpretation || ''}
+              {aiText}
             </ReactMarkdown>
           </div>
         </section>
 
-        {/* 爱情/事业分析 */}
-        <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
-          <h2 className="text-lg font-bold mb-4">详细分析</h2>
-          <div className="space-y-4">
-            {data.love && (
-              <div className="p-4 rounded-lg" style={{ background: 'rgba(236,72,153,0.08)', border: '1px solid rgba(236,72,153,0.2)' }}>
-                <h3 className="text-sm font-medium mb-2" style={{ color: '#ec4899' }}>💕 爱情运势</h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{data.love}</p>
-              </div>
-            )}
-            {data.career && (
-              <div className="p-4 rounded-lg" style={{ background: 'rgba(0,75,170,0.08)', border: '1px solid rgba(0,75,170,0.2)' }}>
-                <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--color-primary)' }}>💼 事业方向</h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{data.career}</p>
-              </div>
-            )}
-          </div>
-        </section>
-
         {/* AI 深度解读 */}
-        {data.aiAnalysis && (
+        {aiText && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -172,7 +153,7 @@ export default function NumerologyResultPage() {
                     strong: ({ children }) => <strong style={{ color: 'var(--color-gold-light)' }}>{children}</strong>,
                   }}
                 >
-                  {data.aiAnalysis}
+                  {aiText}
                 </ReactMarkdown>
               </div>
             </div>

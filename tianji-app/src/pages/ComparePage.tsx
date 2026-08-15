@@ -38,9 +38,6 @@ const SYSTEM_GROUPS = [
   },
 ];
 
-/** 评分维度 */
-const RATING_LABELS = ['事业运', '财运', '感情运', '健康运', '贵人运'] as const;
-
 /** 评分条数据类型 */
 interface RatingItem {
   label: string;

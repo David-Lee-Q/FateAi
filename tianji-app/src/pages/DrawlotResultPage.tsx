@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, ScrollText, Sparkles, Lightbulb, MessageCircle, RefreshCw, Bookmark, Share2 } from 'lucide-react';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -30,27 +30,9 @@ const LOT_LEVEL_STYLES: Record<string, { bg: string; text: string; stars: number
 
 /** 求签结果页 */
 export default function DrawlotResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [question, setQuestion] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadData = async () => {
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [id]);
 
   if (loading) return <PageLoading />;
   if (error || !result) {
@@ -58,15 +40,25 @@ export default function DrawlotResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0e1a' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-state-error)' }}>{error || '未找到结果'}</p>
-          <button onClick={() => navigate('/drawlot')} className="mt-4 px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
-            返回重新求签
-          </button>
+          <div className="mt-4 flex justify-center gap-3">
+            <button onClick={retry} className="px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
+              重试
+            </button>
+            <button onClick={() => navigate('/drawlot')} className="px-6 py-2 rounded-lg text-sm" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
+              返回重新求签
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const { lotNumber, lotTitle, lotLevel, poem, interpretation, story, aiInsights, suggestions } = result.data || result;
+  const details = (data.details && typeof data.details === 'object' ? data.details : {}) as Record<string, unknown>;
+  const lotNumber = String(details.lotNumber ?? '');
+  const lotLevel = String(details.level ?? '中签');
+  const poem = (typeof details.poem === 'string' && details.poem) || '';
+  const interpretationText = interpretation || (typeof details.interpretation === 'string' ? details.interpretation : '');
+  const advice = (typeof details.advice === 'string' && details.advice) || '';
   const levelStyle = LOT_LEVEL_STYLES[lotLevel] || LOT_LEVEL_STYLES['中签'];
 
   return (
@@ -85,7 +77,7 @@ export default function DrawlotResultPage() {
         </div>
       </header>
 
-      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 1280, maxWidth: 720 }}>
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 720 }}>
         {/* 签首卡片 */}
         <div
           className="relative rounded-2xl overflow-hidden mb-8"
@@ -110,8 +102,8 @@ export default function DrawlotResultPage() {
             </div>
 
             {/* 签名 */}
-            <h1 className="text-xl font-semibold mb-2" style={{ color: '#e8ecf4' }}>{lotTitle}</h1>
-            <p className="text-sm" style={{ color: '#7a8599' }}>观音灵签 · 观音菩萨灵应</p>
+            <h1 className="text-xl font-semibold mb-2" style={{ color: '#e8ecf4' }}>观音灵签</h1>
+            <p className="text-sm" style={{ color: '#7a8599' }}>观音菩萨灵应 · 求签解签</p>
 
             {/* 星星评分 */}
             <div className="flex items-center justify-center gap-1 mt-4">
@@ -147,69 +139,39 @@ export default function DrawlotResultPage() {
         )}
 
         {/* 白话解意 */}
-        {interpretation && (
+        {interpretationText && (
           <div className="rounded-2xl p-6 mb-6" style={{ background: '#111827', border: '1px solid rgba(30,39,64,0.8)' }}>
             <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#a0aac0' }}>
               <BookOpen size={16} />
               白话解意
             </h2>
-            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{interpretation}</p>
+            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{interpretationText}</p>
           </div>
         )}
 
-        {/* 签诗典故 */}
-        {story && (
+        {/* 化解建议 */}
+        {advice && (
           <div className="rounded-2xl p-6 mb-6" style={{ background: '#111827', border: '1px solid rgba(30,39,64,0.8)' }}>
-            <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#a0aac0' }}>
-              <ScrollText size={16} />
-              签诗典故
+            <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: '#a0aac0' }}>
+              <Lightbulb size={16} style={{ color: 'var(--color-gold)' }} />
+              求签指引与建议
             </h2>
-            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{story}</p>
+            <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{advice}</p>
           </div>
         )}
 
-        {/* AI 解读 */}
-        {aiInsights && aiInsights.length > 0 && (
+        {/* AI 深度解读 */}
+        {interpretation && (
           <div
             className="rounded-2xl p-6 mb-6"
             style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.03), rgba(200,168,78,0.05))', border: '1px solid rgba(200,168,78,0.1)' }}
           >
             <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: '#a0aac0' }}>
               <Sparkles size={16} style={{ color: 'var(--color-gold)' }} />
-              AI 解读
+              AI 深度解读
             </h2>
-            <div className="space-y-4">
-              {aiInsights.map((insight: string, i: number) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--color-primary-bg-strong)' }}>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <circle cx="6" cy="6" r="4" stroke="var(--color-primary)" strokeWidth="1.2" />
-                      <circle cx="6" cy="6" r="1.5" fill="var(--color-primary)" />
-                    </svg>
-                  </div>
-                  <p className="text-sm" style={{ color: '#a0aac0', lineHeight: 1.8 }}>{insight}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 化解建议 */}
-        {suggestions && suggestions.length > 0 && (
-          <div className="rounded-2xl p-6 mb-6" style={{ background: '#111827', border: '1px solid rgba(30,39,64,0.8)' }}>
-            <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: '#a0aac0' }}>
-              <Lightbulb size={16} style={{ color: 'var(--color-gold)' }} />
-              化解与建议
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {suggestions.map((s: any, i: number) => (
-                <div key={i} className="p-4 rounded-xl" style={{ background: '#0a0e1a' }}>
-                  <div className="text-xs font-medium mb-2" style={{ color: 'var(--color-gold)' }}>{s.title}</div>
-                  <p className="text-xs" style={{ color: '#7a8599', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {s.desc}
-                  </p>
-                </div>
-              ))}
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{interpretation}</ReactMarkdown>
             </div>
           </div>
         )}

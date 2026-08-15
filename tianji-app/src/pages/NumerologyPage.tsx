@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Hash, Calculator, Loader2, ChevronRight } from 'lucide-react';
+import { useState, useMemo, type JSX } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Calculator, Loader2 } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 计算生命灵数（各位数字相加至个位数） */

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   History, Trash2, ScrollText, Star, ChevronRight,
-  CircleDot, Layers, Orbit, Sparkles as SparklesIcon, Moon, Flower2, Hexagon, Loader2, Brain,
+  CircleDot, Layers, Orbit, Sparkles as SparklesIcon, Moon, Flower2, Hexagon, Brain,
 } from 'lucide-react';
 
 /* ============ 历史记录数据 ============ */

@@ -386,7 +386,7 @@ const tagPillStyle = (bg: string, color: string): React.CSSProperties => ({
 function SectionHeader({
   icon,
   iconBg,
-  iconColor,
+  iconColor: _iconColor,
   title,
   subtitle,
 }: {
@@ -422,7 +422,7 @@ function SectionHeader({
 }
 
 /** 单条建议卡片 */
-function AdviceCard({ advice, id, isOpen, onToggle }: {
+function AdviceCard({ advice, isOpen, onToggle }: {
   advice: AdviceItem;
   id: string;
   isOpen: boolean;

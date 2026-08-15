@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Compass, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 奇门宫位卡片 */
 function QimenPalaceCard({ palace, star, door, shadow }: { palace: string; star: string; door: string; shadow: string }) {
@@ -19,29 +19,10 @@ function QimenPalaceCard({ palace, star, door, shadow }: { palace: string; star:
 
 /** 奇门遁甲结果页 */
 export default function QimenResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, question, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -59,6 +40,9 @@ export default function QimenResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/qimen')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回奇门
           </button>
@@ -67,40 +51,39 @@ export default function QimenResultPage() {
     );
   }
 
-  const data = (result.data || {}) as Record<string, unknown>;
-  const question = (data.question as string) || '奇门占卜';
-  const details = (data.details as Record<string, unknown>) || {};
-  const aiContent = result.interpretation
-    || (data.aiAnalysis as string)
-    || (data.aiInterpretation as string)
-    || (data.suggestion as string)
-    || '';
+  const details = (data.details && typeof data.details === 'object' ? data.details : {}) as Record<string, unknown>;
+  const questionText = question || '奇门占卜';
+  const aiContent = interpretation;
+  const summary = (typeof data.summary === 'string' && data.summary) || '';
+  const baMen = (details.baMen && typeof details.baMen === 'object') ? (details.baMen as Record<string, string>) : {};
+  const baShen = (details.baShen && typeof details.baShen === 'object') ? (details.baShen as Record<string, string>) : {};
 
-  // 九宫方位映射
-  const palaceMap: Record<string, { name: string; star: string; door: string; shadow: string }> = {
-    '正南': details.baMen?.['离九宫'] || '景门',
-    '西南': details.baMen?.['坤二宫'] || '死门',
-    '正东': details.baMen?.['震三宫'] || '伤门',
-    '东南': details.baMen?.['巽四宫'] || '景门',
-    '中宫': details.baMen?.['中五宫'] || '伤门',
-    '正西': details.baMen?.['兑七宫'] || '惊门',
-    '东北': details.baMen?.['艮八宫'] || '死门',
-    '正北': details.baMen?.['坎一宫'] || '休门',
-    '西北': details.baMen?.['乾六宫'] || '开门',
-  };
+  const jiuXing = (details.jiuXing && typeof details.jiuXing === 'object') ? (details.jiuXing as Record<string, string>) : {};
+  const tianPan = (details.tianPan && typeof details.tianPan === 'object') ? (details.tianPan as Record<string, string>) : {};
 
   // 从 details 构建九宫数据
-  const palaces = {
-    '正南': { star: details.jiuXing?.['离九宫'] || details.tianPan?.['离九宫'] || '天英', door: details.baMen?.['离九宫'] || '景门', shadow: details.baShen?.['离九宫'] || '螣蛇' },
-    '西南': { star: details.jiuXing?.['坤二宫'] || details.tianPan?.['坤二宫'] || '天任', door: details.baMen?.['坤二宫'] || '死门', shadow: details.baShen?.['坤二宫'] || '太阴' },
-    '正东': { star: details.jiuXing?.['震三宫'] || details.tianPan?.['震三宫'] || '天冲', door: details.baMen?.['震三宫'] || '生门', shadow: details.baShen?.['震三宫'] || '九地' },
-    '东南': { star: details.jiuXing?.['巽四宫'] || details.tianPan?.['巽四宫'] || '天辅', door: details.baMen?.['巽四宫'] || '景门', shadow: details.baShen?.['巽四宫'] || '九天' },
-    '中宫': { star: details.jiuXing?.['中五宫'] || details.tianPan?.['中五宫'] || '天英', door: details.baMen?.['中五宫'] || '伤门', shadow: details.baShen?.['中五宫'] || '太阴' },
-    '正西': { star: details.jiuXing?.['兑七宫'] || details.tianPan?.['兑七宫'] || '天柱', door: details.baMen?.['兑七宫'] || '惊门', shadow: details.baShen?.['兑七宫'] || '玄武' },
-    '东北': { star: details.jiuXing?.['艮八宫'] || details.tianPan?.['艮八宫'] || '天心', door: details.baMen?.['艮八宫'] || '死门', shadow: details.baShen?.['艮八宫'] || '螣蛇' },
-    '正北': { star: details.jiuXing?.['坎一宫'] || details.tianPan?.['坎一宫'] || '天蓬', door: details.baMen?.['坎一宫'] || '开门', shadow: details.baShen?.['坎一宫'] || '值符' },
-    '西北': { star: details.jiuXing?.['乾六宫'] || details.tianPan?.['乾六宫'] || '天芮', door: details.baMen?.['乾六宫'] || '杜门', shadow: details.baShen?.['乾六宫'] || '值使' },
+  const palaces: Record<string, { star: string; door: string; shadow: string }> = {
+    '正南': { star: jiuXing['离九宫'] || tianPan['离九宫'] || '天英', door: baMen['离九宫'] || '景门', shadow: baShen['离九宫'] || '螣蛇' },
+    '西南': { star: jiuXing['坤二宫'] || tianPan['坤二宫'] || '天任', door: baMen['坤二宫'] || '死门', shadow: baShen['坤二宫'] || '太阴' },
+    '正东': { star: jiuXing['震三宫'] || tianPan['震三宫'] || '天冲', door: baMen['震三宫'] || '生门', shadow: baShen['震三宫'] || '九地' },
+    '东南': { star: jiuXing['巽四宫'] || tianPan['巽四宫'] || '天辅', door: baMen['巽四宫'] || '景门', shadow: baShen['巽四宫'] || '九天' },
+    '中宫': { star: jiuXing['中五宫'] || tianPan['中五宫'] || '天英', door: baMen['中五宫'] || '伤门', shadow: baShen['中五宫'] || '太阴' },
+    '正西': { star: jiuXing['兑七宫'] || tianPan['兑七宫'] || '天柱', door: baMen['兑七宫'] || '惊门', shadow: baShen['兑七宫'] || '玄武' },
+    '东北': { star: jiuXing['艮八宫'] || tianPan['艮八宫'] || '天心', door: baMen['艮八宫'] || '死门', shadow: baShen['艮八宫'] || '螣蛇' },
+    '正北': { star: jiuXing['坎一宫'] || tianPan['坎一宫'] || '天蓬', door: baMen['坎一宫'] || '开门', shadow: baShen['坎一宫'] || '值符' },
+    '西北': { star: jiuXing['乾六宫'] || tianPan['乾六宫'] || '天芮', door: baMen['乾六宫'] || '杜门', shadow: baShen['乾六宫'] || '值使' },
   };
+
+  // 从真实排盘数据构建吉凶格局
+  const luckyDoors = ['开门', '休门', '生门'];
+  const unluckyDoors = ['死门', '惊门', '伤门'];
+  const patterns: { type: string; title: string; content: string }[] = [];
+  const luckyGongs = Object.entries(baMen).filter(([, door]) => luckyDoors.includes(door));
+  const unluckyGongs = Object.entries(baMen).filter(([, door]) => unluckyDoors.includes(door));
+  for (const [gong, door] of luckyGongs.slice(0, 3)) patterns.push({ type: '吉', title: `${gong}·${door}`, content: `${gong}临${door}，主吉，宜主动进取。` });
+  for (const [gong, door] of unluckyGongs.slice(0, 3)) patterns.push({ type: '注意', title: `${gong}·${door}`, content: `${gong}临${door}，宜谨慎，避免冒进。` });
+  const zhiFuGong = Object.entries(baShen).find(([, shen]) => shen === '值符');
+  if (zhiFuGong) patterns.push({ type: '吉', title: `值符临${zhiFuGong[0]}`, content: `值符${zhiFuGong[0]}，大吉之象，主贵人扶持。` });
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -127,17 +110,15 @@ export default function QimenResultPage() {
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-3" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {details.juShu || '奇门遁甲'}
+            {typeof details.juShu === 'string' ? details.juShu : '奇门遁甲'}
           </h1>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            问事：{question}
+            问事：{questionText}
           </p>
-          {data.fortune && (
-            <div className="flex justify-center mt-4">
-              <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: '#fff', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-                {data.fortune as string}
-              </div>
-            </div>
+          {summary && (
+            <p className="mt-3 text-xs text-center max-w-md mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+              {summary}
+            </p>
           )}
         </section>
 
@@ -165,11 +146,7 @@ export default function QimenResultPage() {
             <span>⚡</span>吉凶格局
           </h2>
           <div className="space-y-3">
-            {data.patterns || [
-              { type: '吉', title: '三奇得使', content: '乙丙丁三奇配合六仪，利出行、交易、求财。' },
-              { type: '吉', title: '开门吉位', content: '西北乾宫开门，临九天，适合事业发展。' },
-              { type: '注意', title: '白虎凶动', content: '正东震宫白虎临位，谨言慎行，避免冲突。' },
-            ].map((item: any, idx: number) => (
+            {patterns.map((item, idx) => (
               <div
                 key={idx}
                 className="p-4 rounded-lg"
@@ -189,7 +166,7 @@ export default function QimenResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        {(aiContent || data.suggestion) && (
+        {aiContent && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.06), rgba(168,85,247,0.04))', border: '1px solid rgba(124,58,237,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -207,7 +184,7 @@ export default function QimenResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#c4b5fd' }}>{children}</strong>,
                   }}
                 >
-                  {aiContent || (data.suggestion as string) || ''}
+                  {aiContent}
                 </ReactMarkdown>
               </div>
             </div>

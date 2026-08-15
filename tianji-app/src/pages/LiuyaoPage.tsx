@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Coins, Loader2, RotateCw, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Coins, Loader2, RotateCw } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 六爻卦象模拟铜钱结果 */

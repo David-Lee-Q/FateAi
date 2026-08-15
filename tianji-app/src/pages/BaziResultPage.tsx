@@ -1,12 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   Share2, Loader2, ChevronLeft, Send, RefreshCw, Heart, FileText, ChevronRight,
 } from 'lucide-react';
-import type { FortuneResult } from '@/types';
-import { getFortuneResult, submitFollowUp } from '@/services/api';
+import { submitFollowUp } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 // 四柱卡片组件
 function PillarsCard({ pillar, type, tiangan, dizhi, gainian, animal }: {
@@ -219,29 +219,22 @@ function getTabContent(text: string, activeTab: string): string {
 
 // 八字结果页面
 export default function BaziResultPage() {
-  const { id } = useParams<{ id: string }>();
-  const [result, setResult] = useState<FortuneResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [activeTab, setActiveTab] = useState('性格特征');
-  const [wuxing, setWuxing] = useState<Record<string, { percentage: number; strength: string }>>({});
-
-  // 生肖对应表
-  const ZODIAC: Record<string, string> = {
-    '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔',
-    '辰': '龙', '巳': '蛇', '午': '马', '未': '羊',
-    '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪',
-  };
 
   // 解析八字数据
-  const parseBaziData = useCallback((data: Record<string, unknown>) => {
-    const getPillar = (key: string) => (data[key] as Record<string, string>) || {};
+  const parseBaziData = useCallback((d: Record<string, unknown>) => {
+    const ZODIAC: Record<string, string> = {
+      子: '鼠', 丑: '牛', 寅: '虎', 卯: '兔', 辰: '龙', 巳: '蛇',
+      午: '马', 未: '羊', 申: '猴', 酉: '鸡', 戌: '狗', 亥: '猪',
+    };
+    const getPillar = (key: string) => (d[key] as Record<string, string>) || {};
     const yearP = getPillar('yearPillar');
     const monthP = getPillar('monthPillar');
     const dayP = getPillar('dayPillar');
     const hourP = getPillar('hourPillar');
 
-    const naYinCache = (data._naYin as Record<string, string>) || {};
+    const naYinCache = (d._naYin as Record<string, string>) || {};
     const yearGZ = `${yearP.gan || ''}${yearP.zhi || ''}`;
     const monthGZ = `${monthP.gan || ''}${monthP.zhi || ''}`;
     const dayGZ = `${dayP.gan || ''}${dayP.zhi || ''}`;
@@ -254,7 +247,7 @@ export default function BaziResultPage() {
       { pillar: '时柱', type: '子女', tiangan: hourP.gan || '--', dizhi: hourP.zhi || '--', gainian: naYinCache.hourNaYin || naYinCache[hourGZ] || '--', animal: ZODIAC[hourP.zhi || ''] || '--' },
     ];
 
-    const wuXingCount = (data.wuXingCount as Record<string, number>) || {};
+    const wuXingCount = (d.wuXingCount as Record<string, number>) || {};
     const total = 8; // 4 pillars × 2 (gan + zhi)
     const getStrength = (count: number): string => {
       if (count >= 4) return '旺';
@@ -272,36 +265,25 @@ export default function BaziResultPage() {
       土: { percentage: Math.round(((wuXingCount['土'] || 0) / total) * 100), strength: getStrength(wuXingCount['土'] || 0) },
     };
 
-    return { pillars, wuxingData };
+    return { pillars, wuxingData, wuXingCount };
   }, []);
 
-  useEffect(() => {
-    if (!id) return;
+  const { pillars, wuxingData, wuXingCount } = parseBaziData(data);
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await getFortuneResult(id);
-        const fortuneResult = response.data;
-        if (!fortuneResult) {
-          throw new Error('数据为空');
-        }
-        setResult(fortuneResult);
+  // 命格评分：由五行俱全程度真实派生
+  const presentCount = Object.values(wuXingCount).filter((c) => c > 0).length;
+  const baziScore = Math.max(50, Math.min(99, 100 - (5 - presentCount) * 10));
 
-        if (fortuneResult.data) {
-          const { wuxingData } = parseBaziData(fortuneResult.data);
-          setWuxing(wuxingData);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '加载失败');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // 命格标题：由日主干支与五行旺衰真实派生
+  const dayPillar = (data.dayPillar as Record<string, string>) || {};
+  const title = `${dayPillar.gan || ''}${dayPillar.zhi || ''}日 · ${dayPillar.ganWuXing || ''}命 · 五行${presentCount}种`;
 
-    fetchData();
-  }, [id, parseBaziData]);
+  // 命局概况：优先取后端 summary
+  const baziSummary = (typeof data.summary === 'string' && data.summary) || '';
+
+  // 从输入参数获取基本信息
+  const input = (result?.input ?? {}) as Record<string, unknown>;
+  const birthInfo = `${input.year || ''}年${input.month || ''}月${input.day || ''}日`;
 
   if (loading) {
     return (
@@ -319,6 +301,9 @@ export default function BaziResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-error)' }}>{error || '数据加载失败'}</p>
+          <button onClick={retry} className="mt-4 mr-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <Link to="/bazi" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             <ChevronLeft className="w-4 h-4" /> 返回重新测算
           </Link>
@@ -327,11 +312,7 @@ export default function BaziResultPage() {
     );
   }
 
-  const { pillars, wuxingData } = parseBaziData(result.data || {});
-  const interpretation = result.interpretation || '暂无详细解读';
-
-  // 从输入参数获取基本信息
-  const birthInfo = result.input ? `${result.input.year}年${result.input.month}月${result.input.day}日` : '2026年7月10日';
+  const mdInterpretation = interpretation || '暂无详细解读';
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
@@ -421,7 +402,7 @@ export default function BaziResultPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold" style={{ color: 'var(--color-gold)' }}>
-                  {result.score || 85}
+                  {baziScore}
                 </span>
                 <span className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>命格评分</span>
               </div>
@@ -429,11 +410,11 @@ export default function BaziResultPage() {
             {/* 评分说明 */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{result.title || '水火既济 · 中上命格'}</h2>
+                <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{title}</h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-medium" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>优+</span>
               </div>
               <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--color-text-secondary)' }}>
-                {result.summary || '命局中木火土金水五行俱全，日主得令有力，整体格局较为平衡。'}
+                {baziSummary || '命局中五行分布已解析，可参考下方四柱与五行详情。'}
               </p>
               <div className="flex flex-wrap gap-3">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--color-primary-bg)', color: 'var(--color-primary)' }}>水火既济</span>
@@ -480,13 +461,13 @@ export default function BaziResultPage() {
             五行力量分布
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {Object.entries(wuxingData).map(([element, data]) => (
-              <WuxingBar key={element} element={element} percentage={data.percentage} strength={data.strength} />
+            {Object.entries(wuxingData).map(([element, wd]) => (
+              <WuxingBar key={element} element={element} percentage={wd.percentage} strength={wd.strength} />
             ))}
           </div>
           <div className="mt-4 p-3 rounded-lg text-sm" style={{ background: 'var(--color-bg-inset)', color: 'var(--color-text-secondary)' }}>
             <span style={{ color: 'var(--color-primary)' }}>命理分析：</span>
-            日主得令，水势旺盛。命局中金水为喜用，木火土为忌神。宜补水金，忌火土。
+            {baziSummary ? baziSummary.split('\n').find((line) => line.includes('五行')) || baziSummary : '五行分布详情见上方，日主强弱与喜用神可参考 AI 解读。'}
           </div>
         </section>
 
@@ -516,13 +497,13 @@ export default function BaziResultPage() {
           </div>
           <div className="space-y-4 prose prose-sm prose-invert max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {getTabContent(result.interpretation || '', activeTab)}
+              {getTabContent(mdInterpretation, activeTab)}
             </ReactMarkdown>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive resultId={result.id || ''} interpretation={result.interpretation || ''} />
+        <AIDeepDive resultId={result.id || ''} interpretation={mdInterpretation} />
       </main>
 
       {/* 固定底部操作栏 */}

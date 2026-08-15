@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Compass, Sparkles, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 壬课宫位卡片 */
 function DaliurenPalaceCard({ palace, ganZhi, shenJiang, xingChen }: { palace: string; ganZhi: string; shenJiang: string; xingChen: string }) {
@@ -19,31 +19,12 @@ function DaliurenPalaceCard({ palace, ganZhi, shenJiang, xingChen }: { palace: s
 
 /** 大六壬结果页 */
 export default function DaliurenResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, question, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
   const [followUpLoading, setFollowUpLoading] = useState(false);
   const [followUpResult, setFollowUpResult] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   const handleFollowUp = async () => {
     if (!followUpText.trim() || followUpLoading) return;
@@ -75,6 +56,9 @@ export default function DaliurenResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: '#ef4444' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/daliuren')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-gold)', color: '#0a0e1a' }}>
             返回大六壬
           </button>
@@ -83,24 +67,44 @@ export default function DaliurenResultPage() {
     );
   }
 
-  const data = (result.data || {}) as Record<string, unknown>;
-  const question = (data.question as string) || '大六壬占卜';
-  const details = (data.details as Record<string, unknown>) || {};
-  const aiContent = result.interpretation || (data.aiAnalysis as string) || (data.aiInterpretation as string) || (data.suggestion as string) || '';
+  const questionText = question || '大六壬占卜';
+  const aiContent = interpretation;
+  const timeInfo = (data.time && typeof data.time === 'object') ? (data.time as Record<string, string>) : {};
+  const judgments = (data.judgments && typeof data.judgments === 'object') ? (data.judgments as Record<string, unknown>) : {};
+  const overallFortune = (typeof judgments.overall === 'string' && judgments.overall) ? (judgments.overall as string) : '';
+  const fortuneLevel = (typeof judgments.fortune === 'string' && judgments.fortune) ? (judgments.fortune as string) : '';
+  const zongmen = (typeof judgments.lesson === 'string' && judgments.lesson)
+    ? (judgments.lesson as string)
+    : (overallFortune.split(/[，。,.；;]/)[0] || '六壬课');
+  const goodAspects = Array.isArray(judgments.goodAspects) ? (judgments.goodAspects as string[]) : [];
+  const badAspects = Array.isArray(judgments.badAspects) ? (judgments.badAspects as string[]) : [];
+  const liuqin = Array.isArray(data.liuqin) ? (data.liuqin as string[]) : [];
 
-  const keInfo = details.ke || { ke1: '子', ke2: '丑', ke3: '寅', ke4: '卯' };
-  const shenInfo = details.shen || { shen1: '贵神', shen2: '腾蛇', shen3: '太阴', shen4: '六合' };
+  const keInfo = (data.ke && typeof data.ke === 'object') ? (data.ke as Record<string, string>) : {};
+  const shenInfo = (data.shen && typeof data.shen === 'object') ? (data.shen as Record<string, string>) : {};
+  const tianpan = (data.tianpan && typeof data.tianpan === 'object') ? (data.tianpan as Record<string, string>) : {};
+  const dipan = (data.dipan && typeof data.dipan === 'object') ? (data.dipan as Record<string, string>) : {};
 
-  const palaceData = {
-    '东南': { ganZhi: keInfo.ke4 || '卯', shenJiang: shenInfo.shen4 || '六合', xingChen: '太冲' },
-    '正南': { ganZhi: '午', shenJiang: '白虎', xingChen: '胜光' },
-    '西南': { ganZhi: '未', shenJiang: '玄武', xingChen: '小吉' },
-    '正东': { ganZhi: keInfo.ke3 || '寅', shenJiang: shenInfo.shen3 || '太阴', xingChen: '功曹' },
-    '正西': { ganZhi: '申', shenJiang: '青龙', xingChen: '传送' },
-    '东北': { ganZhi: keInfo.ke2 || '丑', shenJiang: shenInfo.shen2 || '腾蛇', xingChen: '大吉' },
-    '正北': { ganZhi: keInfo.ke1 || '子', shenJiang: shenInfo.shen1 || '贵神', xingChen: '神后' },
-    '西北': { ganZhi: '戌', shenJiang: '天空', xingChen: '河魁' },
-  };
+  const PALACE_DIRS = ['东南', '正南', '西南', '正东', '正西', '东北', '正北', '西北'];
+  const palaceData = PALACE_DIRS.reduce<Record<string, { ganZhi: string; shenJiang: string; xingChen: string }>>((acc, dir) => {
+    const wei = dir === '正东' ? '震' : dir === '正南' ? '离' : dir === '正西' ? '兑' : dir === '正北' ? '坎' : dir === '东南' ? '巽' : dir === '西南' ? '坤' : dir === '东北' ? '艮' : '乾';
+    const keKey = { '东南': 'ke4', '正东': 'ke3', '东北': 'ke2', '正北': 'ke1' }[dir];
+    const shenKey = { '东南': 'shen4', '正东': 'shen3', '东北': 'shen2', '正北': 'shen1' }[dir];
+    acc[dir] = {
+      ganZhi: (keKey ? keInfo[keKey] : '') || tianpan[wei] || dipan[wei] || '--',
+      shenJiang: (shenKey ? shenInfo[shenKey] : '') || '--',
+      xingChen: dipan[wei] || tianpan[wei] || '--',
+    };
+    return acc;
+  }, {});
+
+  const patterns: { type: string; title: string; content: string }[] = [];
+  for (const good of goodAspects) patterns.push({ type: '吉', title: '吉利之处', content: good });
+  for (const bad of badAspects) patterns.push({ type: '注意', title: '需要注意', content: bad });
+  for (const item of liuqin) patterns.push({ type: '注意', title: '三传六亲', content: item });
+  if (patterns.length === 0 && overallFortune) {
+    patterns.push({ type: '吉', title: '课象总断', content: overallFortune });
+  }
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -125,15 +129,22 @@ export default function DaliurenResultPage() {
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-3" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {details.juShu || '六壬课'}
+            {zongmen}
           </h1>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            问事：{question}
+            问事：{questionText}
+            {timeInfo.shichen ? ` ｜ 起课：${timeInfo.shichen}` : ''}
+            {timeInfo.yuejiang ? ` ｜ 月将：${timeInfo.yuejiang}` : ''}
           </p>
-          {data.fortune && (
-            <div className="flex justify-center mt-4">
+          {overallFortune && (
+            <div className="flex justify-center gap-3 mt-4">
+              {fortuneLevel && (
+                <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: fortuneLevel === '吉' || fortuneLevel === '上' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)', color: fortuneLevel === '吉' || fortuneLevel === '上' ? '#10b981' : '#fbbf24', border: `1px solid ${fortuneLevel === '吉' || fortuneLevel === '上' ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)'}` }}>
+                  吉凶：{fortuneLevel}
+                </div>
+              )}
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', color: '#0a0e1a', boxShadow: '0 4px 16px rgba(245,158,11,0.3)' }}>
-                {data.fortune as string}
+                {overallFortune}
               </div>
             </div>
           )}
@@ -161,11 +172,7 @@ export default function DaliurenResultPage() {
             <span>⚡</span>吉凶判断
           </h2>
           <div className="space-y-3">
-            {(data.patterns || [
-              { type: '吉', title: '贵神当权', content: '课象得贵神相助，诸事顺遂，贵人扶持。' },
-              { type: '吉', title: '吉神入课', content: '青龙、白虎等吉神入课，财运事业皆有助力。' },
-              { type: '注意', title: '细审时机', content: '注意流年流月变化，选择有利时机行动。' },
-            ]).map((item: any, idx: number) => (
+            {patterns.map((item, idx) => (
               <div key={idx} className="p-4 rounded-lg" style={{ background: item.type === '吉' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', border: `1px solid ${item.type === '吉' ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}` }}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs px-2 py-0.5 rounded" style={{ background: item.type === '吉' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)', color: item.type === '吉' ? '#10b981' : '#fbbf24' }}>{item.type}</span>
@@ -177,7 +184,7 @@ export default function DaliurenResultPage() {
           </div>
         </section>
 
-        {(aiContent || data.suggestion) && (
+        {aiContent && (
           <section className="mb-8 p-6 md:p-8 rounded-xl" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(200,168,78,0.04))', border: '1px solid rgba(245,158,11,0.15)' }}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
@@ -188,7 +195,7 @@ export default function DaliurenResultPage() {
             </div>
             <div className="prose prose-invert max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {aiContent || (data.suggestion as string) || ''}
+                {aiContent}
               </ReactMarkdown>
             </div>
           </section>

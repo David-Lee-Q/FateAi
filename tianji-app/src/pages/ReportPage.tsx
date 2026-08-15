@@ -4,7 +4,7 @@ import {
   Layers, CircleDot, Sunset, Star,
   GitCompareArrows, CheckCircle2, AlertTriangle,
   Download, Bookmark, Share2, CalendarRange,
-  Wrench, BookOpen, BarChart3, Compass,
+  Wrench, Compass,
 } from 'lucide-react';
 
 /* ============================================

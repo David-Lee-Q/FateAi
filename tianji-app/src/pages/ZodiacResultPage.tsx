@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   Share2, Loader2, ChevronLeft, Send, RefreshCw, Heart, FileText, ChevronRight,
 } from 'lucide-react';
-import type { FortuneResult } from '@/types';
-import { getFortuneResult, submitFollowUp } from '@/services/api';
+import { submitFollowUp } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 // 星级评分组件
 function StarRating({ rating, label, color }: { rating: number; label: string; color: string }) {
@@ -131,29 +131,7 @@ function AIDeepDive({ interpretation, resultId }: { interpretation: string; resu
 
 // 星座结果页面
 export default function ZodiacResultPage() {
-  const { id } = useParams<{ id: string }>();
-  const [result, setResult] = useState<FortuneResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await getFortuneResult(id);
-        setResult(resp.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '加载失败');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
 
   if (loading) {
     return (
@@ -171,16 +149,21 @@ export default function ZodiacResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-error)' }}>{error || '数据加载失败'}</p>
-          <Link to="/zodiac" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
-            <ChevronLeft className="w-4 h-4" /> 返回重新测算
-          </Link>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button onClick={retry} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+              <RefreshCw className="w-4 h-4" /> 重试
+            </button>
+            <Link to="/zodiac" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+              <ChevronLeft className="w-4 h-4" /> 返回重新测算
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
-  const data = (result.data || {}) as Record<string, string>;
-  const interpretation = result.interpretation || '';
+  const zodiacData = (data && typeof data === 'object' ? data : {}) as Record<string, unknown>;
+  const interpretationText = interpretation || (typeof data.interpretation === 'string' ? data.interpretation : '');
 
   // 星座信息
   const signMap: Record<string, { emoji: string; date: string; element: string; symbol: string }> = {
@@ -198,23 +181,37 @@ export default function ZodiacResultPage() {
     双鱼座: { emoji: '♓', date: '2月19日 - 3月20日', element: '水象星座', symbol: '♓' },
   };
 
-  const signName = String(data.sign || result.input?.sign || '狮子座');
+  const signName = String((zodiacData.sign as string) || result.input?.sign || '狮子座');
   const signInfo = signMap[signName] || signMap['狮子座'];
 
-  // 五项评分
-  const ratings = {
-    财运: parseInt(data.wealth as string) || 4,
-    事业: parseInt(data.career as string) || 4,
-    感情: parseInt(data.love as string) || 3,
-    健康: parseInt(data.health as string) || 4,
-    学习: parseInt(data.study as string) || 4,
+  const scoreOf = (v: unknown): number => {
+    if (typeof v === 'number') return v;
+    if (v && typeof v === 'object') {
+      const sc = (v as Record<string, unknown>).score;
+      return typeof sc === 'number' ? sc : 3;
+    }
+    const n = parseInt(String(v ?? ''), 10);
+    return Number.isFinite(n) ? n : 3;
   };
 
-  // 行星状态
+  // 五项评分（后端 score 1-5 星制）
+  const ratings = {
+    财运: Math.round(scoreOf(zodiacData.wealth) / 20) || 3,
+    事业: Math.round(scoreOf(zodiacData.career) / 20) || 3,
+    感情: Math.round(scoreOf(zodiacData.love) / 20) || 3,
+    健康: Math.round(scoreOf(zodiacData.health) / 20) || 3,
+    学习: 3,
+  };
+  const overallScore = Math.round(scoreOf(zodiacData.overallScore));
+  const adviceText = (typeof zodiacData.advice === 'string' && zodiacData.advice) || '';
+  const luckyColor = (typeof zodiacData.luckyColor === 'string' && zodiacData.luckyColor) || '';
+  const luckyNumber = String(zodiacData.luckyNumber ?? '');
+
+  // 行星状态（静态视觉展示）
   const planets = [
     { planet: '太阳', emoji: '☀️', sign: signName, status: '庙旺位置', effect: '领导力、创造力爆发期' },
-    { planet: '月亮', emoji: '🌙', sign: '白羊座', status: '旺相', effect: '情感表达直接有力' },
-    { planet: '金星', emoji: '♀', sign: '双子座', status: '失势', effect: '感情观念趋于理性' },
+    { planet: '月亮', emoji: '🌙', sign: signName, status: '旺相', effect: '情感表达直接有力' },
+    { planet: '金星', emoji: '♀', sign: signName, status: '入相位', effect: '感情观念趋于理性' },
   ];
 
   return (
@@ -301,10 +298,20 @@ export default function ZodiacResultPage() {
               </defs>
             </svg>
             <div className="text-center">
-              <div className="text-4xl font-bold" style={{ color: 'var(--color-gold)' }}>{(data.score) || 85}</div>
+              <div className="text-4xl font-bold" style={{ color: 'var(--color-gold)' }}>{overallScore || 85}</div>
               <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>综合评分</div>
+              {(luckyColor || luckyNumber) && (
+                <div className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>
+                  {luckyColor && <span>幸运色：{luckyColor}</span>}
+                  {luckyColor && luckyNumber && <span> · </span>}
+                  {luckyNumber && <span>幸运数字：{luckyNumber}</span>}
+                </div>
+              )}
             </div>
           </div>
+          {adviceText && (
+            <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{adviceText}</p>
+          )}
         </section>
 
         {/* 行星相位 */}
@@ -318,7 +325,7 @@ export default function ZodiacResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive interpretation={interpretation} resultId={result.id} />
+        <AIDeepDive interpretation={interpretationText} resultId={result.id} />
       </main>
 
       {/* 固定底部操作栏 */}

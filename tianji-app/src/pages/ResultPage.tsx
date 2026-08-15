@@ -325,6 +325,132 @@ function GeneralDataCards({ data, system }: { data: Record<string, unknown>; sys
   );
 }
 
+function DreamLayout({ data }: { data: Record<string, unknown> }) {
+  const entries = data.entries as Array<Record<string, unknown>>;
+  const firstEntry = entries[0];
+  const dream: string = String((Array.isArray(data.keywords) ? data.keywords[0] : undefined) || firstEntry?.symbol || '');
+  const symbols = entries.map(e => e.symbol).filter(Boolean);
+  const emotion = data.emotion as string | undefined;
+  const dreamTime = data.dreamTime as string | undefined;
+  const clarity = data.clarity as string | undefined;
+  return (
+    <div className="mb-6">
+      <div className="p-6 rounded-2xl relative overflow-hidden" style={{ 
+        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, rgba(139, 92, 246, 0.08) 100%)',
+        border: '1px solid rgba(99, 102, 241, 0.3)'
+      }}>
+        {/* 装饰云 SVG */}
+        <div className="absolute -top-3 -left-3 w-24 h-16 opacity-30" style={{ animation: 'float 6s ease-in-out infinite' }}>
+          <svg viewBox="0 0 96 64" fill="none">
+            <ellipse cx="48" cy="40" rx="40" ry="20" fill="rgba(99, 102, 241, 0.3)" />
+            <ellipse cx="32" cy="32" rx="24" ry="16" fill="rgba(99, 102, 241, 0.3)" />
+            <ellipse cx="64" cy="36" rx="28" ry="18" fill="rgba(99, 102, 241, 0.3)" />
+          </svg>
+        </div>
+        <div className="absolute top-10 right-16 w-16 h-12 opacity-20" style={{ animation: 'float 6s ease-in-out infinite', animationDelay: '2s' }}>
+          <svg viewBox="0 0 64 48" fill="none">
+            <ellipse cx="32" cy="28" rx="28" ry="16" fill="rgba(14, 165, 233, 0.3)" />
+          </svg>
+        </div>
+        
+        <div className="relative z-10 flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+              <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" />
+            </svg>
+          </div>
+          <div>
+            <h4 className="text-base font-bold" style={{ color: '#818cf8', textShadow: '0 0 20px rgba(99, 102, 241, 0.5)' }}>梦境解析</h4>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>潜意识密码 · 心理图谱</p>
+          </div>
+        </div>
+        
+        {/* 梦境标签信息 */}
+        <div className="flex flex-wrap gap-2 mb-5">
+          {dreamTime && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" 
+              style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc', border: '1px solid rgba(99, 102, 241, 0.4)' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              做梦时间：{dreamTime}
+            </span>
+          )}
+          {clarity && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" 
+              style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.4)' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              清醒度：{clarity}
+            </span>
+          )}
+          {emotion && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" 
+              style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+              情绪：{emotion}
+            </span>
+          )}
+        </div>
+        
+        {/* 梦境描述引用 */}
+        {dream && (
+          <div className="p-4 rounded-xl mb-5" style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/>
+                  <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3z"/>
+                </svg>
+              </div>
+              <p className="text-sm italic leading-relaxed" style={{ color: '#c7d2fe' }}>
+                "{String(dream).substring(0, 200)}"
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {/* 核心元素解析网格 */}
+        {symbols.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {symbols.slice(0, 6).map((s: unknown, i: number) => {
+              const symbolColors = ['rgba(14, 165, 233, 0.2)', 'rgba(251, 191, 36, 0.2)', 'rgba(156, 163, 175, 0.2)', 'rgba(99, 102, 241, 0.2)', 'rgba(16, 185, 129, 0.2)', 'rgba(139, 92, 246, 0.2)'];
+              return (
+                <div 
+                  key={i} 
+                  className="p-4 rounded-xl text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  style={{ 
+                    background: symbolColors[i % symbolColors.length],
+                    border: '1px solid rgba(128, 128, 128, 0.25)',
+                  }}
+                >
+                  <div className="text-lg mb-1">{String(s)}</div>
+                  {entries[i]?.meaning ? (
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+                      {String(entries[i].meaning).substring(0, 30)}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
+        {/* 综合解读卡片 */}
+        {entries.length > 1 && Boolean(entries[0]?.interpretation) && (
+          <div className="mt-5 p-4 rounded-xl" style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+            <h5 className="text-sm font-medium mb-2 flex items-center gap-2" style={{ color: '#a5b4fc' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              综合解读
+            </h5>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+              {String(entries[0].interpretation).substring(0, 150)}...
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // 智能内容卡片组件 - 根据数据类型选择合适的展示样式
 function SmartContentCard({ 
   data, 
@@ -332,8 +458,7 @@ function SmartContentCard({
 }: { 
   data: Record<string, unknown>; 
   system: string;
-}) {
-  const entries = Object.entries(data);
+}) {  const entries = Object.entries(data);
   if (entries.length === 0) return null;
 
   // 检测是否为八字四柱数据
@@ -343,7 +468,6 @@ function SmartContentCard({
   
   // 检测是否有命盘信息
   const isZiwei = system === 'ziwei';
-  const hasMingPan = entries.some(([k]) => ['命宫', '身宫', '紫微星', '天府星'].includes(String(k)));
 
   // 八字四柱布局
   if (isBazi && hasPillar) {
@@ -362,9 +486,9 @@ function SmartContentCard({
     const totalWuxing = Object.values(wuxingData).reduce((a, b) => a + b, 0);
     const aiInterpretation = data.aiInterpretation || data.解读 || '';
     const score = data.score as number | undefined;
-    const mingGe = data.mingGe || data.命格 || '水火既济';
-    const mingGeLevel = data.mingGeLevel || data.评级 || '中上命格';
-    const analysisText = data.analysis || data.分析 || '';
+    const mingGe = String(data.mingGe || data.命格 || '水火既济');
+    const mingGeLevel = String(data.mingGeLevel || data.评级 || '中上命格');
+    const analysisText = String(data.analysis || data.分析 || '');
     
     const wuxingColors: Record<string, { bg: string; gradient: string }> = {
       '金': { bg: 'rgba(200,168,78,0.1)', gradient: 'linear-gradient(90deg, #e8d48b, #c8a84e)' },
@@ -617,7 +741,7 @@ function SmartContentCard({
           </div>
           
           {/* 命宫信息 */}
-          {(mg.mainStar || mg.stars) && (
+          {Boolean(mg.mainStar || mg.stars) && (
             <div className="relative z-10 p-4 rounded-xl mb-5" style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(167, 139, 250, 0.2)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs font-medium" style={{ color: '#c4b5fd' }}>命宫主星</span>
@@ -699,7 +823,7 @@ function SmartContentCard({
   }
 
   // ==================== 塔罗牌布局 ====================
-  if (data.cards?.length) {
+  if (Array.isArray(data.cards) && data.cards.length) {
     const cards = data.cards as Array<Record<string, unknown>>;
     const spreadType = data.spreadType || data.牌阵 || '三牌阵';
     const readingDate = data.date || data.日期 || new Date().toLocaleDateString('zh-CN');
@@ -842,8 +966,9 @@ function SmartContentCard({
   }
 
   // ==================== 手相布局 ====================
-  if (data.lines?.life || data.lines?.heart || data.lines?.mind || data.handType) {
-    const lines = data.lines as Record<string, { description?: string; length?: string; status?: string }> | undefined;
+  const linesObj = (data.lines ?? {}) as Record<string, { description?: string; length?: string; status?: string }>;
+  if (linesObj.life || linesObj.heart || linesObj.mind || data.handType) {
+    const lines = linesObj;
     const handType = data.handType as string | undefined;
     const gender = data.gender as string | undefined;
     const overallAnalysis = data.overallAnalysis as { love?: number; career?: number; health?: number } | undefined;
@@ -1009,8 +1134,8 @@ function SmartContentCard({
   // ==================== 铁板神数布局 ====================
   if (data.mainCode !== undefined || data.mainNumber) {
     const mainCode = typeof data.mainNumber === 'object' && data.mainNumber !== null
-      ? (data.mainNumber as Record<string, unknown>).mainNumber
-      : data.mainCode;
+      ? String((data.mainNumber as Record<string, unknown>).mainNumber ?? '')
+      : String(data.mainCode ?? '');
     const subNums = Array.isArray(data.subNumbers) ? data.subNumbers as Array<Record<string, unknown>> : [];
     const categories = ['一生命运', '事业发展', '感情婚姻', '健康状况'];
     const fortunes = [
@@ -1197,7 +1322,7 @@ function SmartContentCard({
                       {String(c.chuan || ['初传', '中传', '末传'][i])}
                     </span>
                     <span className="text-lg font-bold" style={{ color: '#fcd34d' }}>
-                      {c.gan}{c.zhi}
+                      {String(c.gan)}{String(c.zhi)}
                     </span>
                     {c.shen ? (
                       <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24' }}>
@@ -1234,8 +1359,6 @@ function SmartContentCard({
     if (sign) {
       const elementColors: Record<string, string> = { 火: '#ef4444', 土: '#c4a878', 风: '#3b82f6', 水: '#06b6d4' };
       const elementColor = element ? elementColors[element] || '#8b5cf6' : '#8b5cf6';
-      const scoreColors = ['#f43f5e', '#f97316', '#eab308', '#22c55e'];
-      
       return (
         <div className="mb-6">
           {/* 星座头部卡片 */}
@@ -1344,135 +1467,12 @@ function SmartContentCard({
   }
 
   // ==================== 梦境解析布局 ====================
-  if (data.entries?.length) {
-    const entries = data.entries as Array<Record<string, unknown>>;
-    const firstEntry = entries[0];
-    const dream = data.keywords?.[0] || firstEntry?.symbol || '';
-    const symbols = entries.map(e => e.symbol).filter(Boolean);
-    const emotion = data.emotion as string | undefined;
-    const dreamTime = data.dreamTime as string | undefined;
-    const clarity = data.clarity as string | undefined;
-    return (
-      <div className="mb-6">
-        <div className="p-6 rounded-2xl relative overflow-hidden" style={{ 
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, rgba(139, 92, 246, 0.08) 100%)',
-          border: '1px solid rgba(99, 102, 241, 0.3)'
-        }}>
-          {/* 装饰云 SVG */}
-          <div className="absolute -top-3 -left-3 w-24 h-16 opacity-30" style={{ animation: 'float 6s ease-in-out infinite' }}>
-            <svg viewBox="0 0 96 64" fill="none">
-              <ellipse cx="48" cy="40" rx="40" ry="20" fill="rgba(99, 102, 241, 0.3)" />
-              <ellipse cx="32" cy="32" rx="24" ry="16" fill="rgba(99, 102, 241, 0.3)" />
-              <ellipse cx="64" cy="36" rx="28" ry="18" fill="rgba(99, 102, 241, 0.3)" />
-            </svg>
-          </div>
-          <div className="absolute top-10 right-16 w-16 h-12 opacity-20" style={{ animation: 'float 6s ease-in-out infinite', animationDelay: '2s' }}>
-            <svg viewBox="0 0 64 48" fill="none">
-              <ellipse cx="32" cy="28" rx="28" ry="16" fill="rgba(14, 165, 233, 0.3)" />
-            </svg>
-          </div>
-          
-          <div className="relative z-10 flex items-center gap-3 mb-5">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-                <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-base font-bold" style={{ color: '#818cf8', textShadow: '0 0 20px rgba(99, 102, 241, 0.5)' }}>梦境解析</h4>
-              <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>潜意识密码 · 心理图谱</p>
-            </div>
-          </div>
-          
-          {/* 梦境标签信息 */}
-          <div className="flex flex-wrap gap-2 mb-5">
-            {dreamTime && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" 
-                style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc', border: '1px solid rgba(99, 102, 241, 0.4)' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                做梦时间：{dreamTime}
-              </span>
-            )}
-            {clarity && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" 
-                style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.4)' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                清醒度：{clarity}
-              </span>
-            )}
-            {emotion && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" 
-                style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
-                情绪：{emotion}
-              </span>
-            )}
-          </div>
-          
-          {/* 梦境描述引用 */}
-          {dream ? (
-            <div className="p-4 rounded-xl mb-5" style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/>
-                    <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3z"/>
-                  </svg>
-                </div>
-                <p className="text-sm italic leading-relaxed" style={{ color: '#c7d2fe' }}>
-                  "{String(dream).substring(0, 200)}"
-                </p>
-              </div>
-            </div>
-          ) : null}
-          
-          {/* 核心元素解析网格 */}
-          {symbols.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {symbols.slice(0, 6).map((s: unknown, i: number) => {
-                const symbolColors = ['rgba(14, 165, 233, 0.2)', 'rgba(251, 191, 36, 0.2)', 'rgba(156, 163, 175, 0.2)', 'rgba(99, 102, 241, 0.2)', 'rgba(16, 185, 129, 0.2)', 'rgba(139, 92, 246, 0.2)'];
-                const symbolTextColors = ['#7dd3fc', '#fcd34d', '#9ca3af', '#a5b4fc', '#6ee7b7', '#c4b5fd'];
-                return (
-                  <div 
-                    key={i} 
-                    className="p-4 rounded-xl text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                    style={{ 
-                      background: symbolColors[i % symbolColors.length],
-                      border: '1px solid rgba(128, 128, 128, 0.25)',
-                    }}
-                  >
-                    <div className="text-lg mb-1">{String(s)}</div>
-                    {entries[i]?.meaning && (
-                      <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-                        {String(entries[i].meaning).substring(0, 30)}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          
-          {/* 综合解读卡片 */}
-          {entries.length > 1 && entries[0]?.interpretation && (
-            <div className="mt-5 p-4 rounded-xl" style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-              <h5 className="text-sm font-medium mb-2 flex items-center gap-2" style={{ color: '#a5b4fc' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                综合解读
-              </h5>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-                {String(entries[0].interpretation).substring(0, 150)}...
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
+  if (Array.isArray(data.entries) && data.entries.length) {
+    return <DreamLayout data={data} />;
   }
 
   // ==================== 六爻布局 ====================
-  if (data.originalGua?.name) {
+  if (data.originalGua && typeof data.originalGua === 'object' && 'name' in (data.originalGua as object)) {
     const originalGua = data.originalGua as Record<string, unknown>;
     const changedGua = data.changedGua as Record<string, unknown> | undefined;
     const question = data.question as string | undefined;
@@ -1528,11 +1528,11 @@ function SmartContentCard({
                 问：{String(question).substring(0, 20)}
               </span>
             )}
-            {changedGua?.name && (
+            {changedGua && typeof changedGua === 'object' && 'name' in changedGua ? (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
                 变卦：{String(changedGua.name)}
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -1636,7 +1636,7 @@ function SmartContentCard({
   }
 
   // ==================== 梅花易数布局 ====================
-  if (data.mainGua?.name) {
+  if (data.mainGua && typeof data.mainGua === 'object' && 'name' in (data.mainGua as object)) {
     const mainGua = data.mainGua as Record<string, unknown>;
     const huGua = data.huGua as Record<string, unknown> | undefined;
     const bianGua = data.bianGua as Record<string, unknown> | undefined;
@@ -1674,16 +1674,16 @@ function SmartContentCard({
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(236, 72, 153, 0.2)', color: '#ec4899', border: '1px solid rgba(236, 72, 153, 0.4)' }}>
               本卦：{guaName}
             </span>
-            {huGua?.name && (
+            {huGua && typeof huGua === 'object' && 'name' in huGua ? (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#a78bfa', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
                 互卦：{String(huGua.name)}
               </span>
-            )}
-            {bianGua?.name && (
+            ) : null}
+            {bianGua && typeof bianGua === 'object' && 'name' in bianGua ? (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
                 变卦：{String(bianGua.name)}
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -1869,7 +1869,6 @@ function SmartContentCard({
             {nineStars.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
                 {nineStars.map(([gong, xing], idx) => {
-                  const isAuspicious = ['开', '休', '生', '杜', '景', '死', '惊', '伤', '中'].some(s => xing.includes(s));
                   const colors = ['#a78bfa', '#c4b5fd', '#8b5cf6'];
                   return (
                     <div key={gong} className="p-3 rounded-xl text-center transition-all duration-300 hover:-translate-y-1" 
@@ -1933,7 +1932,6 @@ function SmartContentCard({
   // ==================== 风水布局 ====================
   if (data.direction) {
     const location = data.direction as string;
-    const analysis = data.layoutAdvice as string[] | undefined;
     const flyingStars = data.flyingStars as Record<string, { number: number; element: string; status: string }> | undefined;
     const auspicious = data.auspiciousLocations as string[] | undefined;
     const caution = data.cautionLocations as string[] | undefined;
@@ -2337,8 +2335,8 @@ function SmartContentCard({
     
     // 提取各骰子数据
     const planetData = dice1;
-    const signData = dice2;
-    const houseData = dice3;
+    const signData = dice2 ?? {};
+    const houseData = dice3 ?? {};
     const planetName = String(planetData?.name || planetData?.symbol || '太阳');
     const signName = String(signData?.name || signData?.symbol || '白羊座');
     const houseName = String(houseData?.name || houseData?.symbol || '第5宫');
@@ -2471,8 +2469,7 @@ function SmartContentCard({
             )}
           </div>
 
-          {/* 3. 综合含义卡片 */}
-          {data.interpretation && (
+          {Boolean(data.interpretation) && (
             <div className="rounded-xl p-5" style={{ 
               background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(59, 130, 246, 0.05))',
               border: '1px solid rgba(124, 58, 237, 0.3)'
@@ -2490,7 +2487,6 @@ function SmartContentCard({
           )}
         </div>
 
-        {/* 4. 行星详解 */}
         {planetData && (
           <div className="p-6 rounded-2xl" style={{ 
             background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%)', 
@@ -2538,8 +2534,7 @@ function SmartContentCard({
           </div>
         )}
 
-        {/* 5. 星座详解 */}
-        {signData && (
+        {Object.keys(signData).length > 0 && (
           <div className="p-6 rounded-2xl" style={{ 
             background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%)', 
             border: '1px solid rgba(100, 116, 139, 0.3)' 
@@ -2584,7 +2579,6 @@ function SmartContentCard({
           </div>
         )}
 
-        {/* 6. 宫位指引 */}
         {houseData && (
           <div className="p-6 rounded-2xl" style={{ 
             background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(15, 23, 42, 0.5) 100%)',
@@ -2639,7 +2633,7 @@ function SmartContentCard({
         )}
 
         {/* 7. AI深度解读 */}
-        {data.aiInterpretation && (
+        {Boolean(data.aiInterpretation) && (
           <div className="p-6 rounded-2xl" style={{ 
             background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(124, 58, 237, 0.3) 50%, rgba(15, 23, 42, 0.6) 100%)',
             border: '1px solid rgba(124, 58, 237, 0.4)'
@@ -2680,8 +2674,8 @@ function SmartContentCard({
     const suitableActivities = data.suitableActivities as string[] | undefined;
     const avoidActivities = data.avoidActivities as string[] | undefined;
     const suggestions = data.suggestions as string[] | undefined;
-    const astronomicalFeatures = data.astronomicalFeatures || data.天文特征 || data.features as string | undefined;
-    const energyTraits = data.energyTraits || data.能量特质 as string | undefined;
+    const astronomicalFeatures = String(data.astronomicalFeatures || data.天文特征 || data.features || '');
+    const energyTraits = String(data.energyTraits || data.能量特质 || '');
     const emotionalEnergy = data.emotionalEnergy as number | undefined;
     const intuition = data.intuition as number | undefined;
     const action = data.action as number | undefined;
@@ -2941,7 +2935,7 @@ function SmartContentCard({
   }
 
   // ==================== 符文布局 ====================
-  if (data.runes?.length) {
+  if (Array.isArray(data.runes) && data.runes.length) {
     const runes = data.runes as Array<Record<string, unknown>>;
     const runeSymbols: Record<string, string> = { Fehu: 'ᚠ', Uruz: 'ᚢ', Thurisaz: 'ᚦ', Ansuz: 'ᚨ', Raido: 'ᚱ', Kenaz: 'ᚲ', Gebo: 'ᚷ', Wunjo: 'ᚹ', Sowilo: 'ᛊ', Tiwaz: 'ᛏ' };
     
@@ -3416,14 +3410,14 @@ function EnhancedAIInterpretation({
 
   paragraphs.forEach((para) => {
     const trimmed = para.trim();
-    if (/^[一二三四五六七八九十]、/.test(trimmed) || /^[【\[【]/.test(trimmed)) {
+    if (/^[一二三四五六七八九十]、/.test(trimmed) || /^[【[【]/.test(trimmed)) {
       if (currentSection.content) sections.push(currentSection);
       const titleMatch = trimmed.match(/^[一二三四五六七八九十]、[^\s：:]+/);
-      const bracketMatch = trimmed.match(/^[【\[【][^\】\】\]]+[】\】\]]:?\s*/);
+      const bracketMatch = trimmed.match(/^[【[【][^】】\]]+[】】\]]:?\s*/);
       const title = titleMatch ? titleMatch[0] : bracketMatch ? bracketMatch[0].replace(/[：:]\s*$/, '') : undefined;
       currentSection = { 
         title, 
-        content: trimmed.replace(/^[一二三四五六七八九十]、[^\s：:：]+[：:]\s*/, '').replace(/^[【\[【][^\】\】\]]+[】\】\]]:?\s*/, '') 
+        content: trimmed.replace(/^[一二三四五六七八九十]、[^\s：:：]+[：:]\s*/, '').replace(/^[【[【][^】】\]]+[】】\]]:?\s*/, '') 
       };
     } else {
       currentSection.content += (currentSection.content ? '\n' : '') + trimmed;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mountain, Loader2, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Mountain, Loader2 } from 'lucide-react';
 import { submitFortuneQuery } from '@/services/api';
 
 /** 坐向选项 - 使用后端需要的大写英文 */

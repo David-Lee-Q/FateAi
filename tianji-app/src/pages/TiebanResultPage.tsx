@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Hash, Sparkles, Star } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 四柱信息卡片 */
 function BaziCard({ label, value }: { label: string; value: string }) {
@@ -28,29 +28,10 @@ function NumberResultCard({ number, label, meaning }: { number: string; label: s
 
 /** 铁板神数结果页 */
 export default function TiebanResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, question, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -68,6 +49,9 @@ export default function TiebanResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: '#7c3aed', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/tieban')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: '#7c3aed', color: '#fff' }}>
             返回铁板神数
           </button>
@@ -76,26 +60,38 @@ export default function TiebanResultPage() {
     );
   }
 
-  const data = (result.data || {}) as Record<string, unknown>;
-  const question = (data.question as string) || '铁板神数测算';
-  const details = (data.details as Record<string, unknown>) || {};
-  const aiContent = result.interpretation || (data.aiAnalysis as string) || (data.aiInterpretation as string) || (data.suggestion as string) || '';
+  const questionText = question || '铁板神数测算';
+  const aiContent = interpretation;
 
-  // 获取四柱信息
-  const baziInfo = details.bazi || {
-    year: '甲',
-    month: '子',
-    day: '丑',
-    hour: '寅',
-  };
+  // 平铺结构：直接读取顶层字段
+  const mainNumber = typeof data.mainNumber === 'number'
+    ? data.mainNumber
+    : (Number(data.mainNumber) || 1);
+  const bazi = (data.bazi && typeof data.bazi === 'object')
+    ? (data.bazi as { year?: string; month?: string; day?: string; hour?: string })
+    : {};
+  const luckyNumbers = Array.isArray(data.luckyNumbers)
+    ? (data.luckyNumbers as number[]).map(String)
+    : [];
+  const fortuneLevel = (typeof data.fortuneLevel === 'string' && data.fortuneLevel) ? data.fortuneLevel : '';
+  const characteristics = (typeof data.characteristics === 'string' && data.characteristics) ? data.characteristics : '';
+  const lifetime = (typeof data.lifetime === 'string' && data.lifetime) ? data.lifetime : '';
+  const liuqin = (data.liuqin && typeof data.liuqin === 'object')
+    ? (data.liuqin as Record<string, string>)
+    : {};
+  const liuqinText = Object.values(liuqin).filter(Boolean).join('；');
+  const careerFortune = (typeof data.careerFortune === 'string' && data.careerFortune) ? data.careerFortune : '';
+  const loveFortune = (typeof data.loveFortune === 'string' && data.loveFortune) ? data.loveFortune : '';
+  const yearlyFortune = (typeof data.yearlyFortune === 'string' && data.yearlyFortune) ? data.yearlyFortune : '';
 
-  // 获取铁板神数特有信息
-  const tiebanInfo = details.tieban || {
-    mainNumber: details.mainNumber || '8',
-    luckyNumbers: ['3', '6', '9'],
-    fortuneLevel: '上吉',
-    description: '命主运势极佳，财运亨通',
-  };
+  // 吉凶判断：由真实排盘字段构成
+  const patterns: { type: string; title: string; content: string }[] = [];
+  if (characteristics) patterns.push({ type: '吉', title: '命格特征', content: characteristics });
+  if (lifetime) patterns.push({ type: '吉', title: '终身运势', content: lifetime });
+  if (careerFortune) patterns.push({ type: '注意', title: '事业财运', content: careerFortune });
+  if (loveFortune) patterns.push({ type: '注意', title: '感情姻缘', content: loveFortune });
+  if (yearlyFortune) patterns.push({ type: '注意', title: '流年运势', content: yearlyFortune });
+  if (liuqinText) patterns.push({ type: '注意', title: '六亲缘', content: liuqinText });
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -122,15 +118,15 @@ export default function TiebanResultPage() {
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-3" style={{ fontFamily: "'Noto Serif SC', serif" }}>
-            {tiebanInfo.mainNumber} 数
+            {mainNumber} 数
           </h1>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            问事：{question}
+            问事：{questionText}
           </p>
-          {data.fortune && (
+          {fortuneLevel && (
             <div className="flex justify-center mt-4">
               <div className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: '#fff', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-                {data.fortune as string}
+                {fortuneLevel}
               </div>
             </div>
           )}
@@ -142,10 +138,10 @@ export default function TiebanResultPage() {
             <span>📊</span>四柱基础
           </h2>
           <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto">
-            <BaziCard label="年柱" value={baziInfo.year} />
-            <BaziCard label="月柱" value={baziInfo.month} />
-            <BaziCard label="日柱" value={baziInfo.day} />
-            <BaziCard label="时柱" value={baziInfo.hour} />
+            <BaziCard label="年柱" value={bazi.year || '--'} />
+            <BaziCard label="月柱" value={bazi.month || '--'} />
+            <BaziCard label="日柱" value={bazi.day || '--'} />
+            <BaziCard label="时柱" value={bazi.hour || '--'} />
           </div>
         </section>
 
@@ -156,11 +152,11 @@ export default function TiebanResultPage() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <NumberResultCard
-              number={tiebanInfo.mainNumber}
+              number={String(mainNumber)}
               label="主数"
               meaning="代表命运核心特征"
             />
-            {tiebanInfo.luckyNumbers?.map((num: string, idx: number) => (
+            {luckyNumbers.slice(0, 3).map((num, idx) => (
               <NumberResultCard
                 key={idx}
                 number={num}
@@ -177,11 +173,7 @@ export default function TiebanResultPage() {
             <span>⚡</span>吉凶判断
           </h2>
           <div className="space-y-3">
-            {data.patterns || [
-              { type: '吉', title: '数字大吉', content: '主数运势旺盛，财运事业皆有助力。' },
-              { type: '吉', title: '幸运相助', content: '幸运数字与命格相合，多有贵人相助。' },
-              { type: '注意', title: '注意时节', content: '注意流年变化，适时调整策略。' },
-            ].map((item: any, idx: number) => (
+            {patterns.map((item, idx) => (
               <div
                 key={idx}
                 className="p-4 rounded-lg"
@@ -201,7 +193,7 @@ export default function TiebanResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        {(aiContent || data.suggestion) && (
+        {(aiContent) && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.06), rgba(168,85,247,0.04))', border: '1px solid rgba(124,58,237,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -219,7 +211,7 @@ export default function TiebanResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#c4b5fd' }}>{children}</strong>,
                   }}
                 >
-                  {aiContent || (data.suggestion as string) || ''}
+                  {aiContent}
                 </ReactMarkdown>
               </div>
             </div>

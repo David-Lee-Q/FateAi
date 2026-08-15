@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   Share2, Loader2, ChevronLeft, Send, RefreshCw, Heart, FileText, ChevronRight, Star,
 } from 'lucide-react';
-import type { FortuneResult } from '@/types';
-import { getFortuneResult, submitFollowUp } from '@/services/api';
+import { submitFollowUp } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 // 塔罗牌卡片组件
 function TarotCard({ card, position, orientation }: {
@@ -129,29 +129,7 @@ function AIDeepDive({ interpretation, resultId }: { interpretation: string; resu
 
 // 塔罗牌结果页面
 export default function TarotResultPage() {
-  const { id } = useParams<{ id: string }>();
-  const [result, setResult] = useState<FortuneResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await getFortuneResult(id);
-        setResult(resp.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '加载失败');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
 
   if (loading) {
     return (
@@ -169,24 +147,35 @@ export default function TarotResultPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
         <div className="text-center">
           <p style={{ color: 'var(--color-error)' }}>{error || '数据加载失败'}</p>
-          <Link to="/tarot" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
-            <ChevronLeft className="w-4 h-4" /> 返回重新抽牌
-          </Link>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button onClick={retry} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+              <RefreshCw className="w-4 h-4" /> 重试
+            </button>
+            <Link to="/tarot" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+              <ChevronLeft className="w-4 h-4" /> 返回重新抽牌
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   // 解析塔罗牌数据
-  const rawData = (result.data || {}) as Record<string, unknown>;
-  const cards = (rawData.cards as Array<Record<string, unknown>>) || [
-    { name: '愚人', nameEn: 'The Fool', position: '过去', orientation: 'upright', meaning: '新的开始、冒险' },
-    { name: '恋人', nameEn: 'The Lovers', position: '现在', orientation: 'reversed', meaning: '抉择、平衡' },
-    { name: '星星', nameEn: 'The Star', position: '未来', orientation: 'upright', meaning: '希望、疗愈' },
+  const rawCards = (data.cards && Array.isArray(data.cards) ? data.cards : []) as Array<Record<string, unknown>>;
+  const cardSources = rawCards.length > 0 ? rawCards : [
+    { name: '愚人', nameEn: 'The Fool', isReversed: false, uprightMeaning: '新的开始、冒险', reversedMeaning: '鲁莽、冒失' },
+    { name: '恋人', nameEn: 'The Lovers', isReversed: true, uprightMeaning: '爱情、和谐、选择', reversedMeaning: '失衡、冲突' },
+    { name: '星星', nameEn: 'The Star', isReversed: false, uprightMeaning: '希望、疗愈', reversedMeaning: '失望、迷茫' },
   ];
+  const cards = cardSources.map((c) => ({
+    name: c.name,
+    nameEn: c.nameEn,
+    position: c.position as string || '',
+    orientation: c.isReversed ? ('reversed' as const) : ('upright' as const),
+    meaning: (c.isReversed ? c.reversedMeaning : c.uprightMeaning) as string,
+  }));
 
-  const interpretation = result.interpretation || '';
-  const guidance = (rawData.guidance || {}) as Record<string, string>;
+  const interpretationText = interpretation || (typeof data.interpretation === 'string' ? data.interpretation : '');
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
@@ -305,6 +294,9 @@ export default function TarotResultPage() {
             </svg>
             综合指引
           </h2>
+          <div className="prose prose-invert prose-sm max-w-none mb-6">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{interpretationText}</ReactMarkdown>
+          </div>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <div className="flex items-start gap-3">
@@ -314,7 +306,7 @@ export default function TarotResultPage() {
                   </svg>
                 </div>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  {guidance.love || '感情方面需要冷静思考，给彼此空间。'}
+                  感情方面结合牌面与解读深入思考，给彼此真诚沟通的空间。
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -324,7 +316,7 @@ export default function TarotResultPage() {
                   </svg>
                 </div>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  {guidance.career || '事业上将有新机遇，保持创意与希望。'}
+                  事业上保持开放心态，主动把握牌面预示的机遇与转折。
                 </p>
               </div>
             </div>
@@ -336,7 +328,7 @@ export default function TarotResultPage() {
                   </svg>
                 </div>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  {guidance.health || '健康注意调节身心，适当休息与放松。'}
+                  健康注意调节身心平衡，适时休息放松。
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -346,7 +338,7 @@ export default function TarotResultPage() {
                   </svg>
                 </div>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  {guidance.lucky || '幸运色：紫色与金色；幸运方位：东方；幸运数字：7'}
+                  幸运指引以牌阵整体能量为准，随解读内容灵活把握。
                 </p>
               </div>
             </div>
@@ -354,7 +346,7 @@ export default function TarotResultPage() {
         </section>
 
         {/* AI 深度解读 */}
-        <AIDeepDive interpretation={interpretation} resultId={result.id} />
+        <AIDeepDive interpretation={interpretationText} resultId={result.id} />
       </main>
 
       {/* 固定底部操作栏 */}

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Heart, Share2, Bookmark, Send, Feather, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { fetchFortuneResult } from '@/services/api';
+import { useFortuneResult } from '@/hooks/useFortuneResult';
 
 /** 五格卡片组件 */
 function WugeCard({ name, score, meaning }: { name: string; score: number; meaning: string }) {
@@ -21,29 +21,10 @@ function WugeCard({ name, score, meaning }: { name: string; score: number; meani
 
 /** 姓名测试结果页 */
 export default function NametestResultPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { result, data, interpretation, loading, error, retry } = useFortuneResult();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [followUpText, setFollowUpText] = useState('');
-
-  useEffect(() => {
-    if (!id) return;
-    const loadResult = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFortuneResult(id);
-        setResult(data.data || data);
-      } catch (err) {
-        setError('获取结果失败，请稍后重试');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadResult();
-  }, [id]);
 
   if (loading) {
     return (
@@ -61,6 +42,9 @@ export default function NametestResultPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="text-lg mb-4" style={{ color: 'var(--state-error)' }}>{error || '未找到结果'}</p>
+          <button onClick={retry} className="mr-2 px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            重试
+          </button>
           <button onClick={() => navigate('/nametest')} className="px-6 py-2 rounded-lg text-sm font-medium" style={{ background: 'var(--color-primary)', color: '#fff' }}>
             返回姓名测试
           </button>
@@ -69,8 +53,14 @@ export default function NametestResultPage() {
     );
   }
 
-  const data = (result.data || {}) as Record<string, unknown>;
-  const fullName = (data.name as string) || `${data.surname || ''}${data.givenName || ''}`.trim() || '姓名';
+  const details = (data.details && typeof data.details === 'object' ? data.details : {}) as Record<string, unknown>;
+  const fullName = (typeof details.fullName === 'string' && details.fullName) || '姓名';
+  const sanCai = (typeof details.sanCai === 'string' && details.sanCai) || '';
+  const sanCaiMeaning = (typeof details.sanCaiMeaning === 'string' && details.sanCaiMeaning) || '';
+  const score = (typeof details.score === 'number' ? details.score : Number(details.score)) || 0;
+  const wuGe = (details.wuGe && typeof details.wuGe === 'object') ? (details.wuGe as Record<string, { number?: number; meaning?: string }>) : {};
+  const wuxing = sanCai.slice(0, 1) || '金';
+  const aiText = interpretation;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
@@ -100,12 +90,12 @@ export default function NametestResultPage() {
             {fullName}
           </h1>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            {(data.sancai as string) || '天格/地格/人格三才配置'}
+            {sanCai ? `${sanCai}三才配置${sanCaiMeaning ? ` · ${sanCaiMeaning}` : ''}` : '天格/地格/人格三才配置'}
           </p>
-          {data.score && (
+          {score > 0 && (
             <div className="flex justify-center mt-4">
               <div className="px-6 py-3 rounded-full text-center" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.15), rgba(139,92,246,0.15))', border: '1px solid rgba(0,75,170,0.2)' }}>
-                <span className="text-2xl font-bold" style={{ color: 'var(--color-primary-lighter)' }}>{data.score as number}</span>
+                <span className="text-2xl font-bold" style={{ color: 'var(--color-primary-lighter)' }}>{score}</span>
                 <span className="text-sm ml-1" style={{ color: 'var(--color-text-secondary)' }}>分</span>
               </div>
             </div>
@@ -118,12 +108,12 @@ export default function NametestResultPage() {
             <span>📊</span>五格剖象
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <WugeCard name="天格" score={(data.tianGe as number) || 85} meaning={(data.tianMeaning as string) || '祖先留下的运势影响'} />
-            <WugeCard name="人格" score={(data.renGe as number) || 78} meaning={(data.renMeaning as string) || '主性格、事业、财运'} />
-            <WugeCard name="地格" score={(data.diGe as number) || 82} meaning={(data.diMeaning as string) || '影响早年运势'} />
-            <WugeCard name="外格" score={(data.waiGe as number) || 70} meaning={(data.waiMeaning as string) || '社交能力和人缘'} />
-            <WugeCard name="总格" score={(data.zongGe as number) || 88} meaning={(data.zongMeaning as string) || '一生总运势'} />
-            <WugeCard name="三才" score={(data.sancaiScore as number) || 80} meaning={(data.sancaiMeaning as string) || '天地人三才配置'} />
+            <WugeCard name="天格" score={wuGe.tianGe?.number || 85} meaning={wuGe.tianGe?.meaning || '祖先留下的运势影响'} />
+            <WugeCard name="人格" score={wuGe.renGe?.number || 78} meaning={wuGe.renGe?.meaning || '主性格、事业、财运'} />
+            <WugeCard name="地格" score={wuGe.diGe?.number || 82} meaning={wuGe.diGe?.meaning || '影响早年运势'} />
+            <WugeCard name="外格" score={wuGe.waiGe?.number || 70} meaning={wuGe.waiGe?.meaning || '社交能力和人缘'} />
+            <WugeCard name="总格" score={wuGe.zongGe?.number || 88} meaning={wuGe.zongGe?.meaning || '一生总运势'} />
+            <WugeCard name="三才" score={score} meaning={sanCaiMeaning || '天地人三才配置'} />
           </div>
         </section>
 
@@ -138,19 +128,19 @@ export default function NametestResultPage() {
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold mb-1"
                   style={{
-                    background: (data.wuxing as string) === element ? 'rgba(200,168,78,0.2)' : 'var(--color-bg-inset)',
-                    border: (data.wuxing as string) === element ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
-                    color: (data.wuxing as string) === element ? 'var(--color-gold)' : 'var(--color-text-secondary)',
+                    background: wuxing === element ? 'rgba(200,168,78,0.2)' : 'var(--color-bg-inset)',
+                    border: wuxing === element ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
+                    color: wuxing === element ? 'var(--color-gold)' : 'var(--color-text-secondary)',
                   }}
                 >
                   {element}
                 </div>
-                {(data.wuxing as string) === element && <span className="text-xs" style={{ color: 'var(--color-gold)' }}>主</span>}
+                {wuxing === element && <span className="text-xs" style={{ color: 'var(--color-gold)' }}>主</span>}
               </div>
             ))}
           </div>
           <p className="text-sm text-center" style={{ color: 'var(--color-text-secondary)' }}>
-            {(data.wuxing as string) || '金'}属性姓名，五行平衡有利于运势发展
+            {wuxing}属性姓名，五行平衡有利于运势发展
           </p>
         </section>
 
@@ -167,13 +157,13 @@ export default function NametestResultPage() {
                 strong: ({ children }) => <strong style={{ color: 'var(--color-primary-lighter)' }}>{children}</strong>,
               }}
             >
-              {(data.content as string) || result.interpretation || (data.analysis as string) || ''}
+              {aiText}
             </ReactMarkdown>
           </div>
         </section>
 
         {/* AI 深度解读 */}
-        {data.aiAnalysis && (
+        {aiText && (
           <section className="mb-8 p-6 md:p-8 rounded-xl relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(0,75,170,0.06), rgba(139,92,246,0.04))', border: '1px solid rgba(0,75,170,0.15)' }}>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
@@ -191,7 +181,7 @@ export default function NametestResultPage() {
                     strong: ({ children }) => <strong style={{ color: '#a78bfa' }}>{children}</strong>,
                   }}
                 >
-                  {data.aiAnalysis as string}
+                  {aiText}
                 </ReactMarkdown>
               </div>
             </div>
