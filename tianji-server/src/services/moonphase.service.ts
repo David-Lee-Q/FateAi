@@ -81,3 +81,54 @@ export function calculateMoonphase(birthDate: string): MoonphaseResult {
     },
   };
 }
+
+/** 前端月相 key 到月相索引的映射（与 MOON_PHASES 顺序一致） */
+const PHASE_KEY_INDEX: Record<string, number> = {
+  'new': 0,
+  'waxing-crescent': 1,
+  'first-quarter': 2,
+  'waxing-gibbous': 3,
+  'full': 4,
+  'waning-gibbous': 5,
+  'last-quarter': 6,
+  'waning-crescent': 7,
+};
+
+/**
+ * 按指定月相生成占卜解读（用户主动选择月相时使用）
+ * @param phaseKey 月相标识（new/waxing-crescent/first-quarter/waxing-gibbous/full/waning-gibbous/last-quarter/waning-crescent）
+ * @param question 占卜问题（可选）
+ */
+export function calculateMoonphaseByPhase(phaseKey: string, question?: string): MoonphaseResult {
+  const phaseIndex = PHASE_KEY_INDEX[phaseKey] ?? 4;
+  const phase = MOON_PHASES[phaseIndex];
+  const traits = PHASE_TRAITS[phase.name] || ['适应力强', '思维灵活'];
+
+  const emotionalPattern = phaseIndex <= 3
+    ? '情感表达偏向外放，容易受外界影响，适合在社交环境中释放情绪。'
+    : '情感表达偏向内敛，善于处理内心感受，适合独处时进行情绪调节。';
+
+  const advice = phaseIndex <= 2
+    ? '适合开启新计划，抓住时机大胆行动。'
+    : phaseIndex <= 5
+      ? '适合巩固已有成果，维护人际关系。'
+      : '适合放慢节奏，反思过去，为下一个周期积蓄能量。';
+
+  const questionStr = question ? `关于"${question}"，` : '';
+  const summary = `${questionStr}当前选择${phase.name}${phase.emoji}，`
+    + `${phase.desc}`
+    + `该阶段特质：${traits.join('、')}。`
+    + `建议：${advice}`;
+
+  return {
+    summary,
+    details: {
+      moonPhase: phase.name,
+      moonEmoji: phase.emoji,
+      illumination: phase.illumination,
+      traits,
+      emotionalPattern,
+      advice,
+    },
+  };
+}

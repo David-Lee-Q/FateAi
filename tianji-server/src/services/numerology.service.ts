@@ -5,6 +5,7 @@
  */
 
 import type { NumerologyResult } from '../types';
+import { stableDigit, fnv1a } from '../utils/hash';
 
 /** 生命灵数含义对照表 */
 const LIFE_PATH_MEANINGS: Record<number, string> = {
@@ -87,6 +88,54 @@ export function calculateNumerology(birthDate: string): NumerologyResult {
       lifePathNumber,
       lifePathMeaning: meaning,
       birthdayNumber,
+      personalYear,
+      personalYearMeaning: pyMeaning,
+      expressionNumber,
+      soulNumber,
+      personalityNumber,
+      maturityNumber,
+    },
+  };
+}
+
+/** 各分析类型对应的中文标签 */
+const TYPE_LABELS: Record<string, string> = {
+  'life-path': '生命灵数',
+  'name': '姓名灵数',
+  'phone': '手机号能量数',
+  'plate': '车牌号能量数',
+  'custom': '自定义数字能量',
+};
+
+/**
+ * 基于任意输入（姓名/手机号/车牌/自定义数字）计算数字能量
+ * 与 calculateNumerology 返回相同结构，核心数字由输入稳定派生
+ * @param value 用户输入值
+ * @param type 分析类型（life-path/name/phone/plate/custom）
+ */
+export function calculateNumerologyFromValue(value: string, type?: string): NumerologyResult {
+  const label = TYPE_LABELS[type || ''] || '数字能量';
+  const core = stableDigit(value);
+
+  // 用哈希派生其余数字，保证同一输入结果稳定可复现
+  const seed = fnv1a(`${type || 'custom'}:${value}`);
+  const personalYear = (seed % 9) + 1;
+  const expressionNumber = ((seed >> 3) % 9) + 1;
+  const soulNumber = ((seed >> 6) % 9) + 1;
+  const personalityNumber = ((seed >> 9) % 9) + 1;
+  const maturityNumber = reduceToSingle(core + expressionNumber);
+
+  const meaning = LIFE_PATH_MEANINGS[core] || '独特的数字组合，具有特殊天赋。';
+  const pyMeaning = PERSONAL_YEAR_MEANINGS[personalYear] || '平稳过渡的一年。';
+
+  const summary = `您的${label}为${core}，${meaning}当前能量年数为${personalYear}，${pyMeaning}`;
+
+  return {
+    summary,
+    details: {
+      lifePathNumber: core,
+      lifePathMeaning: meaning,
+      birthdayNumber: core,
       personalYear,
       personalYearMeaning: pyMeaning,
       expressionNumber,

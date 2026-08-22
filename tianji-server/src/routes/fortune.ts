@@ -20,9 +20,10 @@ import { castLiuyao } from '../services/liuyao.service';
 import { castMeihua } from '../services/meihua.service';
 import { castQimen } from '../services/qimen.service';
 import { analyzeFengshui } from '../services/fengshui.service';
-import { calculateNumerology } from '../services/numerology.service';
+import { calculateNumerology, calculateNumerologyFromValue } from '../services/numerology.service';
 import { castAstrodice } from '../services/astrodice.service';
-import { calculateMoonphase } from '../services/moonphase.service';
+import { calculateMoonphase, calculateMoonphaseByPhase } from '../services/moonphase.service';
+import { fnv1a } from '../utils/hash';
 import { castRune } from '../services/rune.service';
 import { analyzeName } from '../services/nametest.service';
 import { getShengxiaoFortune } from '../services/shengxiao.service';
@@ -45,6 +46,7 @@ import type {
 } from '../types';
 import { resultStorage } from '../utils/storage';
 import { interpretFortune, followUpInterpret } from '../services/ai-interpreter';
+import { getOptionalAuthUserId } from './auth';
 
 const router = Router();
 
@@ -207,12 +209,16 @@ router.post('/query', async (req: Request, res: Response) => {
 
       // ========== 西方占卜系统 ==========
       case 'numerology': {
-        const params = inputParams as unknown as NumerologyInputParams;
-        if (!params.birthDate) {
-          res.status(400).json({ success: false, message: '数字能量需要：birthDate (YYYY-MM-DD)' });
+        const params = inputParams as unknown as { birthDate?: string; type?: string; value?: string };
+        const birthDate = params.birthDate || (params.type === 'life-path' ? params.value : undefined);
+        if (birthDate && /^\d{4}-\d{1,2}-\d{1,2}$/.test(birthDate)) {
+          data = calculateNumerology(birthDate);
+        } else if (params.value && String(params.value).trim()) {
+          data = calculateNumerologyFromValue(String(params.value), params.type);
+        } else {
+          res.status(400).json({ success: false, message: '数字能量需要：birthDate (YYYY-MM-DD) 或 value' });
           return;
         }
-        data = calculateNumerology(params.birthDate);
         break;
       }
 
@@ -224,17 +230,21 @@ router.post('/query', async (req: Request, res: Response) => {
 
       case 'moonphase': {
         const params = inputParams as unknown as MoonphaseInputParams;
-        if (!params.birthDate) {
-          res.status(400).json({ success: false, message: '月相占卜需要：birthDate (YYYY-MM-DD)' });
+        if (params.birthDate) {
+          data = calculateMoonphase(params.birthDate);
+        } else if (params.phase) {
+          data = calculateMoonphaseByPhase(params.phase, params.question);
+        } else {
+          res.status(400).json({ success: false, message: '月相占卜需要：birthDate (YYYY-MM-DD) 或 phase' });
           return;
         }
-        data = calculateMoonphase(params.birthDate);
         break;
       }
 
       case 'rune': {
         const params = inputParams as unknown as RuneInputParams;
-        data = castRune(params.spread || 'single', params.question);
+        const spread = (params.spread || params.spreadType || 'single') as 'single' | 'three' | 'odin';
+        data = castRune(spread, params.question);
         break;
       }
 
@@ -352,30 +362,67 @@ router.post('/query', async (req: Request, res: Response) => {
       }
 
       case 'compare': {
-        // 多维对比：接收两组出生信息
         const params = inputParams as {
-          person1: { birthDate: string; gender: string };
-          person2: { birthDate: string; gender: string };
+          person1?: { birthDate: string; gender: string };
+          person2?: { birthDate: string; gender: string };
+          question?: string;
+          systems?: string[];
         };
-        if (!params.person1?.birthDate || !params.person2?.birthDate) {
-          res.status(400).json({ success: false, message: '多维对比需要：person1.birthDate, person2.birthDate' });
+        const hasPersons = !!(params.person1?.birthDate && params.person2?.birthDate);
+        const hasSystems = Array.isArray(params.systems) && params.systems.length >= 2;
+        if (!hasPersons && !hasSystems) {
+          res.status(400).json({
+            success: false,
+            message: '多维对比需要：person1.birthDate + person2.birthDate，或 systems（至少 2 个体系）',
+          });
           return;
         }
-        // 模拟配对评分
-        const score = Math.floor(Math.random() * 30) + 60; // 60-90分
-        data = {
-          summary: `两人运势匹配度：${score}分`,
-          details: {
-            score,
-            dimensions: {
-              baziMatch: Math.floor(Math.random() * 30) + 60,
-              zodiacMatch: Math.floor(Math.random() * 30) + 60,
-              elementMatch: Math.floor(Math.random() * 30) + 60,
-              overallMatch: score,
+
+        if (hasPersons) {
+          // 两人运势匹配度
+          const score = Math.floor(Math.random() * 30) + 60; // 60-90分
+          data = {
+            summary: `两人运势匹配度：${score}分`,
+            details: {
+              score,
+              dimensions: {
+                baziMatch: Math.floor(Math.random() * 30) + 60,
+                zodiacMatch: Math.floor(Math.random() * 30) + 60,
+                elementMatch: Math.floor(Math.random() * 30) + 60,
+                overallMatch: score,
+              },
+              advice: score >= 80 ? '两人运势高度匹配，相处融洽。' : '两人运势较为互补，需多沟通理解。',
             },
-            advice: score >= 80 ? '两人运势高度匹配，相处融洽。' : '两人运势较为互补，需多沟通理解。',
-          },
-        } as CompareResult;
+          } as CompareResult;
+        } else {
+          // 多体系对比：对同一问题在多个体系下的能量评分
+          const q = (params.question || '').trim() || '综合运势';
+          const seed = fnv1a(`${q}::${params.systems!.sort().join(',')}`);
+          const scores: Record<string, number> = {};
+          for (const s of params.systems!) {
+            scores[s] = 55 + (fnv1a(`${q}::${s}`) % 40); // 55-94
+          }
+          const avg = Math.round(
+            Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length
+          );
+          const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+          data = {
+            summary: `围绕「${q}」的 ${params.systems!.length} 个体系对比，整体能量 ${avg} 分，${top[0]} 体系信号最强（${top[1]} 分）。`,
+            details: {
+              score: avg,
+              dimensions: {
+                baziMatch: scores.bazi ?? avg,
+                zodiacMatch: scores.zodiac ?? avg,
+                elementMatch: scores.numerology ?? avg,
+                overallMatch: avg,
+              },
+              advice: `综合来看「${q}」整体趋于平稳，${top[0]} 体系给出的提示值得重点关注。`,
+              systems: params.systems!,
+              systemScores: scores,
+              question: q,
+            },
+          } as CompareResult;
+        }
         break;
       }
 
@@ -403,12 +450,13 @@ router.post('/query', async (req: Request, res: Response) => {
       console.warn('AI 解读生成失败（将使用默认解读）:', aiError);
     }
 
-    // 保存结果
+    // 保存结果（登录用户绑定 userId，匿名查询为 null）
     const result: FortuneResult = {
       id: generateId(),
       system,
       createdAt: new Date().toISOString(),
       status: 'completed',
+      userId: getOptionalAuthUserId(req),
       interpretation: aiText,
       input: inputParams as unknown as Record<string, unknown>,
       data,
@@ -439,13 +487,22 @@ router.get('/result/:id', (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/fortune/history
- * 获取历史查询记录（最近20条）
+ * GET /api/fortune/history?limit=20
+ * 获取历史查询记录
+ * - 携带有效 Bearer token：仅返回该用户自己的记录
+ * - 匿名请求：返回全局记录（演示数据）
  */
-router.get('/history', (_req: Request, res: Response) => {
-  const history = resultStorage.getHistory(20);
+router.get('/history', (req: Request, res: Response) => {
+  const limitParam = parseInt(String(req.query.limit || '20'), 10);
+  const limit = Math.min(Math.max(Number.isFinite(limitParam) ? limitParam : 20, 1), 200);
 
-  res.json({ success: true, data: history });
+  const userId = getOptionalAuthUserId(req);
+  const history = userId
+    ? resultStorage.getHistoryForUser(userId, limit)
+    : resultStorage.getHistory(limit);
+
+  // data 保持数组（兼容既有调用方），mine 标记是否为当前用户自己的记录
+  res.json({ success: true, data: history, mine: Boolean(userId) });
 });
 
 /**

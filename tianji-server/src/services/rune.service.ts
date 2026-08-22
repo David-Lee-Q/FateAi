@@ -37,12 +37,15 @@ const RUNE_SET = [
 /** 三牌阵位置名称 */
 const THREE_SPREAD_POSITIONS = ['过去', '现在', '未来'];
 
+/** 奥丁之眼五牌阵位置名称 */
+const ODIN_SPREAD_POSITIONS = ['过去', '现在', '未来', '建议', '结果'];
+
 /**
  * 符文占卜
- * @param spread 牌阵类型：single（单牌）或 three（三牌阵）
+ * @param spread 牌阵类型：single（单牌）、three（三牌阵）、odin（奥丁之眼五牌阵）
  * @param question 占卜问题（可选）
  */
-export function castRune(spread: 'single' | 'three', question?: string): RuneResult {
+export function castRune(spread: 'single' | 'three' | 'odin', question?: string): RuneResult {
   // 随机抽取符文
   const drawSingleRune = () => {
     const idx = Math.floor(Math.random() * RUNE_SET.length);
@@ -58,16 +61,21 @@ export function castRune(spread: 'single' | 'three', question?: string): RuneRes
   };
 
   // 根据牌阵类型抽取
-  const count = spread === 'single' ? 1 : 3;
+  const count = spread === 'single' ? 1 : spread === 'three' ? 3 : 5;
+  const positions = spread === 'three' ? THREE_SPREAD_POSITIONS : spread === 'odin' ? ODIN_SPREAD_POSITIONS : null;
   const runes = Array.from({ length: count }, (_, i) => {
     const rune = drawSingleRune();
-    if (spread === 'three') {
-      rune.position = THREE_SPREAD_POSITIONS[i];
+    if (positions && i < positions.length) {
+      rune.position = positions[i];
     }
     return rune;
   });
 
-  const spreadName = spread === 'single' ? '单符文占卜' : '三符文占卜（过去-现在-未来）';
+  const spreadName = spread === 'single'
+    ? '单符文占卜'
+    : spread === 'three'
+      ? '三符文占卜（过去-现在-未来）'
+      : '奥丁之眼五符文占卜（过去-现在-未来-建议-结果）';
   const questionStr = question ? `关于"${question}"的` : '';
 
   const summary = `${questionStr}符文占卜结果：`

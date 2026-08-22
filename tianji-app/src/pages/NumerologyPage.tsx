@@ -164,6 +164,7 @@ export default function NumerologyPage() {
       const result = await submitFortuneQuery('numerology', {
         type: activeType,
         value: getCurrentInput(),
+        birthDate: activeType === 'life-path' ? birthDate : undefined,
         lifePathNumber: activeType === 'life-path' ? lifePathNumber : undefined,
       });
       navigate(`/result/numerology/${result.data.id}`);
