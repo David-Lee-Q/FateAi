@@ -49,6 +49,11 @@
   --color-error: #c43a3a;
   --color-info: #004baa;
 
+  /* 状态语义色（大量页面直接引用 --state-*，此前未定义导致回退为继承色） */
+  --state-success: var(--color-success);
+  --state-warning: var(--color-warning);
+  --state-error: var(--color-error);
+
   /* 字体 */
   --font-display: 'Cinzel', 'Noto Serif SC', serif;
   --font-body: 'Noto Sans SC', 'DM Sans', system-ui, sans-serif;
@@ -508,7 +513,7 @@ select option {
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: var(--radius-full) !important;
   padding: 16px 24px 16px 52px !important;
-  font-size: var(--space-10) !important;
+  font-size: 1rem !important;
   color: var(--color-text) !important;
   width: 100%;
   max-width: 640px;
@@ -685,4 +690,75 @@ select option {
   color: var(--color-text-tertiary);
   text-align: center;
   padding: var(--space-2) 0 var(--space-3);
+}
+
+/* ---- 个人信息 · 账号管理交互效果 ---- */
+.pf-account-row {
+  border-radius: 10px;
+  transition: background var(--transition-base);
+}
+.pf-account-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pf-btn-switch {
+  transition: all var(--transition-base);
+}
+.pf-btn-switch:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 75, 170, 0.35);
+}
+.pf-btn-switch:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+  box-shadow: none;
+}
+
+.pf-btn-remove {
+  transition: all var(--transition-base);
+}
+.pf-btn-remove:hover {
+  color: var(--state-error);
+  background: rgba(196, 58, 58, 0.1);
+}
+.pf-btn-remove:active {
+  transform: scale(0.9);
+}
+
+.pf-btn-logout {
+  transition: all var(--transition-base);
+  /* 提亮的红：深红 #c43a3a 在深色底上对比度不足，文案偏暗看不清 */
+  color: #ff7b72;
+}
+.pf-btn-logout:hover {
+  background: rgba(196, 58, 58, 0.14) !important;
+  border-color: rgba(196, 58, 58, 0.6);
+  transform: translateY(-1px);
+}
+.pf-btn-logout:active {
+  transform: translateY(0);
+}
+.pf-btn-logout.pf-confirming {
+  color: var(--color-text-inverse);
+  background: var(--state-error) !important;
+  border-color: var(--state-error);
+}
+.pf-btn-logout.pf-confirming:hover {
+  filter: brightness(1.08);
+}
+.pf-logout-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 20px;
+  padding: 0 7px;
+  margin-left: 4px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-inverse);
+  background: rgba(255, 255, 255, 0.22);
 }

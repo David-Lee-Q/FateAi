@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, ChevronDown } from 'lucide-react';
 import { useFortune } from '@/hooks/useFortune';
 import DatePicker from '@/components/DatePicker';
+import { PROVINCE_CITIES } from '@/data/provinceCity';
 
 /** 时辰选项 */
 const SHICHEN_OPTIONS = [
@@ -20,18 +21,18 @@ const SHICHEN_OPTIONS = [
   { value: '11', label: '亥时 21:00 - 23:00' },
 ];
 
-/** 省份选项 */
+/** 省份选项（全国 31 个省级行政区） */
 const PROVINCE_OPTIONS = [
   { value: '', label: '请选择' },
-  { value: 'bj', label: '北京' },
-  { value: 'sh', label: '上海' },
-  { value: 'gd', label: '广东' },
-  { value: 'zj', label: '浙江' },
-  { value: 'js', label: '江苏' },
-  { value: 'sc', label: '四川' },
-  { value: 'hb', label: '湖北' },
-  { value: 'hn', label: '湖南' },
+  ...PROVINCE_CITIES.map((p) => ({ value: p.value, label: p.label })),
 ];
+
+/** 根据已选省份计算城市选项（级联） */
+function getCityOptions(province: string): { value: string; label: string }[] {
+  const entry = PROVINCE_CITIES.find((p) => p.value === province);
+  if (!entry) return [{ value: '', label: '请先选择省份' }];
+  return [{ value: '', label: '请选择' }, ...entry.cities.map((c) => ({ value: c, label: c }))];
+}
 
 /** 通用下拉选择框组件 */
 function SelectField({
@@ -75,6 +76,12 @@ export default function BaziPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [province, setProvince] = useState('');
   const [city, setCity] = useState('');
+
+  /** 切换省份时重置城市（级联联动） */
+  const handleProvinceChange = (val: string) => {
+    setProvince(val);
+    setCity('');
+  };
 
   /** 提交八字排盘 */
   const handleSubmit = async (e: FormEvent) => {
@@ -250,14 +257,14 @@ export default function BaziPage() {
                       <SelectField
                         label="出生省份"
                         value={province}
-                        onChange={setProvince}
+                        onChange={handleProvinceChange}
                         options={PROVINCE_OPTIONS}
                       />
                       <SelectField
                         label="出生城市"
                         value={city}
                         onChange={setCity}
-                        options={[{ value: '', label: '请选择' }]}
+                        options={getCityOptions(province)}
                       />
                     </div>
                   )}

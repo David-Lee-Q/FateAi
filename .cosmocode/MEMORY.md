@@ -31,6 +31,19 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 
 ## 条目
 
+[直接改 data/*.json 会被后端内存回刷覆盖]
+- Date: 2026-08-21
+- Context: Agent 在执行 综合报告真实数据 功能后清理测试账号时发现
+- Category: 排错调试
+- Instructions:
+  - `tianji-server` 的 `ResultStorage`（src/utils/storage.ts）启动时把 `data/results.json` 全量读入内存 Map，之后每次写操作都把整个内存 Map 回刷文件；用户存储同理。直接编辑 `data/*.json` 文件后，后端下一次写操作会用旧内存态覆盖你的修改（实测被"复活"已删除的记录）
+  - 正确清理流程：①直接改 JSON 文件删数据 → ②`touch tianji-server/src/index.ts` 触发 nodemon 重启让后端重新加载文件 → ③curl `GET :3000/api/health` 确认恢复
+  - 清理测试账号要三处同步：`data/users.json`、`data/sessions.json`、`data/results.json`（按 userId 过滤），否则产生孤儿记录
+  - 前端页面白屏（React 崩溃）可用 jsdom + Vite `ssrLoadModule` + `createRoot` 复现：全局装 jsdom（`createRequire` 加载），`process.env.VITE_API_BASE` 设为 `http://localhost:3000/api` 可在 Node 中打真实后端接口，脚本模板见 /tmp/opencode/ssr-repro.mts
+  - jsdom 交互测试（模拟 input/click）的两个必坑：①必须在 ssrLoadModule 加载 react-dom 之前先建一个 JSDOM 并设置 `globalThis.window/document`，否则 react-dom 模块级 `canUseDOM/isInputEventSupported` 被冻结为 false，之后 dispatch 的 `input` 事件永远不触发 onChange（click 正常、输入框填不上，极难排查）；②React 重渲染会替换 DOM 节点，按钮等元素必须"点击前现查"（querySelector 现查现点），不能缓存旧引用
+  - jsdom 中给受控 input 填值需用原型 setter：`Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set.call(el, v)` 后 dispatch `new window.Event('input', {bubbles:true})`；textarea 同理换 HTMLTextAreaElement
+  - /tmp 下的测试脚本裸导入（import 'vite'/'react'）会因模块解析失败报错，需用 `createRequire('/workspace/tianji-app/package.json')` 加载依赖；tsx 从 tianji-server 目录运行（`cd tianji-server && node --import tsx xxx.mts`）；交互冒烟脚本模板见 /tmp/opencode/fix-smoke.mts（自管理 app 根目录 __smoke_re.tsx 共享入口，结束自动清理）
+
 [天机结果页数据取数排错链路]
 - Date: 2026-08-14
 - Context: Agent 修复天机 20 个算命结果页「后端真数据不显示」问题时发现
