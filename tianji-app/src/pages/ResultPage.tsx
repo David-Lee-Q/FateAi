@@ -2079,7 +2079,7 @@ export default function ResultPage() {
         }}
       >
         <div
-          className="mx-auto flex items-center justify-center gap-4 md:gap-8 px-6 py-3"
+          className="mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-3 md:gap-x-8"
           style={{ maxWidth: 'var(--max-width)' }}
         >
           {/* 收藏结果 */}
