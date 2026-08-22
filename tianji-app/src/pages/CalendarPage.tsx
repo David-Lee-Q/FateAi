@@ -3,50 +3,93 @@ import {
   CalendarDays, ChevronLeft, ChevronRight, Sparkles,
   CheckCircle, XCircle,
 } from 'lucide-react';
-
-/* ============ 模拟农历数据 ============ */
-const LUNAR_MAP: Record<string, string> = {
-  '1-1': '六月初七', '1-2': '六月初八', '1-3': '六月初九', '1-4': '六月初十',
-  '1-5': '六月十一', '1-6': '六月十二', '1-7': '六月十三', '1-8': '六月十四',
-  '1-9': '六月十五', '1-10': '六月十六', '1-11': '六月十七', '1-12': '六月十八',
-  '1-13': '六月十九', '1-14': '六月二十', '1-15': '六月廿一', '1-16': '六月廿二',
-  '1-17': '六月廿三', '1-18': '六月廿四', '1-19': '六月廿五', '1-20': '六月廿六',
-  '1-21': '六月廿七', '1-22': '六月廿八', '1-23': '六月廿九', '1-24': '七月初一',
-  '1-25': '七月初二', '1-26': '七月初三', '1-27': '七月初四', '1-28': '七月初五',
-  '1-29': '七月初六', '1-30': '七月初七', '1-31': '七月初八',
-};
+import { Solar } from 'lunar-typescript';
 
 /* ============ 运势等级配置 ============ */
 type FortuneLevel = 'ji' | 'xiong' | 'ping';
+
+const HOUR_TIMES = ['23-1', '1-3', '3-5', '5-7', '7-9', '9-11', '11-13', '13-15', '15-17', '17-19', '19-21', '21-23'];
 
 interface DayFortune {
   day: number;
   level: FortuneLevel;
   summary: string;
+  lunar: string;        // 农历日期（七月十）
+  ganZhi: string;       // 干支（丙午年 丙申月 戊辰日）
+  jiShen: string[];     // 吉神
+  xiongSha: string[];   // 凶煞
+  yi: string[];         // 宜
+  ji: string[];         // 忌
+  hours: { name: string; time: string; level: FortuneLevel }[]; // 十二时辰吉凶
 }
 
-/** 生成月度运势数据 */
+/** 按当日真实黄历数据生成运势概要 */
+function buildDaySummary(d: DayFortune): string {
+  const xiuNote = d.level === 'xiong'
+    ? '今日气运偏弱，大事可缓、以守为稳。'
+    : d.level === 'ji'
+      ? '今日气运上佳，宜主动推进重要事项。'
+      : '今日气运平和，按部就班即可。';
+  const yiNote = d.yi.length > 0
+    ? `宜${d.yi.slice(0, 4).join('、')}等事，把握时机。`
+    : '无特别宜事，可安排休整与筹划。';
+  const jiNote = d.ji.length > 0
+    ? `需避开${d.ji.slice(0, 3).join('、')}等事项。`
+    : '无忌事限制，诸事可从。';
+  const shenNote = d.jiShen.length > 0 ? `吉神${d.jiShen.slice(0, 3).join('、')}照临，添一分助力。` : '';
+  const bestHour = d.hours.find((h) => h.level === 'ji');
+  const hourNote = bestHour ? `建议择${bestHour.name}时（${bestHour.time}点）办理要事。` : '';
+  return `${xiuNote}${yiNote}${jiNote}${shenNote}${hourNote}`;
+}
+
+/**
+ * 生成月度黄历数据（基于 lunar-typescript 真实农历/黄历数据）
+ * 日级吉凶：忌含"诸事不宜"为凶日；宿曜吉凶结合宜事数量定级
+ */
 function generateMonthFortune(year: number, month: number): DayFortune[] {
   const daysInMonth = new Date(year, month, 0).getDate();
-  const jiList = ['宜出行', '宜签约', '宜祈福', '宜纳财', '宜祭祀', '宜修造', '宜纳采', '宜栽种', '宜嫁娶', '宜入宅', '宜开光', '宜搬迁', '宜搬家'];
-  const xiongList = ['忌动土', '忌嫁娶', '忌远行', '忌开市', '忌签约', '忌出行', '忌动土'];
   const fortunes: DayFortune[] = [];
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const seed = (year * 367 + month * 31 + d * 7) % 100;
+    const lunar = Solar.fromYmd(year, month, d).getLunar();
+    const times = lunar.getTimes();
+    const yi = times.length > 0 ? [...times[0].getYi()] : [];
+    const ji = times.length > 0 ? [...times[0].getJi()] : [];
+    const allXiong = ji.includes('诸事不宜');
+    const xiuLuck = lunar.getXiuLuck();
+
     let level: FortuneLevel;
     let summary: string;
-    if (seed >= 60) {
-      level = 'ji';
-      summary = jiList[d % jiList.length];
-    } else if (seed >= 30) {
-      level = 'ping';
-      summary = '平';
-    } else {
+    if (allXiong) {
       level = 'xiong';
-      summary = xiongList[d % xiongList.length];
+      summary = '诸事不宜';
+    } else if (xiuLuck === '吉' && yi.length >= 5) {
+      level = 'ji';
+      summary = `宜${yi[0] ?? '百事'}`;
+    } else if (xiuLuck === '凶' && yi.length <= 3) {
+      level = 'xiong';
+      summary = `忌${ji[0] ?? '冒进'}`;
+    } else {
+      level = 'ping';
+      summary = yi.length > 0 ? `宜${yi[0]}` : '平';
     }
-    fortunes.push({ day: d, level, summary });
+
+    fortunes.push({
+      day: d,
+      level,
+      summary,
+      lunar: `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`,
+      ganZhi: `${lunar.getYearInGanZhiByLiChun()}年 ${lunar.getMonthInGanZhi()}月 ${lunar.getDayInGanZhi()}日`,
+      jiShen: lunar.getDayJiShen().slice(0, 4),
+      xiongSha: lunar.getDayXiongSha().slice(0, 4),
+      yi,
+      ji,
+      hours: times.slice(0, 12).map((t, i) => ({
+        name: t.getZhi(),
+        time: HOUR_TIMES[i],
+        level: (t.getTianShenLuck() === '吉' ? 'ji' : 'xiong') as FortuneLevel,
+      })),
+    });
   }
   return fortunes;
 }
@@ -148,8 +191,27 @@ export default function CalendarPage() {
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [selectedDay, setSelectedDay] = useState<DayFortune | null>(null);
   const [zeiriQuery, setZeiriQuery] = useState('');
+  const [zeiriResult, setZeiriResult] = useState<{ date: string; desc: string }[] | null>(null);
 
   const fortunes = generateMonthFortune(year, month);
+
+  /** 择日：按活动类型在本月宜事中匹配（真实黄历数据） */
+  const handleZeiriSearch = () => {
+    const kw = zeiriQuery.trim();
+    if (!kw) {
+      setZeiriResult(null);
+      return;
+    }
+    const matched = fortunes.filter((f) => f.yi.some((y) => y.includes(kw))).slice(0, 5);
+    setZeiriResult(matched.map((f) => ({ date: `${month}月${f.day}日`, desc: `宜${f.yi.find((y) => y.includes(kw))}` })));
+  };
+
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
+  const defaultZeiri = fortunes
+    .filter((f) => f.level === 'ji' && (!isCurrentMonth || f.day >= today.getDate()))
+    .slice(0, 3)
+    .map((f) => ({ date: `${month}月${f.day}日`, desc: f.summary }));
+  const zeiriDays = zeiriResult ?? defaultZeiri;
   const firstDayWeek = new Date(year, month - 1, 1).getDay();
   const prevMonthDays = getPrevMonthDays(year, month);
   const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -163,6 +225,7 @@ export default function CalendarPage() {
     setMonth(newMonth);
     setYear(newYear);
     setSelectedDay(null);
+    setZeiriResult(null);
   };
 
   /** 点击日期 */
@@ -185,22 +248,6 @@ export default function CalendarPage() {
   for (let i = 1; i <= remaining; i++) {
     calendarCells.push({ day: i, isCurrentMonth: false });
   }
-
-  /** 十二时辰模拟数据 */
-  const hourData = [
-    { name: '子', time: '23-1', level: 'ji' as FortuneLevel },
-    { name: '丑', time: '1-3', level: 'xiong' as FortuneLevel },
-    { name: '寅', time: '3-5', level: 'ji' as FortuneLevel },
-    { name: '卯', time: '5-7', level: 'ji' as FortuneLevel },
-    { name: '辰', time: '7-9', level: 'xiong' as FortuneLevel },
-    { name: '巳', time: '9-11', level: 'ji' as FortuneLevel },
-    { name: '午', time: '11-13', level: 'xiong' as FortuneLevel },
-    { name: '未', time: '13-15', level: 'ji' as FortuneLevel },
-    { name: '申', time: '15-17', level: 'ji' as FortuneLevel },
-    { name: '酉', time: '17-19', level: 'xiong' as FortuneLevel },
-    { name: '戌', time: '19-21', level: 'ji' as FortuneLevel },
-    { name: '亥', time: '21-23', level: 'xiong' as FortuneLevel },
-  ];
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
@@ -275,7 +322,7 @@ export default function CalendarPage() {
                         <span style={CSS.fortuneDot(cell.fortune.level)} />
                       </div>
                       <span style={{ fontSize: 10, color: 'var(--color-text-tertiary)', lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {LUNAR_MAP[`${month}-${cell.day}`] || ''}
+                        {cell.fortune?.lunar || ''}
                       </span>
                       <span style={{
                         fontSize: 10,
@@ -317,34 +364,36 @@ export default function CalendarPage() {
                     </span>
                     <span style={{ ...CSS.fortuneDot(selectedDay.level), width: 8, height: 8 }} />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', flexWrap: 'wrap' }}>
-                    <span>农历 {LUNAR_MAP[`${month}-${selectedDay.day}`] || '—'}</span>
-                    <span style={{ color: 'var(--color-border)' }}>|</span>
-                    <span>干支 丙午年 乙未月 庚辰日</span>
-                  </div>
-                </div>
-                {/* 吉凶标签 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
-                    borderRadius: 8, fontSize: 'var(--text-xs)', fontWeight: 600,
-                    background: selectedDay.level === 'ji' ? 'rgba(26, 138, 92, 0.12)' : 'rgba(196, 58, 58, 0.12)',
-                    color: selectedDay.level === 'ji' ? 'var(--state-success)' : 'var(--state-error)',
-                    border: selectedDay.level === 'ji' ? '1px solid rgba(26, 138, 92, 0.2)' : '1px solid rgba(196, 58, 58, 0.2)',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    <span style={CSS.fortuneDot(selectedDay.level)} />
-                    {selectedDay.level === 'ji' ? '吉日' : '凶日'}
-                  </span>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
-                    borderRadius: 8, fontSize: 'var(--text-xs)',
-                    background: 'rgba(200, 168, 78, 0.1)', color: 'var(--color-gold)',
-                    border: '1px solid rgba(200, 168, 78, 0.2)', whiteSpace: 'nowrap',
-                  }}>
-                    <Sparkles size={12} /> 天德合
-                  </span>
-                </div>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', flexWrap: 'wrap' }}>
+                     <span>农历 {selectedDay.lunar || '—'}</span>
+                     <span style={{ color: 'var(--color-border)' }}>|</span>
+                     <span>干支 {selectedDay.ganZhi || '—'}</span>
+                   </div>
+                 </div>
+                 {/* 吉凶标签 */}
+                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                   <span style={{
+                     display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
+                     borderRadius: 8, fontSize: 'var(--text-xs)', fontWeight: 600,
+                     background: selectedDay.level === 'ji' ? 'rgba(26, 138, 92, 0.12)' : selectedDay.level === 'xiong' ? 'rgba(196, 58, 58, 0.12)' : 'rgba(200, 168, 78, 0.1)',
+                     color: selectedDay.level === 'ji' ? 'var(--state-success)' : selectedDay.level === 'xiong' ? 'var(--state-error)' : 'var(--color-gold)',
+                     border: selectedDay.level === 'ji' ? '1px solid rgba(26, 138, 92, 0.2)' : selectedDay.level === 'xiong' ? '1px solid rgba(196, 58, 58, 0.2)' : '1px solid rgba(200, 168, 78, 0.2)',
+                     whiteSpace: 'nowrap',
+                   }}>
+                     <span style={CSS.fortuneDot(selectedDay.level)} />
+                     {selectedDay.level === 'ji' ? '吉日' : selectedDay.level === 'xiong' ? '凶日' : '平日'}
+                   </span>
+                   {selectedDay.jiShen[0] && (
+                     <span style={{
+                       display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
+                       borderRadius: 8, fontSize: 'var(--text-xs)',
+                       background: 'rgba(200, 168, 78, 0.1)', color: 'var(--color-gold)',
+                       border: '1px solid rgba(200, 168, 78, 0.2)', whiteSpace: 'nowrap',
+                     }}>
+                       <Sparkles size={12} /> {selectedDay.jiShen[0]}
+                     </span>
+                   )}
+                 </div>
               </div>
 
               {/* 宜忌双列 */}
@@ -355,8 +404,8 @@ export default function CalendarPage() {
                     今日宜
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {selectedDay.level === 'ji' ? (
-                      ['搬家', '出行', '纳财', '签约'].map((item) => (
+                    {selectedDay.yi.length > 0 ? (
+                      selectedDay.yi.slice(0, 8).map((item) => (
                         <span key={item} style={{
                           display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
                           borderRadius: 8, fontSize: 'var(--text-sm)',
@@ -377,16 +426,20 @@ export default function CalendarPage() {
                     今日忌
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {['动土', '开仓', '安葬'].map((item) => (
-                      <span key={item} style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
-                        borderRadius: 8, fontSize: 'var(--text-sm)',
-                        background: 'rgba(196, 58, 58, 0.1)', color: 'var(--state-error)',
-                        border: '1px solid rgba(196, 58, 58, 0.2)', whiteSpace: 'nowrap',
-                      }}>
-                        <XCircle size={14} /> {item}
-                      </span>
-                    ))}
+                    {selectedDay.ji.length > 0 ? (
+                      selectedDay.ji.slice(0, 8).map((item) => (
+                        <span key={item} style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px',
+                          borderRadius: 8, fontSize: 'var(--text-sm)',
+                          background: 'rgba(196, 58, 58, 0.1)', color: 'var(--state-error)',
+                          border: '1px solid rgba(196, 58, 58, 0.2)', whiteSpace: 'nowrap',
+                        }}>
+                          <XCircle size={14} /> {item}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>无特别忌事</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -398,9 +451,8 @@ export default function CalendarPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
                   {[
-                    { name: '天德', isJi: true }, { name: '月德', isJi: true },
-                    { name: '天恩', isJi: true }, { name: '驿马', isJi: true },
-                    { name: '五虚', isJi: false }, { name: '劫煞', isJi: false },
+                    ...selectedDay.jiShen.map((name) => ({ name, isJi: true })),
+                    ...selectedDay.xiongSha.map((name) => ({ name, isJi: false })),
                   ].map((shen) => (
                     <div key={shen.name} style={{
                       display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px',
@@ -420,7 +472,7 @@ export default function CalendarPage() {
                   十二时辰吉凶
                 </div>
                 <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8 }}>
-                  {hourData.map((h) => (
+                  {selectedDay.hours.map((h) => (
                     <div key={h.name} style={{
                       flexShrink: 0, width: 72, padding: '8px 12px', borderRadius: 8,
                       textAlign: 'center', fontSize: 'var(--text-xs)',
@@ -444,7 +496,7 @@ export default function CalendarPage() {
                   border: '1px solid rgba(0, 75, 170, 0.2)', borderRadius: 12, padding: 24,
                 }}>
                   <p style={{ fontSize: 'var(--text-base)', color: 'var(--color-text)', lineHeight: 1.75 }}>
-                    今日天德合日，五行土金相生，整体运势较佳。事业方面有贵人暗中助力，适合推进重要项目；财运平稳上升，正财可期。感情方面需注意沟通方式，避免因小事产生争执。健康无碍，可适当户外活动。建议上午9至11点（巳时）进行重要会晤或签约。
+                    {buildDaySummary(selectedDay)}
                   </p>
                 </div>
               </div>
@@ -475,6 +527,7 @@ export default function CalendarPage() {
                 type="text"
                 value={zeiriQuery}
                 onChange={(e) => setZeiriQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleZeiriSearch()}
                 placeholder="输入活动类型，如搬家、签约、出行..."
                 style={{
                   flex: 1, minWidth: 200,
@@ -483,22 +536,25 @@ export default function CalendarPage() {
                   color: 'var(--color-text)', fontFamily: 'var(--font-body)', outline: 'none',
                 }}
               />
-              <button style={{
-                background: 'var(--color-gold)', color: 'var(--color-primary-darker)',
-                fontWeight: 600, borderRadius: 12, padding: '12px 24px', fontSize: 'var(--text-sm)',
-                border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)',
-                display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
-              }}>
-                <Sparkles size={16} /> AI 推荐吉日
+              <button
+                onClick={handleZeiriSearch}
+                style={{
+                  background: 'var(--color-gold)', color: 'var(--color-primary-darker)',
+                  fontWeight: 600, borderRadius: 12, padding: '12px 24px', fontSize: 'var(--text-sm)',
+                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)',
+                  display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
+                }}
+              >
+                <Sparkles size={16} /> 推荐吉日
               </button>
             </div>
-            {/* 推荐结果预览 */}
+            {/* 推荐结果预览（基于本月真实黄历吉日） */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
-              {[
-                { date: '7月16日', desc: '宜签约' },
-                { date: '7月21日', desc: '宜嫁娶' },
-                { date: '7月26日', desc: '宜纳财' },
-              ].map((item) => (
+              {zeiriDays.length === 0 ? (
+                <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)' }}>
+                  {zeiriResult ? `本月暂无宜"${zeiriQuery.trim()}"的吉日，可尝试下月` : '本月暂无可推荐吉日'}
+                </span>
+              ) : zeiriDays.map((item) => (
                 <div key={item.date} style={{
                   display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8,
                   background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)',
