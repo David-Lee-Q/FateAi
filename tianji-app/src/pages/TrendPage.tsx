@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   TrendingUp,
   Briefcase,
@@ -12,11 +12,8 @@ import {
   Lightbulb,
   Loader2,
 } from 'lucide-react';
-import { useAuth } from '@/context/useAuth';
-import { getHistory } from '@/services/api';
-import type { FortuneResult } from '@/types';
+import { useAuthedHistory } from '@/hooks/useAuthedHistory';
 import {
-  scoreRecords,
   filterRange,
   buildSeries,
   findKeyPoints,
@@ -26,7 +23,6 @@ import {
   type DimensionKey,
   type RangeKey,
   type SeriesPoint,
-  type ScoredRecord,
 } from '@/services/insights';
 import { DemoBanner, EmptyInsights } from '@/components/InsightsShared';
 
@@ -387,34 +383,9 @@ function DemoTrendChart() {
    趋势追踪页面组件
    ======================================== */
 export default function TrendPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { records, isDemo, isLoading } = useAuthedHistory();
   const [dimension, setDimension] = useState<DimensionKey>('overall');
   const [timeRange, setTimeRange] = useState<RangeKey>('30d');
-  const [records, setRecords] = useState<ScoredRecord[] | null>(null);
-
-  const isDemo = !authLoading && !user;
-  const isLoading = Boolean(user) && records === null;
-
-  useEffect(() => {
-    if (!user) {
-      setRecords(null);
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const resp = await getHistory(200);
-        if (cancelled) return;
-        const list = (resp.data ?? []) as FortuneResult[];
-        setRecords(scoreRecords(list));
-      } catch {
-        if (!cancelled) setRecords([]);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   const activeLabel = DIMENSIONS.find((d) => d.value === dimension)?.label ?? '综合运势';
   const rangeRecords = useMemo(

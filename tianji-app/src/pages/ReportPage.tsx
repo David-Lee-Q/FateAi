@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Briefcase, Heart, Coins, Sparkles, Settings2,
@@ -7,11 +7,9 @@ import {
   Download, Bookmark, Share2, CalendarRange,
   Wrench, Compass, ChevronRight,
 } from 'lucide-react';
-import { useAuth } from '@/context/useAuth';
-import { getHistory } from '@/services/api';
-import { buildRealReportContent, scoreRecords, fmtDateTime, type ScoredRecord } from '@/services/insights';
+import { useAuthedHistory } from '@/hooks/useAuthedHistory';
+import { buildRealReportContent, fmtDateTime } from '@/services/insights';
 import { DemoBanner, EmptyInsights } from '@/components/InsightsShared';
-import type { FortuneResult } from '@/types';
 
 /* ============================================
    浅色主题变量覆盖（内联，不依赖全局 dark 主题）
@@ -459,7 +457,7 @@ const VALID_TYPES: ReportTypeId[] = REPORT_TYPES.map((t) => t.id);
 export default function ReportPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user, records, isDemo, isLoading, isEmpty } = useAuthedHistory();
 
   const urlType = searchParams.get('type');
   const [activeType, setActiveType] = useState<ReportTypeId>(
@@ -468,32 +466,6 @@ export default function ReportPage() {
   const [customTopic, setCustomTopic] = useState<CustomTopic>(CUSTOM_TOPICS[0]);
   const [toast, setToast] = useState('');
   const [favorites, setFavorites] = useState<FavoriteItem[]>(loadFavorites);
-  const [records, setRecords] = useState<ScoredRecord[] | null>(null);
-
-  const isDemo = !authLoading && !user;
-  const isLoading = Boolean(user) && records === null;
-  const isEmpty = Boolean(user) && records !== null && records.length === 0;
-
-  useEffect(() => {
-    if (!user) {
-      setRecords(null);
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const resp = await getHistory(200);
-        if (cancelled) return;
-        const list = (resp.data ?? []) as FortuneResult[];
-        setRecords(scoreRecords(list));
-      } catch {
-        if (!cancelled) setRecords([]);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   const activeTypeName = REPORT_TYPES.find((t) => t.id === activeType)?.name || '综合报告';
   const content: ReportContent = !user

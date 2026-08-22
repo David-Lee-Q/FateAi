@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   User, Sparkles, Star, Zap, ChevronRight, CalendarDays,
   Briefcase, Heart, Wallet, Rocket, Users, FileSignature,
@@ -8,11 +8,10 @@ import {
   CalendarPlus, Bookmark, Loader2, GraduationCap,
   Plane, Handshake, Flame, Rabbit,
 } from 'lucide-react';
-import { useAuth } from '@/context/useAuth';
-import { getHistory, askAiAdvice } from '@/services/api';
-import { scoreRecords, buildRealAdviceContent, WEEKDAYS, type ScoredRecord, type RealAdviceContent } from '@/services/insights';
+import { useAuthedHistory } from '@/hooks/useAuthedHistory';
+import { askAiAdvice } from '@/services/api';
+import { buildRealAdviceContent, WEEKDAYS, type RealAdviceContent } from '@/services/insights';
 import { DemoBanner, EmptyInsights } from '@/components/InsightsShared';
-import type { FortuneResult } from '@/types';
 
 /* ================================================================
    数据类型 & 模拟数据
@@ -683,37 +682,10 @@ const PLAN_REAL_ICONS: { icon: React.ReactNode; iconBg: string; iconColor: strin
 ];
 
 export default function AdvicePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, records, isDemo, isLoading, isEmpty } = useAuthedHistory();
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiReply, setAiReply] = useState('');
-  const [records, setRecords] = useState<ScoredRecord[] | null>(null);
-
-  const isDemo = !authLoading && !user;
-  const isLoading = Boolean(user) && records === null;
-  const isEmpty = Boolean(user) && records !== null && records.length === 0;
-
-  // 登录态：拉取真实查询记录（与综合报告同一取数口径）
-  useEffect(() => {
-    if (!user) {
-      setRecords(null);
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const resp = await getHistory(200);
-        if (cancelled) return;
-        const list = (resp.data ?? []) as FortuneResult[];
-        setRecords(scoreRecords(list));
-      } catch {
-        if (!cancelled) setRecords([]);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   const real: RealAdviceContent | null =
     user && records !== null && records.length > 0 ? buildRealAdviceContent(records) : null;
