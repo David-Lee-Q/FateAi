@@ -6,6 +6,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 import fortuneRouter from './routes/fortune';
 import configRouter from './routes/config';
 import authRouter from './routes/auth';
@@ -36,6 +38,21 @@ app.use('/api/config', configRouter);
 
 // 注册认证路由（登录 / 注册 / 个人资料）
 app.use('/api/auth', authRouter);
+
+// 生产模式：托管前端构建产物（单端口部署，API 与静态资源同源）
+// 开发模式下 dist 不存在则跳过，由 Vite DevServer 负责前端
+const frontendDist = path.resolve(__dirname, '../../tianji-app/dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  // SPA 回退：非 /api 的 GET 请求一律返回 index.html，交由前端路由接管
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      res.sendFile(path.join(frontendDist, 'index.html'));
+      return;
+    }
+    next();
+  });
+}
 
 // 启动服务
 const PORT = process.env.PORT || 3000;
