@@ -6,7 +6,7 @@
     "dev": "nodemon --exec tsx src/index.ts --ignore data/ --ignore .env",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +25,7 @@
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.0",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
   }
 }
