@@ -88,12 +88,12 @@ router.post('/query', async (req: Request, res: Response) => {
       // ========== 已有系统 ==========
       case 'bazi': {
         const params = inputParams as unknown as BaziInputParams;
-        const { year, month, day, hour, gender } = params;
+        const { year, month, day, hour, gender, province, city } = params;
         if (!year || !month || !day || hour === undefined || !gender) {
           res.status(400).json({ success: false, message: '八字排盘需要：year, month, day, hour, gender' });
           return;
         }
-        data = calculateBazi(year, month, day, hour, gender);
+        data = calculateBazi(year, month, day, hour, gender, city, province);
         break;
       }
 

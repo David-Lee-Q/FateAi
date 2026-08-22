@@ -265,10 +265,12 @@ export default function BaziResultPage() {
       土: { percentage: Math.round(((wuXingCount['土'] || 0) / total) * 100), strength: getStrength(wuXingCount['土'] || 0) },
     };
 
-    return { pillars, wuxingData, wuXingCount };
+    const trueSolar = (d.trueSolar as { note?: string; changed?: boolean }) || null;
+
+    return { pillars, wuxingData, wuXingCount, trueSolarNote: trueSolar?.note ?? null };
   }, []);
 
-  const { pillars, wuxingData, wuXingCount } = parseBaziData(data);
+  const { pillars, wuxingData, wuXingCount, trueSolarNote } = parseBaziData(data);
 
   // 命格评分：由五行俱全程度真实派生
   const presentCount = Object.values(wuXingCount).filter((c) => c > 0).length;
@@ -438,6 +440,14 @@ export default function BaziResultPage() {
               <PillarsCard key={idx} {...p} />
             ))}
           </div>
+          {trueSolarNote && (
+            <div
+              className="mt-4 p-4 rounded-lg text-sm leading-relaxed"
+              style={{ background: 'rgba(0,75,170,0.08)', border: '1px solid rgba(0,75,170,0.25)', color: 'var(--color-text-secondary)' }}
+            >
+              {trueSolarNote}
+            </div>
+          )}
           {/* 藏干信息 */}
           <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--color-bg-inset)', border: '1px solid var(--color-border)' }}>
             <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-secondary)' }}>地支藏干</h3>

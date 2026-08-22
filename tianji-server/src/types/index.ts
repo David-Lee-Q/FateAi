@@ -31,6 +31,8 @@ export interface BaziInputParams {
   day: number;
   hour: number;
   gender: 'male' | 'female';
+  province?: string; // 出生省份（可选，用于真太阳时校正兜底）
+  city?: string;     // 出生城市（可选，用于真太阳时校正）
 }
 
 /** 八字四柱 */
@@ -49,6 +51,16 @@ export interface BaziResult {
   hourPillar: BaziPillar;   // 时柱
   wuXingCount: Record<string, number>; // 五行统计
   summary: string;           // 总体概述
+  /** 真太阳时校正信息（提供出生地时生成） */
+  trueSolar?: {
+    city: string;            // 校正地点
+    longitude: number;       // 经度
+    offsetMinutes: number;   // 校正偏移（分钟，负值=真太阳时早于标准时）
+    originalHour: number;    // 原始时辰索引
+    correctedHour: number;   // 校正后时辰索引
+    changed: boolean;        // 时辰是否发生变化
+    note: string;            // 说明文字
+  };
   _naYin?: {
     yearNaYin: string;
     monthNaYin: string;
