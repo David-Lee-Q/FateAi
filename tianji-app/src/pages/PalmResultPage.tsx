@@ -63,6 +63,7 @@ export default function PalmResultPage() {
   const wisdomLine = lines.mind?.interpretation || '';
   const genderText = (typeof details.gender === 'string' && details.gender) || '';
   const palmTypeDesc = (typeof details.palmTypeDesc === 'string' && details.palmTypeDesc) || '';
+  const isAI = details.mode === 'ai';
 
   return (
     <div style={{ background: 'linear-gradient(180deg, #1a0a2e 0%, #0a0e1a 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
@@ -81,6 +82,17 @@ export default function PalmResultPage() {
       </header>
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 1280 }}>
+        {/* 解读来源标识 */}
+        <div
+          className="mb-4 px-4 py-3 rounded-xl text-sm"
+          style={isAI
+            ? { background: 'rgba(0,75,170,0.12)', border: '1px solid rgba(0,75,170,0.35)', color: '#8ab4e8' }
+            : { background: 'rgba(200,168,78,0.08)', border: '1px solid rgba(200,168,78,0.3)', color: '#c8a84e' }}
+        >
+          {isAI
+            ? '本次解读由 AI 视觉模型基于您上传的手掌照片真实识别生成。'
+            : 'AI 视觉识别暂不可用，当前为模板模拟结果，仅供参考；上传照片后配置 AI 服务即可获取真实识别。'}
+        </div>
         {/* 手掌分析头部 */}
         <div
           className="relative rounded-2xl p-6 sm:p-8 mb-8 overflow-hidden"

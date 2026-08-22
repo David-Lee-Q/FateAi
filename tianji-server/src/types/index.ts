@@ -478,6 +478,8 @@ export interface PalmResult {
       heart: PalmLine;
       mind: PalmLine;
     };
+    /** 解读来源：ai=视觉模型真实识别，mock=模板模拟（AI 不可用时的降级） */
+    mode: 'ai' | 'mock';
   };
 }
 

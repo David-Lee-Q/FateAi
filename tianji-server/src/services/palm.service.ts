@@ -1,4 +1,5 @@
 import { PalmResult, PalmInputParams } from '../types';
+import { callAIWithImage } from './ai-interpreter';
 
 const PALM_TYPES = ['金型手', '木型手', '水型手', '火型手', '土型手'];
 
@@ -114,21 +115,69 @@ function generatePalmSummary(
   return summary + ' ' + linesAnalysis.join('');
 }
 
-/** 手相算命服务
- * 模拟AI图像识别手掌照片并生成分析结果
- * 实际项目中应接入计算机视觉模型进行手掌特征识别
- */
-export async function analyzePalm(params: PalmInputParams): Promise<PalmResult> {
-  const { gender, image } = params;
-
-  if (!image) {
-    throw new Error('请上传手掌照片');
+/** 视觉模型提示词：要求返回严格 JSON */
+function palmVisionPrompt(genderText: string): string {
+  return `你是资深手相师。请仔细观察这张手掌照片，分析其手型与三大主线（生命线、感情线、智慧线）。性别参考：${genderText}。
+请仅输出一个 JSON 对象（不要任何多余文字或代码块标记），字段如下：
+{
+  "palmType": "金型手|木型手|水型手|火型手|土型手 之一",
+  "palmTypeDesc": "对该手型的一句中文描述（20-50字）",
+  "summary": "整体手相概述（40-100字，客观专业）",
+  "lines": {
+    "life":  { "type": "长|短|深|浅|清晰|断续|分叉|环抱|中断 之一", "description": "生命线形态描述（15-40字）", "interpretation": "生命线含义解读（20-60字）" },
+    "heart": { "type": "同上", "description": "感情线形态描述（15-40字）", "interpretation": "感情线含义解读（20-60字）" },
+    "mind":  { "type": "同上", "description": "智慧线形态描述（15-40字）", "interpretation": "智慧线含义解读（20-60字）" }
   }
+}`;
+}
 
-  const genderText = gender === 'male' ? '男' : '女';
+/** 解析并校验视觉模型返回的 JSON，格式不符返回 null */
+export function parsePalmAIJson(text: string): {
+  palmType: string;
+  palmTypeDesc: string;
+  wuXing: string;
+  summary: string;
+  lines: { life: { type: string; description: string; interpretation: string }; heart: { type: string; description: string; interpretation: string }; mind: { type: string; description: string; interpretation: string } };
+} | null {
+  try {
+    // 去除可能的 ```json 代码块包裹
+    const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    const first = cleaned.indexOf('{');
+    const last = cleaned.lastIndexOf('}');
+    if (first < 0 || last <= first) return null;
+    const obj = JSON.parse(cleaned.slice(first, last + 1)) as Record<string, unknown>;
 
-  await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+    const palmType = typeof obj.palmType === 'string' && PALM_TYPES.includes(obj.palmType) ? obj.palmType : null;
+    if (!palmType) return null;
 
+    const rawLines = obj.lines as Record<string, Record<string, string>> | undefined;
+    const pickLine = (key: 'life' | 'heart' | 'mind') => {
+      const l = rawLines?.[key];
+      if (!l || typeof l.type !== 'string' || typeof l.description !== 'string' || typeof l.interpretation !== 'string') return null;
+      return { type: l.type, description: l.description, interpretation: l.interpretation };
+    };
+    const life = pickLine('life');
+    const heart = pickLine('heart');
+    const mind = pickLine('mind');
+    if (!life || !heart || !mind) return null;
+
+    const summary = typeof obj.summary === 'string' && obj.summary.trim() ? obj.summary.trim() : null;
+    if (!summary) return null;
+
+    return {
+      palmType,
+      palmTypeDesc: typeof obj.palmTypeDesc === 'string' && obj.palmTypeDesc.trim() ? obj.palmTypeDesc.trim() : PALM_TYPE_DESC[palmType],
+      wuXing: WU_XING_MAP[palmType],
+      summary,
+      lines: { life, heart, mind },
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** 模板模拟结果（AI 不可用时的降级） */
+function buildMockPalm(genderText: string): { summary: string; details: Omit<PalmResult['details'], 'mode'> } {
   const palmType = randomFrom(PALM_TYPES);
   const wuXing = WU_XING_MAP[palmType];
   const palmTypeDesc = PALM_TYPE_DESC[palmType];
@@ -159,15 +208,48 @@ export async function analyzePalm(params: PalmInputParams): Promise<PalmResult> 
   };
 
   const summary = generatePalmSummary(palmType, wuXing, genderText, lifeType, heartType, mindType);
+  return { summary, details: { palmType, palmTypeDesc, wuXing, gender: genderText, lines } };
+}
 
-  return {
-    summary,
-    details: {
-      palmType,
-      palmTypeDesc,
-      wuXing,
-      gender: genderText,
-      lines,
-    },
-  };
+/** 手相算命服务
+ * 优先调用视觉模型识别手掌照片生成真实解读；
+ * 无 AI Key 或识别失败时降级为模板模拟（details.mode 标识来源）
+ */
+export async function analyzePalm(params: PalmInputParams): Promise<PalmResult> {
+  const { gender, image } = params;
+
+  if (!image) {
+    throw new Error('请上传手掌照片');
+  }
+
+  const genderText = gender === 'male' ? '男' : '女';
+
+  // 1. 视觉模型真实识别
+  if (image.startsWith('data:image/')) {
+    const aiText = await callAIWithImage(palmVisionPrompt(genderText), image);
+    if (aiText) {
+      const ai = parsePalmAIJson(aiText);
+      if (ai) {
+        return {
+          summary: ai.summary,
+          details: {
+            palmType: ai.palmType,
+            palmTypeDesc: ai.palmTypeDesc,
+            wuXing: ai.wuXing,
+            gender: genderText,
+            lines: {
+              life: { name: '生命线', ...ai.lines.life },
+              heart: { name: '感情线', ...ai.lines.heart },
+              mind: { name: '智慧线', ...ai.lines.mind },
+            },
+            mode: 'ai',
+          },
+        };
+      }
+    }
+  }
+
+  // 2. 降级：模板模拟
+  const mock = buildMockPalm(genderText);
+  return { summary: mock.summary, details: { ...mock.details, mode: 'mock' } };
 }

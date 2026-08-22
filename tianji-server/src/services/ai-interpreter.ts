@@ -1207,6 +1207,61 @@ export async function callAI(prompt: string): Promise<string> {
   }
 }
 
+/**
+ * 调用视觉模型（图片 + 文本）。成功返回模型文本，不可用或失败返回 null
+ */
+export async function callAIWithImage(prompt: string, imageUrl: string): Promise<string | null> {
+  const apiKey = process.env.AI_API_KEY;
+  const apiBase = process.env.AI_API_BASE || 'https://api.openai.com/v1';
+  const model = process.env.AI_MODEL || 'gpt-4o-mini';
+
+  if (!apiKey || apiKey === 'your_api_key_here') {
+    return null;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
+    const response = await fetch(`${apiBase}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: '你是资深手相师，擅长根据手掌照片分析掌纹与手型，输出客观专业的解读。' },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: imageUrl } },
+            ],
+          },
+        ],
+        max_tokens: 1500,
+        temperature: 0.4,
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.warn(`视觉模型调用失败: ${response.status}，将降级为模拟解读`);
+      return null;
+    }
+
+    const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+    return data.choices?.[0]?.message?.content || null;
+  } catch (error) {
+    console.warn('视觉模型调用异常，将降级为模拟解读:', error);
+    return null;
+  }
+}
+
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
