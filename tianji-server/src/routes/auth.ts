@@ -13,6 +13,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import fs from 'fs';
+import { rateLimit } from '../middleware/rateLimit';
 import path from 'path';
 
 const DATA_DIR = path.join(__dirname, '../../data');
@@ -177,8 +178,8 @@ export function getOptionalAuthUserId(req: Request): string | null {
 
 const router = Router();
 
-/** 注册 */
-router.post('/register', (req: Request, res: Response) => {
+/** 注册（限流：每 IP 每小时 3 次） */
+router.post('/register', rateLimit(60 * 60 * 1000, 3), (req: Request, res: Response) => {
   try {
     const { username, password, nickname } = (req.body || {}) as {
       username?: string; password?: string; nickname?: string;
@@ -220,8 +221,8 @@ router.post('/register', (req: Request, res: Response) => {
   }
 });
 
-/** 登录 */
-router.post('/login', (req: Request, res: Response) => {
+/** 登录（限流：每 IP 每分钟 5 次） */
+router.post('/login', rateLimit(60 * 1000, 5), (req: Request, res: Response) => {
   try {
     const { username, password } = (req.body || {}) as { username?: string; password?: string };
     if (!username || !password) {
