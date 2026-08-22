@@ -28,6 +28,7 @@ import NametestLayout from './result/layouts/NametestLayout';
 import ShengxiaoLayout from './result/layouts/ShengxiaoLayout';
 import AlmanacLayout from './result/layouts/AlmanacLayout';
 import DrawlotLayout from './result/layouts/DrawlotLayout';
+import ShareModal from '@/components/ShareModal';
 
 // 环形进度条组件
 function ProgressRing({ score }: { score: number }) {
@@ -1311,7 +1312,7 @@ export default function ResultPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('personality');
-  const [copied, setCopied] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [followQuestion, setFollowQuestion] = useState('');
@@ -1599,15 +1600,9 @@ export default function ResultPage() {
     setTimeout(() => setReportLoading(false), 500);
   }, [result, aiInterpretation]);
 
-  /** 分享操作（复制当前 URL 到剪贴板） */
-  const handleShare = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* 剪贴板 API 不可用时静默失败 */
-    }
+  /** 打开分享弹窗（图片卡片 / 复制文字 / 复制链接） */
+  const handleShare = useCallback(() => {
+    setShareOpen(true);
   }, []);
 
   /* ---- 加载状态 ---- */
@@ -2103,19 +2098,19 @@ export default function ResultPage() {
               {bookmarked ? '已收藏' : '收藏结果'}
             </span>
           </button>
-          {/* 分享卡片 */}
+          {/* 分享 */}
           <button
             onClick={handleShare}
             className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg transition-colors shrink-0"
             style={{
-              color: copied ? 'var(--state-success)' : 'var(--color-text-secondary)',
+              color: 'var(--color-text-secondary)',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
             }}
           >
             <Share2 size={20} />
-            <span className="text-xs whitespace-nowrap">{copied ? '已复制' : '分享卡片'}</span>
+            <span className="text-xs whitespace-nowrap">分享</span>
           </button>
           {/* 查看完整报告 */}
           <button
@@ -2149,6 +2144,10 @@ export default function ResultPage() {
           )}
         </div>
       </div>
+
+      {result && (
+        <ShareModal open={shareOpen} onClose={() => setShareOpen(false)} result={result} />
+      )}
     </div>
   );
 }
