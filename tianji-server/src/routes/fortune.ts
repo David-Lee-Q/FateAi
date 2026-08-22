@@ -4,10 +4,11 @@
  * GET  /api/fortune/result/:id - 获取结果
  * GET  /api/fortune/history   - 获取历史
  *
- * 支持 18 种占卜系统：bazi, tarot, zodiac, dream,
- *   ziwei, liuyao, meihua, qimen, fengshui,
- *   numerology, astrodice, moonphase, rune,
+ * 支持 20 种占卜系统：bazi, tarot, zodiac, dream,
+ *   ziwei, liuyao, meihua, qimen, fengshui, tieban,
+ *   daliuren, numerology, astrodice, moonphase, rune,
  *   nametest, shengxiao, almanac, drawlot, palm
+ * 另支持 AI 洞察系统：search, trend, report, compare
  */
 
 import { Router, Request, Response } from 'express';
