@@ -116,6 +116,21 @@ export async function submitFollowUp(
   return response.data;
 }
 
+/**
+ * 个性化建议：AI 跨体系综合提问
+ * @param question 用户提问（≤500 字）
+ * @param context 可选背景信息
+ */
+export async function askAiAdvice(
+  question: string,
+  context?: string
+): Promise<ApiResponse<{ answer: string; question: string; timestamp: string }>> {
+  const response = await http.post<
+    ApiResponse<{ answer: string; question: string; timestamp: string }>
+  >('/fortune/ai-chat', { question, context });
+  return response.data;
+}
+
 /* ================================================================
  *  扩展接口（通过 fortune/query 统一调度）
  * ================================================================ */

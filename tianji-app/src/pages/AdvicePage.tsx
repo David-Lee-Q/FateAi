@@ -9,7 +9,7 @@ import {
   Plane, Handshake, Flame, Rabbit,
 } from 'lucide-react';
 import { useAuth } from '@/context/useAuth';
-import { getHistory } from '@/services/api';
+import { getHistory, askAiAdvice } from '@/services/api';
 import { scoreRecords, buildRealAdviceContent, WEEKDAYS, type ScoredRecord, type RealAdviceContent } from '@/services/insights';
 import { DemoBanner, EmptyInsights } from '@/components/InsightsShared';
 import type { FortuneResult } from '@/types';
@@ -760,15 +760,15 @@ export default function AdvicePage() {
 
   const warnings: WarningItem[] = real ? real.warnings : WARNING_DATA;
 
-  /** 提交自定义建议请求 */
+  /** 提交自定义建议请求（AI 跨体系综合分析） */
   const handleSubmit = async () => {
-    if (!question.trim()) return;
+    const q = question.trim();
+    if (!q || loading) return;
     setLoading(true);
     setAiReply('');
     try {
-      // TODO: 接入实际 API
-      await new Promise((r) => setTimeout(r, 1500));
-      setAiReply('已收到您的提问，AI 正在基于多个占卜体系为您综合分析。');
+      const res = await askAiAdvice(q);
+      setAiReply(res.data?.answer || 'AI 暂无有效回复，请换个问法再试。');
     } catch {
       setAiReply('抱歉，请求失败，请稍后重试。');
     } finally {

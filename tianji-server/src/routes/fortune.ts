@@ -45,7 +45,7 @@ import type {
   SearchResult, TrendResult, ReportResult, CompareResult,
 } from '../types';
 import { resultStorage } from '../utils/storage';
-import { interpretFortune, followUpInterpret } from '../services/ai-interpreter';
+import { interpretFortune, followUpInterpret, askAiAdvice } from '../services/ai-interpreter';
 import { getOptionalAuthUserId } from './auth';
 
 const router = Router();
@@ -572,6 +572,34 @@ router.post('/followup', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('AI 追问异常:', error);
     res.status(500).json({ success: false, message: '追问失败，请稍后重试' });
+  }
+});
+
+/**
+ * POST /api/fortune/ai-chat
+ * 个性化建议自定义提问：AI 跨体系综合分析
+ * 参数：question（必填，≤500 字）、context（可选背景）
+ */
+router.post('/ai-chat', async (req, res) => {
+  try {
+    const { question, context } = req.body as { question?: string; context?: string };
+    const q = (question || '').trim();
+    if (!q) {
+      res.status(400).json({ success: false, message: '提问内容不能为空' });
+      return;
+    }
+    if (q.length > 500) {
+      res.status(400).json({ success: false, message: '提问过长（最多 500 字）' });
+      return;
+    }
+    const answer = await askAiAdvice(q, context?.trim() || undefined);
+    res.json({
+      success: true,
+      data: { answer, question: q, timestamp: new Date().toISOString() },
+    });
+  } catch (error) {
+    console.error('AI 建议提问异常:', error);
+    res.status(500).json({ success: false, message: 'AI 分析失败，请稍后重试' });
   }
 });
 

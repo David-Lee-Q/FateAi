@@ -1121,6 +1121,30 @@ export async function followUpInterpret(
   return callAI(prompt);
 }
 
+/** 个性化建议页自定义提问 Prompt */
+export const ADVICE_PROMPT = (question: string): string => `你正处于"个性化建议"板块，用户对综合运势提出了以下提问。请基于中国传统命理（八字、紫微、生肖流年）与西方占卜（塔罗、星象）多体系视角综合分析，给出具体可执行的建议。
+
+用户提问：${question}
+
+要求：
+- 用中文回答，控制在 300 字以内
+- 结构：先直接回应问题核心，再给出 2-3 条具体行动建议
+- 避免宿命论，强调后天努力与行动的价值
+- 不做具体投资/医疗/法律建议
+- 若信息不足以精确判断，先说明可补充的信息，再给出通用参考框架`;
+
+/**
+ * 个性化建议页：AI 跨体系综合解答
+ * @param question 用户提问
+ * @param context 可选的额外背景（如用户资料、近期关注点）
+ */
+export async function askAiAdvice(question: string, context?: string): Promise<string> {
+  const prompt = context
+    ? `背景信息：${context}\n\n${ADVICE_PROMPT(question)}`
+    : ADVICE_PROMPT(question);
+  return callAI(prompt);
+}
+
 // ============================================================
 // AI 服务调用函数
 // ============================================================
