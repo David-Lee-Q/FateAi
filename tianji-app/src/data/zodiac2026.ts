@@ -599,11 +599,58 @@ export function getMonthlyFortune(animalBranch: number, monthBranch: number): Mo
   return { fortune: 'zhong', reason: '月建与生肖气运平和，宜专注积累，不宜强求。' };
 }
 
-/** 当前所处农历月索引（2026-08-22 处于农历七月=申月，索引 6） */
-export const CURRENT_MONTH_INDEX = 6;
+/** 2026 丙午年各农历月对应的公历区间（与 MONTH_META 顺序一致，经 lunar-typescript 精确生成） */
+export const MONTH_RANGES: { start: string; end: string }[] = [
+  // 正月
+  { start: '2026-02-17', end: '2026-03-18' },
+  // 二月
+  { start: '2026-03-19', end: '2026-04-16' },
+  // 三月
+  { start: '2026-04-17', end: '2026-05-16' },
+  // 四月
+  { start: '2026-05-17', end: '2026-06-14' },
+  // 五月
+  { start: '2026-06-15', end: '2026-07-13' },
+  // 六月
+  { start: '2026-07-14', end: '2026-08-12' },
+  // 七月
+  { start: '2026-08-13', end: '2026-09-10' },
+  // 八月
+  { start: '2026-09-11', end: '2026-10-09' },
+  // 九月
+  { start: '2026-10-10', end: '2026-11-08' },
+  // 十月
+  { start: '2026-11-09', end: '2026-12-08' },
+  // 冬月
+  { start: '2026-12-09', end: '2027-01-07' },
+  // 腊月（至 2027 丙午除夕）
+  { start: '2027-01-08', end: '2027-02-05' },
+];
 
-/** 当前农历月的公历区间 */
-export const CURRENT_MONTH_RANGE = '2026.08.13 - 2026.09.10';
+/**
+ * 按当前日期推算所处农历月索引（0=正月 ... 11=腊月）。
+ * 超出 2026 丙午年范围时钳位到首月/末月。
+ */
+export function getCurrentMonthIndex(now: Date = new Date()): number {
+  const iso = toIsoDate(now);
+  for (let i = 0; i < MONTH_RANGES.length; i++) {
+    const r = MONTH_RANGES[i];
+    if (iso >= r.start && iso <= r.end) return i;
+  }
+  return iso < MONTH_RANGES[0].start ? 0 : MONTH_RANGES.length - 1;
+}
+
+/** 当前农历月的公历区间（格式 YYYY.MM.DD - YYYY.MM.DD） */
+export function getCurrentMonthRange(now: Date = new Date()): string {
+  const i = getCurrentMonthIndex(now);
+  const r = MONTH_RANGES[i];
+  const fmt = (d: string) => d.replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$1.$2.$3');
+  return `${fmt(r.start)} - ${fmt(r.end)}`;
+}
+
+function toIsoDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 /** 本月建议文案（按吉凶） */
 export const MONTH_ADVICE: Record<MonthFortune, string> = {

@@ -13,9 +13,10 @@ import {
 import {
   ZODIAC_FORTUNES,
   MONTH_META,
+  BRANCH_NAMES,
   getMonthlyFortune,
-  CURRENT_MONTH_INDEX,
-  CURRENT_MONTH_RANGE,
+  getCurrentMonthIndex,
+  getCurrentMonthRange,
   MONTH_ADVICE,
 } from '../data/zodiac2026';
 
@@ -139,15 +140,18 @@ export default function ShengxiaoPage() {
   /** 当前生肖的 2026 丙午年运势数据 */
   const f = ZODIAC_FORTUNES[selectedZodiac] ?? ZODIAC_FORTUNES.horse;
 
+  /** 当前所处农历月索引（按日期动态推算） */
+  const currentMonthIndex = getCurrentMonthIndex();
+
   /** 按生肖推算的 12 个月吉凶 */
   const monthlyFortunes = MONTH_META.map((m, i) => ({
     ...m,
     ...getMonthlyFortune(f.branch, m.branch),
-    isCurrent: i === CURRENT_MONTH_INDEX,
+    isCurrent: i === currentMonthIndex,
   }));
 
-  /** 本月（农历七月·申月）运势 */
-  const currentMonthMeta = MONTH_META[CURRENT_MONTH_INDEX];
+  /** 本月运势（随日期动态切换） */
+  const currentMonthMeta = MONTH_META[currentMonthIndex];
   const currentMonth = getMonthlyFortune(f.branch, currentMonthMeta.branch);
 
   /** 吉月 / 凶月汇总 */
@@ -462,7 +466,7 @@ export default function ShengxiaoPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2 text-sm" style={{ color: '#a0aac0' }}>
                   <CalendarDays size={16} style={{ color: '#004baa' }} />
-                  <span>{CURRENT_MONTH_RANGE} · 农历{currentMonthMeta.lunar}（申月）</span>
+                  <span>{getCurrentMonthRange()} · 农历{currentMonthMeta.lunar}（{BRANCH_NAMES[currentMonthMeta.branch]}月）</span>
                 </div>
                 <span
                   className="inline-flex items-center gap-1.5 shrink-0"
