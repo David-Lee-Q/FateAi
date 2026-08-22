@@ -31,6 +31,17 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 
 ## 条目
 
+[后端改码不生效：孤儿 nodemon/tsx 占用 3000 端口]
+- Date: 2026-08-22
+- Context: Agent 在验证登录限流时发现"服务器不加载新代码"
+- Category: 排错调试
+- Instructions:
+  - 症状：`tianji-server/src` 改动后 curl 行为不变、日志无 nodemon 重启记录
+  - 原因：多次 `npm run dev` 会累积陈旧 nodemon 实例，实际持有 3000 端口的可能是已失去监听的孤儿 tsx 进程（`ps` 看 ppid=1），它不 watch 文件 → 一直跑旧代码
+  - 排查：`ss -tlnp | grep ':3000 '` 找持端口 pid → `ps -o ppid= -p <pid>` 确认是否孤儿；`ps aux | grep -E "nodemon|tsx src/index" | grep -v grep` 看实例数
+  - 修复：kill 掉本项目全部 nodemon/tsx 实例 → 确认端口释放 → `cd tianji-server && nohup npm run dev > /tmp/opencode/server-dev.log 2>&1 &` 重新启动 → curl `:3000/api/health` 且新行为生效
+  - 生产启动方式（区别于开发）：`cd tianji-server && npm run build` 后 `PORT=<port> node dist/index.js`，单端口同时托管前端 dist（根路径即首页）
+
 [直接改 data/*.json 会被后端内存回刷覆盖]
 - Date: 2026-08-21
 - Context: Agent 在执行 综合报告真实数据 功能后清理测试账号时发现
