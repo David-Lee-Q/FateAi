@@ -19,9 +19,15 @@ const http = axios.create({
   },
 });
 
-/** 请求拦截器：可在此附加 token 等通用逻辑 */
+/** 请求拦截器：登录态下附加 Bearer token，使查询记录绑定到当前用户 */
 http.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    const token = localStorage.getItem('tianji_auth_token');
+    if (token) {
+      config.headers.set('Authorization', `Bearer ${token}`);
+    }
+    return config;
+  },
   (error) => Promise.reject(error)
 );
 
@@ -81,11 +87,13 @@ export async function fetchFortuneResult(
 
 /**
  * 获取历史查询记录
+ * 登录态下仅返回当前用户自己的记录；匿名返回全局演示记录
+ * @param limit 返回条数上限（最大 200，默认 20）
  */
-export async function getHistory(): Promise<ApiResponse<FortuneResult[]>> {
-  const response = await http.get<ApiResponse<FortuneResult[]>>(
-    '/fortune/history'
-  );
+export async function getHistory(limit = 20): Promise<ApiResponse<FortuneResult[]>> {
+  const response = await http.get<ApiResponse<FortuneResult[]>>('/fortune/history', {
+    params: { limit },
+  });
   return response.data;
 }
 

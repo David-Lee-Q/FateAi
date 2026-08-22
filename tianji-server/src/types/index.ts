@@ -253,7 +253,10 @@ export interface FengshuiResult extends BaseFortuneResult {
 
 /** 数字能量输入参数 */
 export interface NumerologyInputParams {
-  birthDate: string; // YYYY-MM-DD
+  birthDate?: string; // YYYY-MM-DD（生命灵数必填）
+  type?: string;      // 分析类型：life-path/name/phone/plate/custom
+  value?: string;     // 对应类型的输入值
+  lifePathNumber?: number; // 前端预计算的生命灵数（可选）
 }
 
 /** 数字能量结果 */
@@ -292,7 +295,9 @@ export interface AstrodiceResult extends BaseFortuneResult {
 
 /** 月相占卜输入参数 */
 export interface MoonphaseInputParams {
-  birthDate: string; // YYYY-MM-DD
+  birthDate?: string; // YYYY-MM-DD（按出生月相解读）
+  phase?: string;     // 月相标识（按所选月相解读）：new/waxing-crescent/first-quarter/waxing-gibbous/full/waning-gibbous/last-quarter/waning-crescent
+  question?: string;  // 占卜问题（可选）
 }
 
 /** 月相占卜结果 */
@@ -311,7 +316,8 @@ export interface MoonphaseResult extends BaseFortuneResult {
 
 /** 符文占卜输入参数 */
 export interface RuneInputParams {
-  spread: 'single' | 'three';
+  spread?: 'single' | 'three' | 'odin';
+  spreadType?: string;  // 前端字段名兼容
   question?: string;
 }
 
@@ -601,6 +607,9 @@ export interface CompareResult {
       overallMatch: number;
     };
     advice: string;
+    systems?: string[];              // 多体系对比时的体系列表
+    systemScores?: Record<string, number>; // 各体系评分
+    question?: string;               // 对比问题
   };
 }
 
@@ -633,6 +642,7 @@ export interface FortuneResult {
   system: FortuneSystem;
   createdAt: string;
   status: 'completed' | 'pending';
+  userId?: string | null; // 归属用户（匿名查询为 null/缺省）
   interpretation?: string; // AI 解读文本
   input?: Record<string, unknown>; // 用户输入参数
   data: BaziResult | TarotResult | ZodiacResult | DreamResult

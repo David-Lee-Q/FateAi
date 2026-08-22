@@ -8,6 +8,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import fortuneRouter from './routes/fortune';
 import configRouter from './routes/config';
+import authRouter from './routes/auth';
 import { warmupKnowledgeCache } from './services/knowledge.loader';
 
 dotenv.config();
@@ -33,6 +34,9 @@ app.use('/api/fortune', fortuneRouter);
 // 注册 AI 配置管理路由
 app.use('/api/config', configRouter);
 
+// 注册认证路由（登录 / 注册 / 个人资料）
+app.use('/api/auth', authRouter);
+
 // 启动服务
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -44,5 +48,10 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/health             - 健康检查`);
   console.log(`  GET  /api/config/ai          - 获取AI配置`);
   console.log(`  PUT  /api/config/ai          - 保存AI配置`);
+  console.log(`  POST /api/auth/register      - 用户注册`);
+  console.log(`  POST /api/auth/login         - 用户登录`);
+  console.log(`  GET  /api/auth/me            - 当前用户`);
+  console.log(`  PUT  /api/auth/profile       - 更新个人资料`);
+  console.log(`  POST /api/auth/logout        - 退出登录`);
   console.log(`  知识库已加载 ${warmedSystems.length} 个系统: ${warmedSystems.join(', ')}`);
 });

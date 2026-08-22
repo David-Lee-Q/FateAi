@@ -27,6 +27,10 @@ npm-debug.log*
 .env.local
 .env.*.local
 
+# 运行时敏感数据（用户密码散列、会话 token）
+tianji-server/data/users.json
+tianji-server/data/sessions.json
+
 # 临时文件
 *.tmp
 *.temp

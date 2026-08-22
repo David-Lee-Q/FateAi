@@ -1,6 +1,8 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
+import { AuthProvider } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 /* ===== 按需加载页面组件（代码分割） ===== */
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -53,6 +55,7 @@ const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const SearchPage = lazy(() => import('@/pages/SearchPage'));
 const HistoryPage = lazy(() => import('@/pages/HistoryPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const AdvicePage = lazy(() => import('@/pages/AdvicePage'));
 const TiebanResultPage = lazy(() => import('@/pages/TiebanResultPage'));
 const DaliurenResultPage = lazy(() => import('@/pages/DaliurenResultPage'));
@@ -87,12 +90,37 @@ function withSuspense(Component: React.LazyExoticComponent<React.ComponentType>)
   );
 }
 
+/** 路由守卫：未登录跳转登录页，并记录来源路径以便登录后回跳 */
+function RequireAuth({ children }: { children: React.ReactElement }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+          style={{ borderColor: 'var(--color-gold)', borderTopColor: 'transparent' }}
+        />
+      </div>
+    );
+  }
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+  return children;
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* 所有路由共享 MainLayout 布局 */}
-        <Route element={<MainLayout />}>
+      <AuthProvider>
+        <Routes>
+          {/* 登录页（独立布局，无导航栏） */}
+          <Route path="/login" element={withSuspense(LoginPage)} />
+
+          {/* 所有路由共享 MainLayout 布局 */}
+          <Route element={<MainLayout />}>
           <Route path="/" element={withSuspense(HomePage)} />
           <Route path="/result" element={withSuspense(ResultPage)} />
           <Route path="/result/:id" element={withSuspense(ResultPage)} />
@@ -157,12 +185,13 @@ function App() {
           <Route path="/calendar" element={withSuspense(CalendarPage)} />
           <Route path="/advice" element={withSuspense(AdvicePage)} />
 
-          {/* 个人与搜索 */}
-          <Route path="/profile" element={withSuspense(ProfilePage)} />
+          {/* 个人与搜索（个人中心与历史记录需登录） */}
+          <Route path="/profile" element={<RequireAuth>{withSuspense(ProfilePage)}</RequireAuth>} />
           <Route path="/search" element={withSuspense(SearchPage)} />
-          <Route path="/history" element={withSuspense(HistoryPage)} />
-        </Route>
-      </Routes>
+          <Route path="/history" element={<RequireAuth>{withSuspense(HistoryPage)}</RequireAuth>} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

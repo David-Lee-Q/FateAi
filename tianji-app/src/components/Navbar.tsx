@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Search, User } from 'lucide-react';
+import { useAuth } from '@/context/useAuth';
 
 /** 导航菜单配置 */
 const NAV_LINKS = [
@@ -35,6 +36,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
 
   /** 判断当前路径是否属于某个导航分类 */
   const isActive = useMemo(() => {
@@ -90,16 +92,38 @@ export default function Navbar() {
           >
             <Search size={20} />
           </Link>
-          {/* 用户头像 */}
-          <Link
-            to="/profile"
-            className="flex h-8 w-8 items-center justify-center rounded-full"
-            style={{
-              background: 'linear-gradient(135deg, var(--color-primary), var(--color-gold))',
-            }}
-          >
-            <User size={16} color="#fff" />
-          </Link>
+          {/* 登录 / 用户头像 */}
+          {user ? (
+            <Link
+              to="/profile"
+              className="flex h-8 items-center gap-2 rounded-full px-2"
+              title={user.nickname}
+            >
+              <span
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{
+                  background: 'linear-gradient(135deg, var(--color-primary), var(--color-gold))',
+                  fontSize: 'var(--text-sm)', fontWeight: 700, color: '#fff',
+                }}
+              >
+                {user.nickname.charAt(0).toUpperCase()}
+              </span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {user.nickname}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-2 rounded-lg px-4"
+              style={{
+                border: '1px solid rgba(200, 168, 78, 0.4)',
+                color: 'var(--color-gold)', fontSize: 'var(--text-sm)', fontWeight: 500,
+              }}
+            >
+              <User size={15} /> 登录
+            </Link>
+          )}
         </div>
 
         {/* 移动端菜单按钮 */}
