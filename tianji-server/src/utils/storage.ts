@@ -85,6 +85,14 @@ class ResultStorage {
       .slice(0, limit);
   }
 
+  /** 获取某用户的历史记录（按创建时间倒序） */
+  getHistoryForUser(userId: string, limit: number = 20): FortuneResult[] {
+    return Array.from(this.store.values())
+      .filter((item) => item.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+  }
+
   /** 根据 ID 删除一条结果 */
   delete(id: string): boolean {
     const deleted = this.store.delete(id);

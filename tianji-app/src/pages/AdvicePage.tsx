@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   User, Sparkles, Star, Zap, ChevronRight, CalendarDays,
   Briefcase, Heart, Wallet, Rocket, Users, FileSignature,
@@ -8,6 +8,11 @@ import {
   CalendarPlus, Bookmark, Loader2, GraduationCap,
   Plane, Handshake, Flame, Rabbit,
 } from 'lucide-react';
+import { useAuth } from '@/context/useAuth';
+import { getHistory } from '@/services/api';
+import { scoreRecords, buildRealAdviceContent, WEEKDAYS, type ScoredRecord, type RealAdviceContent } from '@/services/insights';
+import { DemoBanner, EmptyInsights } from '@/components/InsightsShared';
+import type { FortuneResult } from '@/types';
 
 /* ================================================================
    数据类型 & 模拟数据
@@ -53,10 +58,21 @@ interface WarningItem {
   riskPeriod: string;
 }
 
-/* ---- 时间线数据（7 天） ---- */
+/** 演示时间线日期标签（相对今天动态生成） */
+function demoDateTag(idx: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + idx);
+  const md = `${d.getMonth() + 1}月${d.getDate()}日`;
+  if (idx === 0) return `${md} · 今天`;
+  if (idx === 1) return `${md} · 明天`;
+  if (idx === 2) return `${md} · 高峰日`;
+  return `${md} · ${WEEKDAYS[d.getDay()]}`;
+}
+
+/* ---- 时间线数据（7 天，演示内容） ---- */
 const TIMELINE_DATA: TimelineDay[] = [
   {
-    dateTag: '7月10日 · 今天',
+    dateTag: '',
     dateIcon: <Star size={12} />,
     advices: [
       {
@@ -88,7 +104,7 @@ const TIMELINE_DATA: TimelineDay[] = [
     ],
   },
   {
-    dateTag: '7月11日 · 周六',
+    dateTag: '',
     advices: [
       {
         icon: <Wallet size={16} />,
@@ -106,7 +122,7 @@ const TIMELINE_DATA: TimelineDay[] = [
     ],
   },
   {
-    dateTag: '7月12日 · 高峰日',
+    dateTag: '',
     dateIcon: <Zap size={12} />,
     advices: [
       {
@@ -151,7 +167,7 @@ const TIMELINE_DATA: TimelineDay[] = [
     ],
   },
   {
-    dateTag: '7月13日 · 周一',
+    dateTag: '',
     advices: [
       {
         icon: <BookOpen size={16} />,
@@ -169,7 +185,7 @@ const TIMELINE_DATA: TimelineDay[] = [
     ],
   },
   {
-    dateTag: '7月14日 · 周二',
+    dateTag: '',
     advices: [
       {
         icon: <Home size={16} />,
@@ -200,7 +216,7 @@ const TIMELINE_DATA: TimelineDay[] = [
     ],
   },
   {
-    dateTag: '7月15日 · 周三',
+    dateTag: '',
     advices: [
       {
         icon: <Dumbbell size={16} />,
@@ -218,7 +234,7 @@ const TIMELINE_DATA: TimelineDay[] = [
     ],
   },
   {
-    dateTag: '7月16日 · 周四',
+    dateTag: '',
     advices: [
       {
         icon: <Target size={16} />,
@@ -633,10 +649,116 @@ function TimelineDayAdvices({ day, dayIndex }: { day: TimelineDay; dayIndex: num
    主页面组件
    ================================================================ */
 
+/** 真实态建议卡片的图标循环（与演示配色一致） */
+const REAL_ADVICE_ICONS: React.ReactNode[] = [
+  <BookOpen size={16} key="book" />,
+  <Star size={16} key="star" />,
+  <Sparkles size={16} key="spark" />,
+];
+const REAL_ADVICE_BGS = [
+  'rgba(26, 138, 92, 0.12)',
+  'rgba(200, 168, 78, 0.12)',
+  'rgba(0, 75, 170, 0.15)',
+];
+const REAL_ADVICE_COLORS = [
+  'var(--color-success)',
+  'var(--color-gold)',
+  'var(--color-primary-lighter)',
+];
+
+/** 真实态重点事项标签配色 */
+function realTagStyle(label: string): { bg: string; color: string } {
+  if (label === '优势') return { bg: 'rgba(26, 138, 92, 0.12)', color: 'var(--color-success)' };
+  if (label === '关注') return { bg: 'rgba(200, 122, 26, 0.12)', color: 'var(--color-warning)' };
+  if (label === '常用') return { bg: 'rgba(0, 75, 170, 0.15)', color: 'var(--color-primary-lighter)' };
+  return { bg: 'rgba(200, 168, 78, 0.12)', color: 'var(--color-gold)' };
+}
+
+/** 真实态月度规划图标（按 事业/感情/财运/健康 顺序） */
+const PLAN_REAL_ICONS: { icon: React.ReactNode; iconBg: string; iconColor: string }[] = [
+  { icon: <Briefcase size={20} />, iconBg: 'rgba(26, 138, 92, 0.12)', iconColor: 'var(--color-success)' },
+  { icon: <Heart size={20} />, iconBg: 'rgba(200, 168, 78, 0.12)', iconColor: 'var(--color-gold)' },
+  { icon: <Wallet size={20} />, iconBg: 'rgba(0, 75, 170, 0.15)', iconColor: 'var(--color-primary-lighter)' },
+  { icon: <Stethoscope size={20} />, iconBg: 'rgba(26, 138, 92, 0.12)', iconColor: 'var(--color-success)' },
+];
+
 export default function AdvicePage() {
+  const { user, loading: authLoading } = useAuth();
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiReply, setAiReply] = useState('');
+  const [records, setRecords] = useState<ScoredRecord[] | null>(null);
+
+  const isDemo = !authLoading && !user;
+  const isLoading = Boolean(user) && records === null;
+  const isEmpty = Boolean(user) && records !== null && records.length === 0;
+
+  // 登录态：拉取真实查询记录（与综合报告同一取数口径）
+  useEffect(() => {
+    if (!user) {
+      setRecords(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await getHistory(200);
+        if (cancelled) return;
+        const list = (resp.data ?? []) as FortuneResult[];
+        setRecords(scoreRecords(list));
+      } catch {
+        if (!cancelled) setRecords([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const real: RealAdviceContent | null =
+    user && records !== null && records.length > 0 ? buildRealAdviceContent(records) : null;
+
+  /* ---- 各区块数据源：未登录用演示数据，登录态用真实记录生成 ---- */
+  const timelineDays: TimelineDay[] = real
+    ? real.timeline.map((d) => ({
+        dateTag: d.dateTag,
+        dateIcon: d.latest ? <Star size={12} /> : d.highlight ? <Zap size={12} /> : undefined,
+        advices: d.advices.map((a, i) => ({
+          icon: REAL_ADVICE_ICONS[i % REAL_ADVICE_ICONS.length],
+          iconBg: REAL_ADVICE_BGS[i % REAL_ADVICE_BGS.length],
+          iconColor: REAL_ADVICE_COLORS[i % REAL_ADVICE_COLORS.length],
+          title: a.title,
+          desc: a.desc,
+          evidenceHtml: <>{a.evidence}</>,
+        })),
+      }))
+    : TIMELINE_DATA.map((d, idx) => ({ ...d, dateTag: demoDateTag(idx) }));
+
+  const priorities: PriorityItem[] = real
+    ? real.priorities.map((p) => ({
+        tags: p.tags.map((label) => ({ label, ...realTagStyle(label) })),
+        title: p.title,
+        desc: p.desc,
+        deadline: p.deadline,
+      }))
+    : PRIORITY_DATA;
+
+  const plans: PlanItem[] = real
+    ? real.plans.map((p, i) => {
+        const pi = PLAN_REAL_ICONS[i % PLAN_REAL_ICONS.length];
+        return {
+          ...pi,
+          title: p.title,
+          periodTag: { label: p.periodLabel, bg: 'rgba(255, 255, 255, 0.06)', color: 'var(--color-text-secondary)' },
+          desc: p.desc,
+          matchPercent: `匹配度 ${p.match}%`,
+          matchColor: p.match >= 65 ? 'var(--color-success)' : p.match >= 50 ? 'var(--color-warning)' : 'var(--color-error)',
+          dateRange: p.dateRange,
+        };
+      })
+    : PLAN_DATA;
+
+  const warnings: WarningItem[] = real ? real.warnings : WARNING_DATA;
 
   /** 提交自定义建议请求 */
   const handleSubmit = async () => {
@@ -683,12 +805,41 @@ export default function AdvicePage() {
               lineHeight: 'var(--leading-relaxed)',
               maxWidth: 560,
             }}>
-              基于命理信息，生成可执行的行动建议
+              {isDemo ? '基于命理信息，生成可执行的行动建议 · 演示数据' : '基于你的真实查询记录，生成可执行的行动建议'}
             </p>
           </div>
         </div>
       </section>
 
+      {/* 演示数据横幅（仅未登录态） */}
+      {isDemo && (
+        <div style={containerStyle}>
+          <DemoBanner />
+        </div>
+      )}
+
+      {/* 登录态：生成中 */}
+      {!isDemo && isLoading && (
+        <div style={{ ...containerStyle, padding: '96px 0' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+            color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)',
+          }}>
+            <CalendarDays size={20} className="animate-spin" style={{ color: 'var(--color-gold)' }} />
+            正在基于你的真实查询记录生成个性化建议…
+          </div>
+        </div>
+      )}
+
+      {/* 登录态：暂无查询记录 */}
+      {!isDemo && isEmpty && (
+        <div style={{ ...containerStyle, padding: 'var(--space-12) 0' }}>
+          <EmptyInsights />
+        </div>
+      )}
+
+      {(isDemo || real !== null) && (
+      <>
       {/* ==================== 2. 用户命理概要卡片 ==================== */}
       <section style={{ background: '#0a0e1a', padding: '0 0 var(--space-16)' }}>
         <div style={containerStyle}>
@@ -734,7 +885,7 @@ export default function AdvicePage() {
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}>
-                  张天明
+                  {isDemo ? '张天明' : (user?.nickname || '我的档案')}
                 </h3>
                 <p style={{
                   marginTop: 4,
@@ -744,26 +895,36 @@ export default function AdvicePage() {
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}>
-                  命理档案已生成
+                  {isDemo ? '命理档案已生成' : real!.profile.subtitle}
                 </p>
               </div>
               {/* 命理标签 */}
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
-                <span style={tagPillStyle('rgba(0, 75, 170, 0.15)', 'var(--color-primary-lighter)')}>
-                  <Rabbit size={14} />
-                  <span>属兔</span>
-                </span>
-                <span style={tagPillStyle('rgba(200, 168, 78, 0.12)', 'var(--color-gold)')}>
-                  <Sparkles size={14} />
-                  <span>狮子座</span>
-                </span>
-                <span style={tagPillStyle('rgba(26, 138, 92, 0.12)', 'var(--color-success)')}>
-                  <Flame size={14} />
-                  <span>日主丙火</span>
-                </span>
-                <span style={tagPillStyle('rgba(200, 168, 78, 0.08)', 'var(--color-gold-light)')}>
-                  <span>甲子年 · 庚午月</span>
-                </span>
+                {isDemo ? (
+                  <>
+                    <span style={tagPillStyle('rgba(0, 75, 170, 0.15)', 'var(--color-primary-lighter)')}>
+                      <Rabbit size={14} />
+                      <span>属兔</span>
+                    </span>
+                    <span style={tagPillStyle('rgba(200, 168, 78, 0.12)', 'var(--color-gold)')}>
+                      <Sparkles size={14} />
+                      <span>狮子座</span>
+                    </span>
+                    <span style={tagPillStyle('rgba(26, 138, 92, 0.12)', 'var(--color-success)')}>
+                      <Flame size={14} />
+                      <span>日主丙火</span>
+                    </span>
+                    <span style={tagPillStyle('rgba(200, 168, 78, 0.08)', 'var(--color-gold-light)')}>
+                      <span>甲子年 · 庚午月</span>
+                    </span>
+                  </>
+                ) : (
+                  real!.profile.tags.map((t) => (
+                    <span key={t} style={tagPillStyle('rgba(255, 255, 255, 0.06)', 'var(--color-text-secondary)')}>
+                      <span>{t}</span>
+                    </span>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -777,14 +938,14 @@ export default function AdvicePage() {
             icon={<CalendarDays size={20} color="var(--color-gold)" />}
             iconBg="rgba(200, 168, 78, 0.12)"
             iconColor="var(--color-gold)"
-            title="近 7 天行动建议"
-            subtitle="根据每日运势波动，精细安排日程"
+            title={isDemo ? '近 7 天行动建议' : '近期行动建议'}
+            subtitle={isDemo ? '根据每日运势波动，精细安排日程' : real!.timelineSubtitle}
           />
 
           {/* 时间线列表 */}
           <div>
-            {TIMELINE_DATA.map((day, idx) => (
-              <div key={idx} style={idx < TIMELINE_DATA.length - 1 ? {} : { paddingBottom: 0 }}>
+            {timelineDays.map((day, idx) => (
+              <div key={idx} style={idx < timelineDays.length - 1 ? {} : { paddingBottom: 0 }}>
                 <TimelineDayItem day={day} dayIndex={idx} />
               </div>
             ))}
@@ -808,7 +969,7 @@ export default function AdvicePage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 24,
           }}>
-            {PRIORITY_DATA.map((item, idx) => (
+            {priorities.map((item, idx) => (
               <div
                 key={idx}
                 style={{
@@ -888,7 +1049,7 @@ export default function AdvicePage() {
             iconBg="rgba(0, 75, 170, 0.15)"
             iconColor="var(--color-primary-lighter)"
             title="本月规划建议"
-            subtitle="基于七月整体运势走势，推荐启动或完成的事项"
+            subtitle={isDemo ? '基于七月整体运势走势，推荐启动或完成的事项' : '基于你的真实查询均分，推荐本月各维度的推进节奏'}
           />
 
           <div style={{
@@ -896,7 +1057,7 @@ export default function AdvicePage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: 24,
           }}>
-            {PLAN_DATA.map((item, idx) => (
+            {plans.map((item, idx) => (
               <div
                 key={idx}
                 style={{
@@ -1006,7 +1167,7 @@ export default function AdvicePage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 24,
           }}>
-            {WARNING_DATA.map((item, idx) => (
+            {warnings.map((item, idx) => (
               <div
                 key={idx}
                 style={{
@@ -1075,6 +1236,8 @@ export default function AdvicePage() {
           </div>
         </div>
       </section>
+      </>
+      )}
 
       {/* ==================== 7. 自定义需求输入框 ==================== */}
       <section style={{ background: '#0d1220', padding: 'var(--space-16) 0 var(--space-20)' }}>

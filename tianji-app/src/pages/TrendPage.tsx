@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   TrendingUp,
   Briefcase,
@@ -10,7 +10,25 @@ import {
   Sparkles,
   BarChart3,
   Lightbulb,
+  Loader2,
 } from 'lucide-react';
+import { useAuth } from '@/context/useAuth';
+import { getHistory } from '@/services/api';
+import type { FortuneResult } from '@/types';
+import {
+  scoreRecords,
+  filterRange,
+  buildSeries,
+  findKeyPoints,
+  cycleAnalysis,
+  trendInsight,
+  fmtMD,
+  type DimensionKey,
+  type RangeKey,
+  type SeriesPoint,
+  type ScoredRecord,
+} from '@/services/insights';
+import { DemoBanner, EmptyInsights } from '@/components/InsightsShared';
 
 /* ========================================
    数据定义
@@ -33,8 +51,11 @@ const TIME_RANGES = [
   { label: '近5年', value: '5y' },
 ] as const;
 
-/** 周期分析卡片数据 */
-const CYCLE_CARDS = [
+/* ========================================
+   演示数据（仅未登录态展示）
+   ======================================== */
+
+const DEMO_CYCLE_CARDS = [
   {
     tag: '短周期',
     time: '7-14 天',
@@ -61,8 +82,7 @@ const CYCLE_CARDS = [
   },
 ];
 
-/** AI 趋势变化原因数据 */
-const REASON_ITEMS = [
+const DEMO_REASON_ITEMS = [
   {
     num: '1',
     bg: 'rgba(0, 75, 170, 0.2)',
@@ -86,8 +106,7 @@ const REASON_ITEMS = [
   },
 ];
 
-/** AI 行动建议数据 */
-const ACTION_ITEMS = [
+const DEMO_ACTION_ITEMS = [
   {
     num: 'A',
     bg: 'rgba(0, 75, 170, 0.2)',
@@ -111,21 +130,318 @@ const ACTION_ITEMS = [
   },
 ];
 
+/** 解读条目序号配色（按索引循环） */
+const ITEM_BGS = [
+  { bg: 'rgba(0, 75, 170, 0.2)', color: 'var(--color-primary-lighter)' },
+  { bg: 'rgba(200, 168, 78, 0.15)', color: 'var(--color-gold)' },
+  { bg: 'rgba(26, 138, 92, 0.15)', color: 'var(--state-success)' },
+];
+
+/** 解读条目 */
+function AiReasonItem({ num, bg, color, bold, text }: { num: string; bg: string; color: string; bold: string; text: string }) {
+  return (
+    <div className="flex gap-3">
+      <span
+        className="flex-shrink-0 flex items-center justify-center rounded-md font-semibold"
+        style={{
+          width: 24,
+          height: 24,
+          fontSize: 'var(--text-xs, 0.75rem)',
+          background: bg,
+          color,
+        }}
+      >
+        {num}
+      </span>
+      <p
+        className="line-clamp-3"
+        style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm, 0.875rem)', lineHeight: 'var(--leading-relaxed, 1.75)' }}
+      >
+        <strong style={{ color: 'var(--color-text)' }}>{bold}</strong>
+        ：{text}
+      </p>
+    </div>
+  );
+}
+
+/* ========================================
+   动态趋势图（真实数据）
+   ======================================== */
+
+interface ChartNode {
+  x: number;
+  y: number;
+  dateLabel: string;
+  value: number;
+  tagLabel: string;
+  color: string;
+  isCurrent: boolean;
+}
+
+function smoothPath(pts: { x: number; y: number }[]): string {
+  if (pts.length === 0) return '';
+  if (pts.length === 1) return `M${pts[0].x},${pts[0].y}`;
+  let d = `M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+function pickLabelIndexes(n: number, maxLabels = 8): number[] {
+  if (n <= maxLabels) return Array.from({ length: n }, (_, i) => i);
+  const idxs = new Set<number>();
+  for (let i = 0; i < maxLabels; i++) {
+    idxs.add(Math.round((i * (n - 1)) / (maxLabels - 1)));
+  }
+  return Array.from(idxs).sort((a, b) => a - b);
+}
+
+function TrendChart({ series }: { series: SeriesPoint[] }) {
+  const W = 1100;
+  const X0 = 80;
+  const X1 = 1060;
+  const Y0 = 40;
+  const Y1 = 328;
+  const n = series.length;
+  const xOf = (i: number) => (n <= 1 ? (X0 + X1) / 2 : X0 + (i / (n - 1)) * (X1 - X0));
+  const yOf = (v: number) => Y1 - (v / 100) * (Y1 - Y0);
+
+  const pts = series.map((p, i) => ({ x: xOf(i), y: yOf(p.value) }));
+  const linePath = smoothPath(pts);
+  const areaPath = n > 0 ? `${linePath} L${pts[n - 1].x.toFixed(1)},${Y1} L${pts[0].x.toFixed(1)},${Y1} Z` : '';
+
+  const kp = findKeyPoints(series);
+  const nodes: ChartNode[] = [];
+  if (n > 0) {
+    series.forEach((p, i) => {
+      const base = { x: xOf(i), y: yOf(p.value), dateLabel: fmtMD(p.date), value: p.value };
+      if (p === kp.current) nodes.push({ ...base, tagLabel: '当前值', color: 'var(--color-gold)', isCurrent: true });
+      else if (p === kp.peak) nodes.push({ ...base, tagLabel: '高峰期', color: 'var(--state-success)', isCurrent: false });
+      else if (p === kp.trough) nodes.push({ ...base, tagLabel: '低谷期', color: 'var(--state-error)', isCurrent: false });
+      else if (p === kp.turning) nodes.push({ ...base, tagLabel: '转折点', color: 'var(--color-gold)', isCurrent: false });
+    });
+  }
+  // 每个点都加普通节点（无 tooltip 强调色），保证单点数据可见
+  if (n === 1 && nodes.length === 0) {
+    const p = series[0];
+    nodes.push({ x: xOf(0), y: yOf(p.value), dateLabel: fmtMD(p.date), value: p.value, tagLabel: '当前值', color: 'var(--color-gold)', isCurrent: true });
+  }
+
+  const labelIdx = pickLabelIndexes(n);
+  const clampX = (x: number) => Math.max(X0 + 44, Math.min(X1 - 44, x));
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} 380`}
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-full"
+      style={{ height: 'auto', minHeight: 320 }}
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <defs>
+        <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#004baa" />
+          <stop offset="50%" stopColor="#1a6fd4" />
+          <stop offset="100%" stopColor="#c8a84e" />
+        </linearGradient>
+        <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="rgba(0,75,170,0.25)" />
+          <stop offset="100%" stopColor="rgba(0,75,170,0)" />
+        </linearGradient>
+      </defs>
+
+      {/* 网格线 */}
+      <g stroke="rgba(255,255,255,0.04)" strokeWidth={1}>
+        <line x1={X0} y1={Y0} x2={X1} y2={Y0} />
+        <line x1={X0} y1={112} x2={X1} y2={112} />
+        <line x1={X0} y1={184} x2={X1} y2={184} />
+        <line x1={X0} y1={256} x2={X1} y2={256} />
+        <line x1={X0} y1={Y1} x2={X1} y2={Y1} />
+      </g>
+
+      {/* Y轴标签 */}
+      <g fill="var(--color-text-tertiary)" fontSize={11} fontFamily="var(--font-body)" textAnchor="end">
+        <text x={X0 - 8} y={Y0 + 4}>100</text>
+        <text x={X0 - 8} y={116}>75</text>
+        <text x={X0 - 8} y={188}>50</text>
+        <text x={X0 - 8} y={260}>25</text>
+        <text x={X0 - 8} y={Y1 + 4}>0</text>
+      </g>
+
+      {/* X轴标签 */}
+      <g fill="var(--color-text-tertiary)" fontSize={11} fontFamily="var(--font-body)" textAnchor="middle">
+        {labelIdx.map((i) => (
+          <text key={i} x={xOf(i)} y={356}>{fmtMD(series[i].date)}</text>
+        ))}
+      </g>
+
+      {/* 数据区域填充 */}
+      {n > 0 && <path d={areaPath} fill="url(#areaGrad)" />}
+      {n > 1 && (
+        <path d={linePath} fill="none" stroke="url(#curveGrad)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      )}
+
+      {/* 关键节点 */}
+      {nodes.map((node, idx) => {
+        const above = node.y > 110;
+        const tx = clampX(node.x);
+        const ty = above ? node.y - 64 : node.y + 12;
+        return (
+          <g key={idx} className="trend-chart-node">
+            <circle
+              cx={node.x}
+              cy={node.y}
+              r={node.isCurrent ? 5.5 : 4.5}
+              fill={node.color}
+              stroke={node.isCurrent ? '#fff' : 'none'}
+              strokeWidth={node.isCurrent ? 1.5 : 0}
+              className="node-dot"
+            />
+            <g className="tooltip-box">
+              <rect x={tx - 44} y={ty} width={88} height={48} rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" strokeWidth={1} />
+              <text x={tx} y={ty + 19} fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">{node.dateLabel}</text>
+              <text x={tx} y={ty + 37} fill={node.color} fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">{node.value} 分</text>
+              <text x={tx} y={ty + 46} fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">{node.tagLabel}</text>
+            </g>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ========================================
+   演示趋势图（静态 SVG，仅未登录态）
+   ======================================== */
+function DemoTrendChart() {
+  return (
+    <svg
+      viewBox="0 0 1100 380"
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-full"
+      style={{ height: 'auto', minHeight: 320 }}
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <defs>
+        <linearGradient id="dCurveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#004baa" />
+          <stop offset="50%" stopColor="#1a6fd4" />
+          <stop offset="100%" stopColor="#c8a84e" />
+        </linearGradient>
+        <linearGradient id="dAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="rgba(0,75,170,0.25)" />
+          <stop offset="100%" stopColor="rgba(0,75,170,0)" />
+        </linearGradient>
+        <linearGradient id="dPredictAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="rgba(200,168,78,0.1)" />
+          <stop offset="100%" stopColor="rgba(200,168,78,0)" />
+        </linearGradient>
+      </defs>
+      <g stroke="rgba(255,255,255,0.04)" strokeWidth={1}>
+        <line x1="80" y1="40" x2="1060" y2="40" />
+        <line x1="80" y1="112" x2="1060" y2="112" />
+        <line x1="80" y1="184" x2="1060" y2="184" />
+        <line x1="80" y1="256" x2="1060" y2="256" />
+        <line x1="80" y1="328" x2="1060" y2="328" />
+      </g>
+      <g fill="var(--color-text-tertiary)" fontSize={11} fontFamily="var(--font-body)" textAnchor="end">
+        <text x="72" y="44">100</text>
+        <text x="72" y="116">75</text>
+        <text x="72" y="188">50</text>
+        <text x="72" y="260">25</text>
+        <text x="72" y="332">0</text>
+      </g>
+      <g fill="var(--color-text-tertiary)" fontSize={11} fontFamily="var(--font-body)" textAnchor="middle">
+        <text x="80" y="356">6/10</text>
+        <text x="176" y="356">6/14</text>
+        <text x="272" y="356">6/18</text>
+        <text x="368" y="356">6/22</text>
+        <text x="464" y="356">6/26</text>
+        <text x="560" y="356">6/30</text>
+        <text x="656" y="356">7/4</text>
+        <text x="752" y="356">7/8</text>
+        <text x="848" y="356">7/10</text>
+        <text x="944" y="356">7/12</text>
+        <text x="1040" y="356">7/14</text>
+      </g>
+      <line x1="848" y1="40" x2="848" y2="328" stroke="var(--color-gold)" strokeWidth={1} strokeDasharray="4,4" opacity={0.3} />
+      <text x="855" y="56" fill="var(--color-gold)" fontSize={10} fontFamily="var(--font-body)" opacity={0.6}>预测</text>
+      <path d="M80,218 C120,200 155,170 176,160 C210,148 240,175 272,190 C305,205 335,145 368,120 C400,96 430,108 464,130 C498,152 528,168 560,184 C592,200 622,155 656,135 C690,116 720,140 752,160 C785,180 815,148 848,128 L848,328 L80,328 Z" fill="url(#dAreaGrad)" />
+      <path d="M848,128 C880,108 912,90 944,78 C976,66 1008,72 1040,84 L1040,328 L848,328 Z" fill="url(#dPredictAreaGrad)" />
+      <path d="M80,218 C120,200 155,170 176,160 C210,148 240,175 272,190 C305,205 335,145 368,120 C400,96 430,108 464,130 C498,152 528,168 560,184 C592,200 622,155 656,135 C690,116 720,140 752,160 C785,180 815,148 848,128" fill="none" stroke="url(#dCurveGrad)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M848,128 C880,108 912,90 944,78 C976,66 1008,72 1040,84" fill="none" stroke="var(--color-gold)" strokeWidth={2} strokeLinecap="round" strokeDasharray="6,4" opacity={0.6} />
+    </svg>
+  );
+}
+
 /* ========================================
    趋势追踪页面组件
    ======================================== */
 export default function TrendPage() {
-  const [dimension, setDimension] = useState('overall');
-  const [timeRange, setTimeRange] = useState('30d');
+  const { user, loading: authLoading } = useAuth();
+  const [dimension, setDimension] = useState<DimensionKey>('overall');
+  const [timeRange, setTimeRange] = useState<RangeKey>('30d');
+  const [records, setRecords] = useState<ScoredRecord[] | null>(null);
 
-  /** 当前激活维度的标签（用于图表标题） */
+  const isDemo = !authLoading && !user;
+  const isLoading = Boolean(user) && records === null;
+
+  useEffect(() => {
+    if (!user) {
+      setRecords(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await getHistory(200);
+        if (cancelled) return;
+        const list = (resp.data ?? []) as FortuneResult[];
+        setRecords(scoreRecords(list));
+      } catch {
+        if (!cancelled) setRecords([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
   const activeLabel = DIMENSIONS.find((d) => d.value === dimension)?.label ?? '综合运势';
+  const rangeRecords = useMemo(
+    () => (records ? filterRange(records, timeRange) : []),
+    [records, timeRange],
+  );
+  const series = useMemo(
+    () => buildSeries(rangeRecords, dimension, timeRange),
+    [rangeRecords, dimension, timeRange],
+  );
+  const cycleCards = useMemo(
+    () => cycleAnalysis(rangeRecords, dimension, timeRange),
+    [rangeRecords, dimension, timeRange],
+  );
+  const insight = useMemo(() => trendInsight(rangeRecords, dimension), [rangeRecords, dimension]);
+
+  const cycleTagStyle = (i: number) =>
+    [
+      { bg: 'rgba(0, 75, 170, 0.15)', color: 'var(--color-primary-lighter)' },
+      { bg: 'rgba(200, 168, 78, 0.12)', color: 'var(--color-gold)' },
+      { bg: 'rgba(26, 138, 92, 0.12)', color: 'var(--state-success)' },
+    ][i % 3];
 
   return (
     <div>
-      {/* ===== 内联样式（匹配设计稿自定义 CSS） ===== */}
+      {/* ===== 内联样式 ===== */}
       <style>{`
-        /* 维度 Tab */
         .trend-dim-tab {
           padding: 10px 22px;
           border-radius: var(--radius-lg);
@@ -150,8 +466,6 @@ export default function TrendPage() {
           font-weight: 600;
           box-shadow: 0 0 16px rgba(200, 168, 78, 0.12);
         }
-
-        /* 时间范围按钮 */
         .trend-range-btn {
           padding: 8px 18px;
           border-radius: var(--radius-md);
@@ -174,8 +488,6 @@ export default function TrendPage() {
           color: var(--color-primary-lighter);
           font-weight: 500;
         }
-
-        /* 图表卡片 */
         .trend-chart-card {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.06);
@@ -192,25 +504,17 @@ export default function TrendPage() {
           background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
           opacity: 0.3;
         }
-
-        /* 图表节点悬停 Tooltip（CSS 驱动，与设计稿一致） */
         .trend-chart-node { cursor: pointer; }
         .trend-chart-node .node-dot {
           transition: r var(--transition-fast, 150ms ease), opacity var(--transition-fast, 150ms ease);
         }
-        .trend-chart-node:hover .node-dot {
-          r: 7;
-        }
+        .trend-chart-node:hover .node-dot { r: 7; }
         .trend-chart-node .tooltip-box {
           opacity: 0;
           transition: opacity var(--transition-fast, 150ms ease);
           pointer-events: none;
         }
-        .trend-chart-node:hover .tooltip-box {
-          opacity: 1;
-        }
-
-        /* 图例小圆点 */
+        .trend-chart-node:hover .tooltip-box { opacity: 1; }
         .trend-legend-dot {
           width: 10px;
           height: 10px;
@@ -218,8 +522,6 @@ export default function TrendPage() {
           display: inline-block;
           flex-shrink: 0;
         }
-
-        /* 周期卡片 */
         .trend-cycle-card {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.06);
@@ -231,8 +533,6 @@ export default function TrendPage() {
           border-color: rgba(200, 168, 78, 0.2);
           box-shadow: 0 4px 20px rgba(0, 75, 170, 0.08);
         }
-
-        /* AI 解读卡片 */
         .trend-ai-card {
           background: linear-gradient(135deg, rgba(0, 75, 170, 0.08), rgba(200, 168, 78, 0.04));
           border: 1px solid rgba(200, 168, 78, 0.15);
@@ -250,8 +550,6 @@ export default function TrendPage() {
           background: radial-gradient(circle, rgba(200, 168, 78, 0.08), transparent 70%);
           pointer-events: none;
         }
-
-        /* 隐藏滚动条 */
         .trend-no-scrollbar::-webkit-scrollbar { display: none; }
         .trend-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
@@ -280,15 +578,21 @@ export default function TrendPage() {
             >
               趋势追踪
             </h1>
-            <p
-              className="section-subtitle"
-              style={{ maxWidth: 560 }}
-            >
-              时间轴上的运势变化，发现命运的周期规律
+            <p className="section-subtitle" style={{ maxWidth: 560 }}>
+              {isDemo ? '时间轴上的运势变化，发现命运的周期规律' : '基于你的真实查询记录，追踪运势变化与周期规律'}
             </p>
           </div>
         </div>
       </section>
+
+      {/* ==================== 演示数据横幅（仅未登录态） ==================== */}
+      {isDemo && (
+        <section style={{ background: '#0a0e1a', padding: 'var(--space-6) 0 0' }}>
+          <div className="content-container">
+            <DemoBanner />
+          </div>
+        </section>
+      )}
 
       {/* ==================== 2. 维度选择 + 时间范围 ==================== */}
       <section style={{ background: '#0a0e1a', padding: 'var(--space-8) 0 var(--space-6)' }}>
@@ -296,10 +600,7 @@ export default function TrendPage() {
           className="content-container"
           style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}
         >
-          {/* 维度 Tab */}
-          <div
-            className="flex items-center gap-3 flex-nowrap overflow-x-auto trend-no-scrollbar"
-          >
+          <div className="flex items-center gap-3 flex-nowrap overflow-x-auto trend-no-scrollbar">
             {DIMENSIONS.map((dim) => {
               const DimIcon = dim.icon;
               return (
@@ -315,7 +616,6 @@ export default function TrendPage() {
             })}
           </div>
 
-          {/* 时间范围 */}
           <div className="flex items-center gap-3 flex-nowrap overflow-x-auto trend-no-scrollbar">
             <span
               style={{
@@ -335,7 +635,7 @@ export default function TrendPage() {
               <button
                 key={range.value}
                 className={`trend-range-btn ${timeRange === range.value ? 'active' : ''}`}
-                onClick={() => setTimeRange(range.value)}
+                onClick={() => setTimeRange(range.value as RangeKey)}
               >
                 {range.label}
               </button>
@@ -347,473 +647,268 @@ export default function TrendPage() {
       {/* ==================== 3. 趋势图区 ==================== */}
       <section style={{ background: '#0a0e1a', padding: '0 0 var(--space-16)' }}>
         <div className="content-container">
-          <div className="trend-chart-card">
-            {/* 图例 + 标题 */}
-            <div
-              className="flex items-center justify-between flex-wrap gap-4"
-              style={{ marginBottom: 'var(--space-6)' }}
-            >
-              <h3
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 600,
-                  fontSize: 'var(--text-xl, 1.25rem)',
-                  color: 'var(--color-text)',
-                }}
-              >
-                {activeLabel}趋势
-              </h3>
-              <div className="flex items-center gap-5 flex-wrap">
-                {/* 运势高峰 */}
-                <span className="flex items-center gap-2">
-                  <span className="trend-legend-dot" style={{ background: 'var(--state-success)' }} />
-                  <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>
-                    运势高峰
+          {isDemo ? (
+            <div className="trend-chart-card">
+              <div className="flex items-center justify-between flex-wrap gap-4" style={{ marginBottom: 'var(--space-6)' }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 'var(--text-xl, 1.25rem)', color: 'var(--color-text)' }}>
+                  {activeLabel}趋势
+                </h3>
+                <div className="flex items-center gap-5 flex-wrap">
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'var(--state-success)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>运势高峰</span>
                   </span>
-                </span>
-                {/* 运势低谷 */}
-                <span className="flex items-center gap-2">
-                  <span className="trend-legend-dot" style={{ background: 'var(--state-error)' }} />
-                  <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>
-                    运势低谷
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'var(--state-error)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>运势低谷</span>
                   </span>
-                </span>
-                {/* 转折节点 */}
-                <span className="flex items-center gap-2">
-                  <span className="trend-legend-dot" style={{ background: 'var(--color-gold)' }} />
-                  <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>
-                    转折节点
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'var(--color-gold)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>转折节点</span>
                   </span>
-                </span>
-                {/* 预测区间 */}
-                <span className="flex items-center gap-2">
-                  <span
-                    className="trend-legend-dot"
-                    style={{
-                      background: 'transparent',
-                      border: '1.5px dashed var(--color-text-tertiary)',
-                    }}
-                  />
-                  <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>
-                    预测区间
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'transparent', border: '1.5px dashed var(--color-text-tertiary)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>预测区间</span>
                   </span>
-                </span>
+                </div>
+              </div>
+              <div className="w-full" style={{ minHeight: 320 }}>
+                <DemoTrendChart />
               </div>
             </div>
-
-            {/* SVG 趋势图（与设计稿完全一致） */}
-            <div className="w-full" style={{ minHeight: 320 }}>
-              <svg
-                viewBox="0 0 1100 380"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-full"
-                style={{ height: 'auto', minHeight: 320 }}
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <defs>
-                  {/* 蓝金色渐变用于曲线 */}
-                  <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#004baa" />
-                    <stop offset="50%" stopColor="#1a6fd4" />
-                    <stop offset="100%" stopColor="#c8a84e" />
-                  </linearGradient>
-                  {/* 曲线下方填充渐变 */}
-                  <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="rgba(0,75,170,0.25)" />
-                    <stop offset="100%" stopColor="rgba(0,75,170,0)" />
-                  </linearGradient>
-                  {/* 预测区填充 */}
-                  <linearGradient id="predictAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="rgba(200,168,78,0.1)" />
-                    <stop offset="100%" stopColor="rgba(200,168,78,0)" />
-                  </linearGradient>
-                </defs>
-
-                {/* 网格线 */}
-                <g stroke="rgba(255,255,255,0.04)" strokeWidth={1}>
-                  <line x1="80" y1="40" x2="1060" y2="40" />
-                  <line x1="80" y1="112" x2="1060" y2="112" />
-                  <line x1="80" y1="184" x2="1060" y2="184" />
-                  <line x1="80" y1="256" x2="1060" y2="256" />
-                  <line x1="80" y1="328" x2="1060" y2="328" />
-                </g>
-
-                {/* Y轴标签 */}
-                <g
-                  fill="var(--color-text-tertiary)"
-                  fontSize={11}
-                  fontFamily="var(--font-body)"
-                  textAnchor="end"
-                >
-                  <text x="72" y="44">100</text>
-                  <text x="72" y="116">75</text>
-                  <text x="72" y="188">50</text>
-                  <text x="72" y="260">25</text>
-                  <text x="72" y="332">0</text>
-                </g>
-
-                {/* X轴标签 */}
-                <g
-                  fill="var(--color-text-tertiary)"
-                  fontSize={11}
-                  fontFamily="var(--font-body)"
-                  textAnchor="middle"
-                >
-                  <text x="80" y="356">6/10</text>
-                  <text x="176" y="356">6/14</text>
-                  <text x="272" y="356">6/18</text>
-                  <text x="368" y="356">6/22</text>
-                  <text x="464" y="356">6/26</text>
-                  <text x="560" y="356">6/30</text>
-                  <text x="656" y="356">7/4</text>
-                  <text x="752" y="356">7/8</text>
-                  <text x="848" y="356">7/10</text>
-                  <text x="944" y="356">7/12</text>
-                  <text x="1040" y="356">7/14</text>
-                </g>
-
-                {/* 预测区分隔线 */}
-                <line
-                  x1="848" y1="40" x2="848" y2="328"
-                  stroke="var(--color-gold)"
-                  strokeWidth={1}
-                  strokeDasharray="4,4"
-                  opacity={0.3}
-                />
-                <text
-                  x="855" y="56"
-                  fill="var(--color-gold)"
-                  fontSize={10}
-                  fontFamily="var(--font-body)"
-                  opacity={0.6}
-                >
-                  预测
-                </text>
-
-                {/* 曲线下方填充区域（实际数据） */}
-                <path
-                  d="M80,218 C120,200 155,170 176,160 C210,148 240,175 272,190 C305,205 335,145 368,120 C400,96 430,108 464,130 C498,152 528,168 560,184 C592,200 622,155 656,135 C690,116 720,140 752,160 C785,180 815,148 848,128 L848,328 L80,328 Z"
-                  fill="url(#areaGrad)"
-                />
-
-                {/* 预测区填充 */}
-                <path
-                  d="M848,128 C880,108 912,90 944,78 C976,66 1008,72 1040,84 L1040,328 L848,328 Z"
-                  fill="url(#predictAreaGrad)"
-                />
-
-                {/* 实际数据曲线 */}
-                <path
-                  d="M80,218 C120,200 155,170 176,160 C210,148 240,175 272,190 C305,205 335,145 368,120 C400,96 430,108 464,130 C498,152 528,168 560,184 C592,200 622,155 656,135 C690,116 720,140 752,160 C785,180 815,148 848,128"
-                  fill="none"
-                  stroke="url(#curveGrad)"
-                  strokeWidth={2.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-
-                {/* 预测虚线曲线 */}
-                <path
-                  d="M848,128 C880,108 912,90 944,78 C976,66 1008,72 1040,84"
-                  fill="none"
-                  stroke="var(--color-gold)"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeDasharray="6,4"
-                  opacity={0.6}
-                />
-
-                {/* ===== 关键数据节点（可悬停查看详情） ===== */}
-
-                {/* 节点1: 低谷 6/18 分数45 */}
-                <g className="trend-chart-node">
-                  <circle cx="272" cy="190" r="4.5" fill="var(--state-error)" className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="228" y="196" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
-                    <text x="272" y="215" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">6/18</text>
-                    <text x="272" y="233" fill="var(--state-error)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">45 分</text>
-                    <text x="272" y="246" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">低谷期</text>
-                  </g>
-                </g>
-
-                {/* 节点2: 高峰 6/22 分数78 */}
-                <g className="trend-chart-node">
-                  <circle cx="368" cy="120" r="4.5" fill="var(--state-success)" className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="324" y="72" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
-                    <text x="368" y="91" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">6/22</text>
-                    <text x="368" y="109" fill="var(--state-success)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">78 分</text>
-                    <text x="368" y="122" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">高峰期</text>
-                  </g>
-                </g>
-
-                {/* 节点3: 转折 6/30 分数50 */}
-                <g className="trend-chart-node">
-                  <circle cx="560" cy="184" r="4.5" fill="var(--color-gold)" className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="516" y="136" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" strokeWidth={1} />
-                    <text x="560" y="155" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">6/30</text>
-                    <text x="560" y="173" fill="var(--color-gold)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">50 分</text>
-                    <text x="560" y="186" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">转折点</text>
-                  </g>
-                </g>
-
-                {/* 节点4: 高峰 7/4 分数67 */}
-                <g className="trend-chart-node">
-                  <circle cx="656" cy="135" r="4.5" fill="var(--state-success)" className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="612" y="87" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
-                    <text x="656" y="106" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">7/4</text>
-                    <text x="656" y="124" fill="var(--state-success)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">67 分</text>
-                    <text x="656" y="137" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">高峰期</text>
-                  </g>
-                </g>
-
-                {/* 节点5: 低谷 7/8 分数58 */}
-                <g className="trend-chart-node">
-                  <circle cx="752" cy="160" r="4.5" fill="var(--state-error)" className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="708" y="168" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
-                    <text x="752" y="187" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">7/8</text>
-                    <text x="752" y="205" fill="var(--state-error)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">58 分</text>
-                    <text x="752" y="218" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">低谷期</text>
-                  </g>
-                </g>
-
-                {/* 节点6: 当前 7/10 分数70 */}
-                <g className="trend-chart-node">
-                  <circle cx="848" cy="128" r="5.5" fill="var(--color-gold)" stroke="#fff" strokeWidth={1.5} className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="804" y="80" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.3)" strokeWidth={1} />
-                    <text x="848" y="99" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">7/10（今天）</text>
-                    <text x="848" y="117" fill="var(--color-gold)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">70 分</text>
-                    <text x="848" y="130" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">当前值</text>
-                  </g>
-                </g>
-
-                {/* 预测节点: 7/12 分数84 */}
-                <g className="trend-chart-node">
-                  <circle cx="944" cy="78" r="4" fill="var(--color-gold)" opacity={0.5} className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="900" y="30" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" strokeWidth={1} />
-                    <text x="944" y="49" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">7/12（预测）</text>
-                    <text x="944" y="67" fill="var(--color-gold)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">84 分</text>
-                    <text x="944" y="80" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">预测高峰</text>
-                  </g>
-                </g>
-
-                {/* 预测节点: 7/14 分数75 */}
-                <g className="trend-chart-node">
-                  <circle cx="1040" cy="84" r="4" fill="var(--color-gold)" opacity={0.5} className="node-dot" />
-                  <g className="tooltip-box">
-                    <rect x="996" y="94" width="88" height="48" rx={8} fill="rgba(10,14,26,0.92)" stroke="rgba(200,168,78,0.2)" strokeWidth={1} />
-                    <text x="1040" y="113" fill="var(--color-text-secondary)" fontSize={10} fontFamily="var(--font-body)" textAnchor="middle">7/14（预测）</text>
-                    <text x="1040" y="131" fill="var(--color-gold)" fontSize={13} fontWeight={600} fontFamily="var(--font-body)" textAnchor="middle">75 分</text>
-                    <text x="1040" y="144" fill="var(--color-text-tertiary)" fontSize={9} fontFamily="var(--font-body)" textAnchor="middle">预测回落</text>
-                  </g>
-                </g>
-              </svg>
+          ) : isLoading ? (
+            <div className="trend-chart-card" style={{ minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+              <Loader2 size={22} className="animate-spin" style={{ color: 'var(--color-gold)' }} />
+              <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm, 0.875rem)' }}>正在加载你的查询记录…</span>
             </div>
-          </div>
+          ) : rangeRecords.length === 0 ? (
+            <EmptyInsights text={`${TIME_RANGES.find((r) => r.value === timeRange)?.label}暂无查询记录`} />
+          ) : (
+            <div className="trend-chart-card">
+              <div className="flex items-center justify-between flex-wrap gap-4" style={{ marginBottom: 'var(--space-6)' }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 'var(--text-xl, 1.25rem)', color: 'var(--color-text)' }}>
+                  {activeLabel}趋势
+                  <span style={{ marginLeft: 10, fontSize: 'var(--text-sm, 0.875rem)', fontWeight: 400, color: 'var(--color-text-tertiary)' }}>
+                    共 {rangeRecords.length} 次查询
+                  </span>
+                </h3>
+                <div className="flex items-center gap-5 flex-wrap">
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'var(--state-success)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>运势高峰</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'var(--state-error)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>运势低谷</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="trend-legend-dot" style={{ background: 'var(--color-gold)' }} />
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)', whiteSpace: 'nowrap' }}>转折 / 当前</span>
+                  </span>
+                </div>
+              </div>
+              <div className="w-full" style={{ minHeight: 320 }}>
+                <TrendChart series={series} />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ==================== 4. 周期分析区 ==================== */}
-      <section style={{ background: '#0d1220', padding: 'var(--space-16) 0' }}>
-        <div className="content-container">
-          {/* 板块标题 */}
-          <div className="flex items-center gap-3 mb-8">
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 'var(--radius-lg)',
-                background: 'rgba(200, 168, 78, 0.12)',
-              }}
-            >
-              <Repeat size={20} style={{ color: 'var(--color-gold)' }} />
+      {!isDemo && !isLoading && rangeRecords.length > 0 && (
+        <section style={{ background: '#0d1220', padding: 'var(--space-16) 0' }}>
+          <div className="content-container">
+            <div className="flex items-center gap-3 mb-8">
+              <div
+                className="flex items-center justify-center"
+                style={{ width: 40, height: 40, borderRadius: 'var(--radius-lg)', background: 'rgba(200, 168, 78, 0.12)' }}
+              >
+                <Repeat size={20} style={{ color: 'var(--color-gold)' }} />
+              </div>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 600,
+                  fontSize: 'clamp(var(--text-xl, 1.25rem), 2vw, var(--text-2xl, 1.5rem))',
+                  color: 'var(--color-text-inverse)',
+                  textWrap: 'balance',
+                  wordBreak: 'keep-all',
+                  overflowWrap: 'break-word',
+                }}
+              >
+                周期分析
+              </h2>
             </div>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 600,
-                fontSize: 'clamp(var(--text-xl, 1.25rem), 2vw, var(--text-2xl, 1.5rem))',
-                color: 'var(--color-text-inverse)',
-                textWrap: 'balance',
-                wordBreak: 'keep-all',
-                overflowWrap: 'break-word',
-              }}
-            >
-              周期分析
-            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {cycleCards.map((item, i) => {
+                const tagStyle = cycleTagStyle(i);
+                return (
+                  <div key={item.tag} className="trend-cycle-card">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span
+                        className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md font-medium"
+                        style={{ fontSize: 'var(--text-xs, 0.75rem)', background: tagStyle.bg, color: tagStyle.color }}
+                      >
+                        {item.tag}
+                      </span>
+                      <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)' }}>{item.time}</span>
+                    </div>
+                    <h4 className="font-semibold mb-2" style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}>
+                      {item.title}
+                    </h4>
+                    <p
+                      className="line-clamp-4"
+                      style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm, 0.875rem)', lineHeight: 'var(--leading-relaxed, 1.75)' }}
+                    >
+                      {item.desc}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-
-          {/* 三列卡片 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {CYCLE_CARDS.map((item) => (
-              <div key={item.tag} className="trend-cycle-card">
-                <div className="flex items-center gap-2 mb-4">
-                  <span
-                    className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md font-medium"
-                    style={{
-                      fontSize: 'var(--text-xs, 0.75rem)',
-                      background: item.tagBg,
-                      color: item.tagColor,
-                    }}
+        </section>
+      )}
+      {isDemo && (
+        <section style={{ background: '#0d1220', padding: 'var(--space-16) 0' }}>
+          <div className="content-container">
+            <div className="flex items-center gap-3 mb-8">
+              <div
+                className="flex items-center justify-center"
+                style={{ width: 40, height: 40, borderRadius: 'var(--radius-lg)', background: 'rgba(200, 168, 78, 0.12)' }}
+              >
+                <Repeat size={20} style={{ color: 'var(--color-gold)' }} />
+              </div>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 600,
+                  fontSize: 'clamp(var(--text-xl, 1.25rem), 2vw, var(--text-2xl, 1.5rem))',
+                  color: 'var(--color-text-inverse)',
+                  textWrap: 'balance',
+                  wordBreak: 'keep-all',
+                  overflowWrap: 'break-word',
+                }}
+              >
+                周期分析
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {DEMO_CYCLE_CARDS.map((item) => (
+                <div key={item.tag} className="trend-cycle-card">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span
+                      className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md font-medium"
+                      style={{ fontSize: 'var(--text-xs, 0.75rem)', background: item.tagBg, color: item.tagColor }}
+                    >
+                      {item.tag}
+                    </span>
+                    <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)' }}>{item.time}</span>
+                  </div>
+                  <h4 className="font-semibold mb-2" style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}>
+                    {item.title}
+                  </h4>
+                  <p
+                    className="line-clamp-4"
+                    style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm, 0.875rem)', lineHeight: 'var(--leading-relaxed, 1.75)' }}
                   >
-                    {item.tag}
-                  </span>
-                  <span style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm, 0.875rem)' }}>
-                    {item.time}
-                  </span>
+                    {item.desc}
+                  </p>
                 </div>
-                <h4
-                  className="font-semibold mb-2"
-                  style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}
-                >
-                  {item.title}
-                </h4>
-                <p
-                  className="line-clamp-4"
-                  style={{
-                    color: 'var(--color-text-secondary)',
-                    fontSize: 'var(--text-sm, 0.875rem)',
-                    lineHeight: 'var(--leading-relaxed, 1.75)',
-                  }}
-                >
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== 5. AI 解读区 ==================== */}
-      <section
-        style={{
-          background: 'linear-gradient(180deg, #0d1220 0%, #0a0a2e 100%)',
-          padding: 'var(--space-16) 0 var(--space-20)',
-        }}
-      >
-        <div className="content-container">
-          {/* 板块标题 */}
-          <div className="flex items-center gap-3 mb-8">
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 'var(--radius-lg)',
-                background: 'rgba(200, 168, 78, 0.12)',
-              }}
-            >
-              <Sparkles size={20} style={{ color: 'var(--color-gold)' }} />
+              ))}
             </div>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 600,
-                fontSize: 'clamp(var(--text-xl, 1.25rem), 2vw, var(--text-2xl, 1.5rem))',
-                color: 'var(--color-text-inverse)',
-                textWrap: 'balance',
-                wordBreak: 'keep-all',
-                overflowWrap: 'break-word',
-              }}
-            >
-              AI 解读
-            </h2>
           </div>
+        </section>
+      )}
 
-          {/* 两列卡片 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 趋势变化原因分析 */}
-            <div className="trend-ai-card">
-              <div className="flex items-center gap-2 mb-5">
-                <BarChart3 size={18} style={{ color: 'var(--color-primary-lighter)' }} />
-                <h4
-                  className="font-semibold"
-                  style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}
-                >
-                  趋势变化原因
-                </h4>
+      {/* ==================== 5. AI 解读区（空态下隐藏） ==================== */}
+      {(isDemo || rangeRecords.length > 0) && (
+        <section
+          style={{
+            background: 'linear-gradient(180deg, #0d1220 0%, #0a0a2e 100%)',
+            padding: 'var(--space-16) 0 var(--space-20)',
+          }}
+        >
+          <div className="content-container">
+            <div className="flex items-center gap-3 mb-8">
+              <div
+                className="flex items-center justify-center"
+                style={{ width: 40, height: 40, borderRadius: 'var(--radius-lg)', background: 'rgba(200, 168, 78, 0.12)' }}
+              >
+                <Sparkles size={20} style={{ color: 'var(--color-gold)' }} />
               </div>
-              <div className="flex flex-col gap-4">
-                {REASON_ITEMS.map((item) => (
-                  <div key={item.num} className="flex gap-3">
-                    <span
-                      className="flex-shrink-0 flex items-center justify-center rounded-md font-semibold"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        fontSize: 'var(--text-xs, 0.75rem)',
-                        background: item.bg,
-                        color: item.color,
-                      }}
-                    >
-                      {item.num}
-                    </span>
-                    <p
-                      className="line-clamp-3"
-                      style={{
-                        color: 'var(--color-text-secondary)',
-                        fontSize: 'var(--text-sm, 0.875rem)',
-                        lineHeight: 'var(--leading-relaxed, 1.75)',
-                      }}
-                    >
-                      <strong style={{ color: 'var(--color-text)' }}>{item.bold}</strong>
-                      ：{item.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 600,
+                  fontSize: 'clamp(var(--text-xl, 1.25rem), 2vw, var(--text-2xl, 1.5rem))',
+                  color: 'var(--color-text-inverse)',
+                  textWrap: 'balance',
+                  wordBreak: 'keep-all',
+                  overflowWrap: 'break-word',
+                }}
+              >
+                AI 解读
+              </h2>
             </div>
 
-            {/* 行动建议 */}
-            <div className="trend-ai-card">
-              <div className="flex items-center gap-2 mb-5">
-                <Lightbulb size={18} style={{ color: 'var(--color-gold)' }} />
-                <h4
-                  className="font-semibold"
-                  style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}
-                >
-                  行动建议
-                </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* 趋势变化原因分析 */}
+              <div className="trend-ai-card">
+                <div className="flex items-center gap-2 mb-5">
+                  <BarChart3 size={18} style={{ color: 'var(--color-primary-lighter)' }} />
+                  <h4 className="font-semibold" style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}>
+                    趋势变化原因{!isDemo ? '（基于真实查询）' : ''}
+                  </h4>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {isDemo
+                    ? DEMO_REASON_ITEMS.map((item) => (
+                        <AiReasonItem key={item.num} num={item.num} bg={item.bg} color={item.color} bold={item.bold} text={item.text} />
+                      ))
+                    : insight.reasons.map((item, i) => (
+                        <AiReasonItem
+                          key={i}
+                          num={String(i + 1)}
+                          bg={ITEM_BGS[i % 3].bg}
+                          color={ITEM_BGS[i % 3].color}
+                          bold={item.bold}
+                          text={item.text}
+                        />
+                      ))}
+                </div>
               </div>
-              <div className="flex flex-col gap-4">
-                {ACTION_ITEMS.map((item) => (
-                  <div key={item.num} className="flex gap-3">
-                    <span
-                      className="flex-shrink-0 flex items-center justify-center rounded-md font-semibold"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        fontSize: 'var(--text-xs, 0.75rem)',
-                        background: item.bg,
-                        color: item.color,
-                      }}
-                    >
-                      {item.num}
-                    </span>
-                    <p
-                      className="line-clamp-3"
-                      style={{
-                        color: 'var(--color-text-secondary)',
-                        fontSize: 'var(--text-sm, 0.875rem)',
-                        lineHeight: 'var(--leading-relaxed, 1.75)',
-                      }}
-                    >
-                      <strong style={{ color: 'var(--color-text)' }}>{item.bold}</strong>
-                      ：{item.text}
-                    </p>
-                  </div>
-                ))}
+
+              {/* 行动建议 */}
+              <div className="trend-ai-card">
+                <div className="flex items-center gap-2 mb-5">
+                  <Lightbulb size={18} style={{ color: 'var(--color-gold)' }} />
+                  <h4 className="font-semibold" style={{ color: 'var(--color-text)', fontSize: 'var(--text-base, 1rem)' }}>
+                    行动建议{!isDemo ? '（基于真实查询）' : ''}
+                  </h4>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {isDemo
+                    ? DEMO_ACTION_ITEMS.map((item) => (
+                        <AiReasonItem key={item.num} num={item.num} bg={item.bg} color={item.color} bold={item.bold} text={item.text} />
+                      ))
+                    : insight.actions.map((item, i) => (
+                        <AiReasonItem
+                          key={i}
+                          num={String.fromCharCode(65 + i)}
+                          bg={ITEM_BGS[i % 3].bg}
+                          color={ITEM_BGS[i % 3].color}
+                          bold={item.bold}
+                          text={item.text}
+                        />
+                      ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

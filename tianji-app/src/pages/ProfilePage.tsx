@@ -1,26 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Clock, Settings, Database, Award, Edit3, Download,
   Trash2, Brain, Eye, EyeOff, Save, Check, AlertCircle,
-  UserCircle, FileJson, Search,
+  UserCircle, FileJson, Search, LogOut, X, Loader2, KeyRound,
 } from 'lucide-react';
 import { getAiConfig, saveAiConfig } from '@/services/api';
 import type { AiConfig } from '@/services/api';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { useAuth } from '@/context/useAuth';
 
-/* ============ 模拟用户数据 ============ */
-const MOCK_USER = {
-  nickname: '天机用户',
-  registerDays: 128,
-  registerDate: '2024-03-15',
-  birthday: '1995年6月15日（阳历）',
-  birthdayLunar: '农历：乙亥年五月十八',
-  birthTime: '14:30',
-  birthPlace: '广东省 · 广州市',
-  gender: '男',
-  totalQueries: 86,
-  totalFavorites: 23,
-};
+/* ============ 占卜系统选项（与后端 /api/fortune 支持的 20 个系统一致） ============ */
+const DIVINATION_SYSTEMS: { value: string; label: string }[] = [
+  { value: 'bazi', label: '八字命理' },
+  { value: 'ziwei', label: '紫微斗数' },
+  { value: 'liuyao', label: '六爻占卜' },
+  { value: 'meihua', label: '梅花易数' },
+  { value: 'qimen', label: '奇门遁甲' },
+  { value: 'tieban', label: '铁板神数' },
+  { value: 'daliuren', label: '大六壬' },
+  { value: 'fengshui', label: '风水堪舆' },
+  { value: 'tarot', label: '塔罗占卜' },
+  { value: 'zodiac', label: '星座运势' },
+  { value: 'numerology', label: '数字能量' },
+  { value: 'astrodice', label: '骰子占卜' },
+  { value: 'moonphase', label: '月相占卜' },
+  { value: 'rune', label: '符文占卜' },
+  { value: 'dream', label: '周公解梦' },
+  { value: 'nametest', label: '姓名测试' },
+  { value: 'shengxiao', label: '生肖运势' },
+  { value: 'almanac', label: '黄历宜忌' },
+  { value: 'drawlot', label: '签诗抽签' },
+  { value: 'palm', label: '手相算命' },
+];
 
 /* ============ Tab 配置 ============ */
 type TabKey = 'personal' | 'preferences' | 'data';
@@ -31,12 +43,144 @@ const TABS: { key: TabKey; label: string; icon: typeof UserCircle }[] = [
   { key: 'data', label: '数据管理', icon: Database },
 ];
 
+/* ============ 编辑表单输入行 ============ */
+function EditField({ label, value, onChange, placeholder }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string;
+}) {
+  return (
+    <div>
+      <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 500, marginBottom: 6, color: 'var(--color-text-secondary)' }}>{label}</label>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{
+          width: '100%', boxSizing: 'border-box', borderRadius: 8,
+          border: '1px solid var(--color-border)', padding: '10px 14px',
+          fontSize: 'var(--text-sm)', color: 'var(--color-text)',
+          background: 'var(--color-bg)', outline: 'none', fontFamily: 'var(--font-body)',
+        }}
+      />
+    </div>
+  );
+}
+
 /* ============ 个人中心页面 ============ */
 export default function ProfilePage() {
+  const navigate = useNavigate();
+  const { user, logout, updateProfile, accounts, switchAccount, forgetAccount } = useAuth();
+
   const [activeTab, setActiveTab] = useState<TabKey>('personal');
+  const [switching, setSwitching] = useState<string | null>(null);
+  const [accountMsg, setAccountMsg] = useState('');
+
+  const handleSwitchAccount = async (username: string) => {
+    if (!user || username === user.username || switching) return;
+    setSwitching(username);
+    setAccountMsg('');
+    try {
+      await switchAccount(username);
+      setAccountMsg(`已切换到 ${username}`);
+    } catch (err) {
+      setAccountMsg(err instanceof Error ? err.message : '切换失败');
+    } finally {
+      setSwitching(null);
+      window.setTimeout(() => setAccountMsg(''), 3000);
+    }
+  };
   const [defaultSystem, setDefaultSystem] = useState('bazi');
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(true);
+
+  // 编辑资料弹窗状态
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ nickname: '', birthday: '', birthdayLunar: '', birthTime: '', birthPlace: '', gender: '' });
+  const [editSaving, setEditSaving] = useState(false);
+  const [editMsg, setEditMsg] = useState('');
+
+  // 从登录账户派生的展示数据
+  const nickname = user?.nickname || '天机用户';
+  const profile = user?.profile;
+  const registerDays = user
+    ? Math.max(1, Math.ceil((Date.now() - new Date(user.createdAt).getTime()) / 86400000))
+    : 0;
+  const registerDate = user ? new Date(user.createdAt).toLocaleDateString('zh-CN') : '';
+  const display = (value?: string) => (value ? value : '未设置');
+
+  const openEdit = () => {
+    if (!user) return;
+    setEditForm({
+      nickname: user.nickname,
+      birthday: user.profile.birthday,
+      birthdayLunar: user.profile.birthdayLunar,
+      birthTime: user.profile.birthTime,
+      birthPlace: user.profile.birthPlace,
+      gender: user.profile.gender,
+    });
+    setEditMsg('');
+    setEditOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editForm.nickname.trim()) {
+      setEditMsg('昵称不能为空');
+      return;
+    }
+    setEditSaving(true);
+    setEditMsg('');
+    try {
+      await updateProfile({
+        nickname: editForm.nickname.trim(),
+        birthday: editForm.birthday.trim(),
+        birthdayLunar: editForm.birthdayLunar.trim(),
+        birthTime: editForm.birthTime.trim(),
+        birthPlace: editForm.birthPlace.trim(),
+        gender: editForm.gender,
+      });
+      setEditOpen(false);
+    } catch (err) {
+      setEditMsg(err instanceof Error ? err.message : '保存失败，请重试');
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  /** 退出登录（二次确认 + 倒计时提示，避免 iframe 环境 window.confirm 被拦截导致点击无响应） */
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutCountdown, setLogoutCountdown] = useState(4);
+  const logoutTimer = useRef<number | null>(null);
+  const logoutTick = useRef<number | null>(null);
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    if (!confirmingLogout) {
+      setConfirmingLogout(true);
+      setLogoutCountdown(4);
+      if (logoutTimer.current) window.clearTimeout(logoutTimer.current);
+      if (logoutTick.current) window.clearInterval(logoutTick.current);
+      const startedAt = Date.now();
+      logoutTick.current = window.setInterval(() => {
+        setLogoutCountdown(Math.max(0, 4 - Math.floor((Date.now() - startedAt) / 1000)));
+      }, 200);
+      logoutTimer.current = window.setTimeout(() => {
+        setConfirmingLogout(false);
+        if (logoutTick.current) window.clearInterval(logoutTick.current);
+      }, 4000);
+      return;
+    }
+    if (logoutTimer.current) window.clearTimeout(logoutTimer.current);
+    if (logoutTick.current) window.clearInterval(logoutTick.current);
+    setConfirmingLogout(false);
+    setLoggingOut(true);
+    try {
+      await logout();
+      navigate('/login');
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   // AI 配置状态
   const [aiConfig, setAiConfig] = useState<AiConfig | null>(null);
@@ -85,14 +229,29 @@ export default function ProfilePage() {
     deleteHistory(id);
   };
 
-  /** 清空所有数据 */
+  /** 清空所有数据（二次确认，避免 iframe 环境 window.confirm 被拦截导致点击无响应） */
+  const [confirmingClear, setConfirmingClear] = useState(false);
+  const confirmTimer = useRef<number | null>(null);
+
   const handleClearAllData = () => {
-    if (window.confirm('确定要删除所有数据吗？此操作不可恢复。')) {
-      clearHistory();
-      setDataOperationMsg('已清空所有数据');
-      setTimeout(() => setDataOperationMsg(''), 3000);
+    if (!confirmingClear) {
+      setConfirmingClear(true);
+      if (confirmTimer.current) window.clearTimeout(confirmTimer.current);
+      confirmTimer.current = window.setTimeout(() => setConfirmingClear(false), 4000);
+      return;
     }
+    if (confirmTimer.current) window.clearTimeout(confirmTimer.current);
+    setConfirmingClear(false);
+    clearHistory();
+    setDataOperationMsg('已清空所有数据');
+    setTimeout(() => setDataOperationMsg(''), 3000);
   };
+
+  useEffect(() => () => {
+    if (confirmTimer.current) window.clearTimeout(confirmTimer.current);
+    if (logoutTimer.current) window.clearTimeout(logoutTimer.current);
+    if (logoutTick.current) window.clearInterval(logoutTick.current);
+  }, []);
 
   /** 加载 AI 配置 */
   useEffect(() => {
@@ -126,18 +285,6 @@ export default function ProfilePage() {
     justifyContent: 'space-between',
     padding: '16px 0',
     borderBottom: '1px solid var(--color-border-light)',
-  };
-
-  const btnEditStyle: React.CSSProperties = {
-    background: 'transparent',
-    border: '1px solid var(--color-border)',
-    color: 'var(--color-text-secondary)',
-    fontSize: 'var(--text-xs)',
-    fontWeight: 500,
-    padding: '6px 14px',
-    borderRadius: 8,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
   };
 
   const toggleStyle = (active: boolean): React.CSSProperties => ({
@@ -246,7 +393,7 @@ export default function ProfilePage() {
                 {/* 用户信息 */}
                 <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                   <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--color-text-inverse)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {MOCK_USER.nickname}
+                    {nickname}
                   </h1>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
                     <span style={{
@@ -257,19 +404,22 @@ export default function ProfilePage() {
                     }}>
                       <Award size={12} /> 普通会员
                     </span>
-                    <span style={{ fontSize: 'var(--text-xs)', whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>
-                      已使用 {MOCK_USER.registerDays} 天
+                    <span style={{ fontSize: 'var(--text-xs)', whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }} title={registerDate}>
+                      已使用 {registerDays} 天
                     </span>
                   </div>
                 </div>
                 {/* 编辑资料按钮 */}
-                <button style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
-                  cursor: 'pointer', whiteSpace: 'nowrap',
-                  background: 'transparent', color: 'var(--color-gold)',
-                  border: '1px solid rgba(200, 168, 78, 0.3)', flexShrink: 0,
-                }}>
+                <button
+                  onClick={openEdit}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
+                    cursor: 'pointer', whiteSpace: 'nowrap',
+                    background: 'transparent', color: 'var(--color-gold)',
+                    border: '1px solid rgba(200, 168, 78, 0.3)', flexShrink: 0,
+                  }}
+                >
                   <Edit3 size={16} /> 编辑资料
                 </button>
               </div>
@@ -286,34 +436,138 @@ export default function ProfilePage() {
                 <div style={infoRowStyle}>
                   <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-tertiary)' }}>出生日期</p>
-                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-text)' }}>{MOCK_USER.birthday}</p>
-                    <p style={{ fontSize: 'var(--text-xs)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-text-tertiary)' }}>{MOCK_USER.birthdayLunar}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-text)' }}>{display(profile?.birthday)}</p>
+                    <p style={{ fontSize: 'var(--text-xs)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-text-tertiary)' }}>{profile?.birthdayLunar || ' '}</p>
                   </div>
-                  <button style={btnEditStyle}>编辑</button>
                 </div>
                 {/* 出生时间 */}
                 <div style={{ ...infoRowStyle, borderBottom: '1px solid var(--color-border-light)' }}>
                   <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-tertiary)' }}>出生时间</p>
-                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, color: 'var(--color-text)' }}>{MOCK_USER.birthTime}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, color: 'var(--color-text)' }}>{display(profile?.birthTime)}</p>
                   </div>
-                  <button style={btnEditStyle}>编辑</button>
                 </div>
                 {/* 出生地 */}
                 <div style={{ ...infoRowStyle, borderBottom: '1px solid var(--color-border-light)' }}>
                   <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-tertiary)' }}>出生地</p>
-                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, color: 'var(--color-text)' }}>{MOCK_USER.birthPlace}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, color: 'var(--color-text)' }}>{display(profile?.birthPlace)}</p>
                   </div>
-                  <button style={btnEditStyle}>编辑</button>
                 </div>
                 {/* 性别 */}
-                <div style={{ ...infoRowStyle, borderBottom: 'none' }}>
+                <div style={{ ...infoRowStyle, borderBottom: '1px solid var(--color-border-light)' }}>
                   <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-tertiary)' }}>性别</p>
-                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, color: 'var(--color-text)' }}>{MOCK_USER.gender}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 4, color: 'var(--color-text)' }}>{display(profile?.gender)}</p>
                   </div>
-                  <button style={btnEditStyle}>编辑</button>
+                </div>
+
+                {/* 账号管理（本机账号一键切换） */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 0', borderBottom: '1px solid var(--color-border-light)' }}>
+                    <KeyRound size={15} style={{ color: 'var(--color-gold)' }} />
+                    <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text)' }}>账号管理</span>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>已在本机保留 {accounts.length} 个账号，可一键切换</span>
+                  </div>
+                  {accounts.map((a, i) => {
+                    const isCurrent = user && a.username === user.username;
+                    const isSwitching = switching === a.username;
+                    return (
+                      <div
+                        key={a.username}
+                        className="pf-account-row"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: '14px 0',
+                          borderBottom: i < accounts.length - 1 ? '1px solid var(--color-border-light)' : 'none',
+                        }}
+                      >
+                        <span style={{
+                          width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: 'linear-gradient(135deg, var(--color-primary), var(--color-gold))',
+                          fontSize: 'var(--text-sm)', fontWeight: 700, color: '#fff',
+                        }}>
+                          {a.user.nickname.charAt(0).toUpperCase()}
+                        </span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {a.user.nickname}
+                            {isCurrent && (
+                              <span style={{ marginLeft: 8, fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-gold)' }}>当前</span>
+                            )}
+                          </p>
+                          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            @{a.username}
+                          </p>
+                        </div>
+                        {!isCurrent && (
+                          isSwitching ? (
+                            <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-gold)', flexShrink: 0 }} />
+                          ) : (
+                            <button
+                              onClick={() => handleSwitchAccount(a.username)}
+                              className="pf-btn-switch"
+                              style={{
+                                flexShrink: 0, height: 32, padding: '0 18px', borderRadius: 8, fontSize: 'var(--text-xs)', fontWeight: 600,
+                                color: '#fff', background: 'var(--color-primary)', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                              }}
+                            >
+                              切换
+                            </button>
+                          )
+                        )}
+                        <button
+                          onClick={() => forgetAccount(a.username)}
+                          title="从本机移除该账号"
+                          aria-label={`移除账号 ${a.username}`}
+                          className="pf-btn-remove"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', padding: 8, borderRadius: 8, flexShrink: 0 }}
+                        >
+                          <X size={15} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {accountMsg && (
+                    <p style={{ marginTop: 10, fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>{accountMsg}</p>
+                  )}
+
+                  {/* 退出登录（破坏性操作，二次确认） */}
+                  <div style={{ paddingTop: 16, borderTop: '1px solid var(--color-border-light)' }}>
+                    <button
+                      onClick={handleLogout}
+                      title="退出当前登录（本机账号保留，可随时切换或重新登录）"
+                      className={`pf-btn-logout${confirmingLogout ? ' pf-confirming' : ''}`}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        height: 44, width: '100%', borderRadius: 12,
+                        fontSize: 'var(--text-sm)', fontWeight: 600,
+                        cursor: 'pointer', whiteSpace: 'nowrap',
+                        background: confirmingLogout ? 'transparent' : 'rgba(196, 58, 58, 0.06)',
+                        border: '1px solid rgba(196, 58, 58, 0.35)',
+                      }}
+                    >
+                      {loggingOut
+                        ? <Loader2 size={16} className="animate-spin" />
+                        : <LogOut size={16} />}
+                      {confirmingLogout ? (
+                        <>
+                          再次点击确认退出
+                          <span className="pf-logout-count">{logoutCountdown}s</span>
+                        </>
+                      ) : '退出登录'}
+                    </button>
+                    <p style={{
+                      fontSize: 'var(--text-xs)', marginTop: 8, textAlign: 'center',
+                      color: confirmingLogout ? '#ff7b72' : 'var(--color-text-tertiary)',
+                      transition: 'color 200ms ease',
+                    }}>
+                      {confirmingLogout
+                        ? `将退出${user?.nickname || '当前'}的本机登录，${logoutCountdown} 秒内无操作自动取消`
+                        : '退出后本机账号保留，可随时切换或重新登录'}
+                    </p>
+                  </div>
                 </div>
               </section>
             )}
@@ -348,10 +602,9 @@ export default function ProfilePage() {
                       maxWidth: 240,
                     }}
                   >
-                    <option value="bazi">八字命理</option>
-                    <option value="tarot">塔罗占卜</option>
-                    <option value="zodiac">星座运势</option>
-                    <option value="dream">周公解梦</option>
+                    {DIVINATION_SYSTEMS.map((sys) => (
+                      <option key={sys.value} value={sys.value}>{sys.label}</option>
+                    ))}
                   </select>
                 </div>
                 {/* 推送通知 */}
@@ -477,8 +730,8 @@ export default function ProfilePage() {
                     <p style={{ fontSize: 'var(--text-sm)', marginTop: 8, whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>查询历史条数</p>
                   </div>
                   <div style={statCardStyle}>
-                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-4xl)', fontWeight: 700, whiteSpace: 'nowrap', color: 'var(--color-gold)' }}>{MOCK_USER.totalFavorites}</p>
-                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 8, whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>收藏结果数量</p>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-4xl)', fontWeight: 700, whiteSpace: 'nowrap', color: 'var(--color-gold)' }}>{registerDays}</p>
+                    <p style={{ fontSize: 'var(--text-sm)', marginTop: 8, whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>注册天数</p>
                   </div>
                 </div>
 
@@ -490,15 +743,16 @@ export default function ProfilePage() {
                       <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--color-text)' }}>查询历史</h3>
                     </div>
                     {formattedHistory.length > 0 && (
-                      <button
+                        <button
                         onClick={handleClearAllData}
                         style={{
-                          background: 'none', border: 'none', cursor: 'pointer',
+                          background: confirmingClear ? 'rgba(196, 58, 58, 0.12)' : 'none',
+                          border: 'none', cursor: 'pointer',
                           color: 'var(--state-error)', fontSize: 'var(--text-xs)',
-                          display: 'flex', alignItems: 'center', gap: 4,
+                          display: 'flex', alignItems: 'center', gap: 4, padding: confirmingClear ? '2px 8px' : 0, borderRadius: 6,
                         }}
                       >
-                        <Trash2 size={12} /> 清空
+                        <Trash2 size={12} /> {confirmingClear ? '再次点击确认清空' : '清空'}
                       </button>
                     )}
                   </div>
@@ -607,11 +861,12 @@ export default function ProfilePage() {
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                       padding: '12px 24px', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
                       cursor: 'pointer', whiteSpace: 'nowrap', width: '100%',
-                      background: 'transparent', color: 'var(--state-error)',
+                      background: confirmingClear ? 'var(--state-error)' : 'transparent',
+                      color: confirmingClear ? 'var(--color-text-inverse)' : 'var(--state-error)',
                       border: '1px solid rgba(196, 58, 58, 0.3)',
                     }}
                   >
-                    <Trash2 size={16} /> 删除所有数据
+                    <Trash2 size={16} /> {confirmingClear ? '再次点击确认删除所有数据' : '删除所有数据'}
                   </button>
                   <p style={{ fontSize: 'var(--text-xs)', marginTop: 8, color: 'var(--color-text-tertiary)' }}>
                     删除操作不可恢复，请谨慎操作。
@@ -636,6 +891,93 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* 编辑资料弹窗 */}
+      {editOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0, 8, 24, 0.72)' }}
+            onClick={() => { if (!editSaving) setEditOpen(false); }}
+          />
+          <div style={{
+            position: 'relative', width: '100%', maxWidth: 640,
+            background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)',
+            borderRadius: 20, padding: '28px 32px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-text)' }}>编辑个人资料</h2>
+              <button
+                onClick={() => setEditOpen(false)}
+                aria-label="关闭"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', padding: 4 }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px 20px' }}>
+              <EditField label="昵称" value={editForm.nickname} onChange={(v) => setEditForm({ ...editForm, nickname: v })} placeholder="将显示在个人中心" />
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 500, marginBottom: 6, color: 'var(--color-text-secondary)' }}>性别</label>
+                <select
+                  value={editForm.gender}
+                  onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
+                  style={{
+                    width: '100%', boxSizing: 'border-box', borderRadius: 8,
+                    border: '1px solid var(--color-border)', padding: '10px 14px',
+                    fontSize: 'var(--text-sm)', color: 'var(--color-text)',
+                    background: 'var(--color-bg)', outline: 'none', fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  <option value="">请选择</option>
+                  <option value="男">男</option>
+                  <option value="女">女</option>
+                </select>
+              </div>
+              <EditField label="出生日期" value={editForm.birthday} onChange={(v) => setEditForm({ ...editForm, birthday: v })} placeholder="如 1995年6月15日" />
+              <EditField label="出生时间" value={editForm.birthTime} onChange={(v) => setEditForm({ ...editForm, birthTime: v })} placeholder="如 14:30" />
+              <EditField label="出生地" value={editForm.birthPlace} onChange={(v) => setEditForm({ ...editForm, birthPlace: v })} placeholder="如 广东省 · 广州市" />
+              <EditField label="农历生日（可选）" value={editForm.birthdayLunar} onChange={(v) => setEditForm({ ...editForm, birthdayLunar: v })} placeholder="如 农历：乙亥年五月十八" />
+            </div>
+
+            {editMsg && (
+              <div style={{
+                marginTop: 14, padding: '10px 14px', borderRadius: 8,
+                background: 'rgba(196, 58, 58, 0.1)', border: '1px solid rgba(196, 58, 58, 0.25)',
+                color: 'var(--state-error)', fontSize: 'var(--text-xs)',
+              }}>
+                {editMsg}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <button
+                onClick={() => setEditOpen(false)}
+                style={{
+                  flex: 1, padding: '11px 0', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
+                  cursor: 'pointer', background: 'transparent', color: 'var(--color-text-secondary)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                取消
+              </button>
+              <button
+                onClick={handleEditSave}
+                disabled={editSaving}
+                style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '11px 0', borderRadius: 12, fontSize: 'var(--text-sm)', fontWeight: 600,
+                  cursor: editSaving ? 'not-allowed' : 'pointer',
+                  background: editSaving ? 'var(--color-border)' : 'var(--color-primary)',
+                  color: 'var(--color-text-inverse)', border: 'none',
+                }}
+              >
+                <Save size={14} /> {editSaving ? '保存中...' : '保存'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
