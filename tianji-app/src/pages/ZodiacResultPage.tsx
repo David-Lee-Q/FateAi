@@ -181,7 +181,15 @@ export default function ZodiacResultPage() {
     双鱼座: { emoji: '♓', date: '2月19日 - 3月20日', element: '水象星座', symbol: '♓' },
   };
 
-  const signName = String((zodiacData.sign as string) || result.input?.sign || '狮子座');
+  const signRaw = zodiacData.sign;
+  const signName =
+    (typeof signRaw === 'object' && signRaw !== null
+      ? String((signRaw as Record<string, unknown>).name || '')
+      : typeof signRaw === 'string'
+        ? signRaw
+        : '') ||
+    String(result.input?.sign || '') ||
+    '狮子座';
   const signInfo = signMap[signName] || signMap['狮子座'];
 
   const scoreOf = (v: unknown): number => {
