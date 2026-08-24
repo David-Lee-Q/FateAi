@@ -37,9 +37,9 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - Category: 运维部署
 - Instructions:
   - 项目镜像在 GitHub：`github` remote → `https://github.com/David-Lee-Q/FateAi.git`（分支 master）；每次提交推 origin 后需同步 `git push github master`
-  - GitHub 推送凭据由用户逐次提供 token，用一次性 URL 推送（`git push https://x-access-token:<token>@github.com/David-Lee-Q/FateAi.git master`），禁止把 token 写进 remote 配置或任何文件
+  - GitHub 推送凭据由用户逐次提供 token。推荐 GIT_ASKPASS 方式（token 只走环境变量，不进命令参数/进程列表/git 配置）：写 askpass 脚本（`#!/bin/sh` + `echo "${GH_PUSH_TOKEN:-}"`，chmod 700）→ `export GH_PUSH_TOKEN=<token>` → `export GIT_ASKPASS=<脚本路径>` → `git -c credential.helper= push github master`；禁止把真实 token 写进 remote 配置、MEMORY 或任何仓库文件（文档中一律用 `<token>` 占位）
   - 本地 .git 曾出现历史对象缺失（`error: Could not read <sha>` / fsck `missing commit`，旧提交断链）：修复命令 `git fetch origin --refetch master`（git ≥2.36），修复后 `git fsck --connectivity-only` 应干净、`git rev-list --count HEAD` 恢复 40
-  - 若本地无法修复且需立即外推：从 gitlab 全量克隆到 /tmp 后从克隆目录推送（gitlab 端历史完整）
+  - 若本地无法修复且需立即外推：`mktemp -d` 建私有临时目录从 gitlab 全量克隆后从克隆目录推送（gitlab 端历史完整）；克隆的 .git/config 含 gitlab 凭据，用完立即删除该目录
 
 [后端改码不生效：孤儿 nodemon/tsx 占用 3000 端口]
 - Date: 2026-08-22

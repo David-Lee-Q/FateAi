@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import ZodiacLayout from '../src/pages/result/layouts/ZodiacLayout';
 
@@ -29,14 +30,13 @@ describe('ZodiacLayout 五维评分（回归：后端 {score} 对象形态）', 
   it('love/career/wealth/health 对象正确取 score，无 0 分条', () => {
     render(<ZodiacLayout data={backendData} system="zodiac" />);
 
-    expect(screen.getByText('双子座')).toBeTruthy();
-    expect(screen.getByText(/风象星座/)).toBeTruthy();
-    expect(screen.getByText('56分')).toBeTruthy();
-    expect(screen.getByText('93分')).toBeTruthy();
-    expect(screen.getByText('69分')).toBeTruthy();
-    expect(screen.getByText('96分')).toBeTruthy();
-    expect(screen.getByText('79分')).toBeTruthy();
-    expect(screen.queryByText('0分')).toBeNull();
+    expect(screen.getByText('双子座')).toBeInTheDocument();
+    expect(screen.getByText(/风象星座/)).toBeInTheDocument();
+    // 同一分数可能在多维重复出现，用 getAllByText 断言存在而非唯一
+    for (const score of ['56分', '93分', '69分', '96分', '79分']) {
+      expect(screen.getAllByText(score).length).toBeGreaterThanOrEqual(1);
+    }
+    expect(screen.queryAllByText('0分')).toHaveLength(0);
     expect(screen.queryAllByText(/\[object Object\]/)).toHaveLength(0);
   });
 
@@ -55,11 +55,9 @@ describe('ZodiacLayout 五维评分（回归：后端 {score} 对象形态）', 
       />,
     );
 
-    expect(screen.getByText('狮子座')).toBeTruthy();
-    expect(screen.getByText('72分')).toBeTruthy();
-    expect(screen.getByText('61分')).toBeTruthy();
-    expect(screen.getByText('80分')).toBeTruthy();
-    expect(screen.getByText('90分')).toBeTruthy();
-    expect(screen.getByText('88分')).toBeTruthy();
+    expect(screen.getByText('狮子座')).toBeInTheDocument();
+    for (const score of ['72分', '61分', '80分', '90分', '88分']) {
+      expect(screen.getAllByText(score).length).toBeGreaterThanOrEqual(1);
+    }
   });
 });

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ZodiacResultPage from '../src/pages/ZodiacResultPage';
@@ -31,17 +32,7 @@ vi.mock('@/services/api', () => ({
   submitFollowUp: vi.fn().mockResolvedValue({ data: {} }),
 }));
 
-function renderResultPage() {
-  return render(
-    <MemoryRouter initialEntries={['/result/zodiac/zodiac-test-1']}>
-      <Routes>
-        <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
-      </Routes>
-    </MemoryRouter>,
-  );
-}
-
-function renderResultPageFor(id: string) {
+function renderResultPage(id = 'zodiac-test-1') {
   return render(
     <MemoryRouter initialEntries={[`/result/zodiac/${id}`]}>
       <Routes>
@@ -63,13 +54,13 @@ describe('星座结果页 sign 对象渲染（回归：[object Object]）', () =
     // 三张行星卡各含"在双子座"
     expect(screen.getAllByText(/在双子座/)).toHaveLength(3);
     // signMap 命中（回退前会显示狮子座的 7月23日 - 8月22日）
-    expect(screen.getByText(/5月21日 - 6月21日/)).toBeTruthy();
-    expect(screen.getByText(/风象星座/)).toBeTruthy();
-    expect(screen.queryByText(/7月23日 - 8月22日/)).toBeNull();
+    expect(screen.getByText(/5月21日 - 6月21日/)).toBeInTheDocument();
+    expect(screen.getByText(/风象星座/)).toBeInTheDocument();
+    expect(screen.queryByText(/7月23日 - 8月22日/)).not.toBeInTheDocument();
     // 幸运信息与建议
-    expect(screen.getByText('幸运色：粉色')).toBeTruthy();
-    expect(screen.getByText('幸运数字：4')).toBeTruthy();
-    expect(screen.getByText('保持积极心态，抓住机遇。')).toBeTruthy();
+    expect(screen.getByText('幸运色：粉色')).toBeInTheDocument();
+    expect(screen.getByText('幸运数字：4')).toBeInTheDocument();
+    expect(screen.getByText('保持积极心态，抓住机遇。')).toBeInTheDocument();
     // 无 [object Object]
     expect(screen.queryAllByText(/\[object Object\]/)).toHaveLength(0);
   });
@@ -87,13 +78,13 @@ describe('星座结果页 sign 对象渲染（回归：[object Object]）', () =
       },
     });
 
-    renderResultPageFor('zodiac-test-2');
+    renderResultPage('zodiac-test-2');
 
     const signMatches = await screen.findAllByText('天蝎座', {}, { timeout: 3000 });
     expect(signMatches.length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/在天蝎座/)).toHaveLength(3);
-    expect(screen.getByText(/10月24日 - 11月22日/)).toBeTruthy();
-    expect(screen.getByText(/水象星座/)).toBeTruthy();
+    expect(screen.getByText(/10月24日 - 11月22日/)).toBeInTheDocument();
+    expect(screen.getByText(/水象星座/)).toBeInTheDocument();
     expect(screen.queryAllByText(/\[object Object\]/)).toHaveLength(0);
   });
 });
