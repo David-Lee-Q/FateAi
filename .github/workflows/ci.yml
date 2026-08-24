@@ -15,6 +15,9 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            tianji-app/package-lock.json
+            tianji-server/package-lock.json
 
       - name: 前端 类型/lint/测试/构建
         working-directory: tianji-app
@@ -25,9 +28,10 @@ jobs:
           npm test
           npm run build
 
-      - name: 后端 类型/测试
+      - name: 后端 类型/测试/构建
         working-directory: tianji-server
         run: |
           npm ci
           npx tsc --noEmit
           npm test
+          npm run build
