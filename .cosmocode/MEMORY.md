@@ -37,7 +37,7 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 - Category: 运维部署
 - Instructions:
   - 项目镜像在 GitHub：`github` remote → `https://github.com/David-Lee-Q/FateAi.git`（分支 master）；每次提交推 origin 后需同步 `git push github master`
-  - GitHub 推送凭据由用户逐次提供 token。推荐 GIT_ASKPASS 方式（token 不进命令参数/进程列表/git 配置/shell 历史）：①`read -r -s GH_PUSH_TOKEN`（提示符处粘贴 token，-s 不回显且不落历史）→`export GH_PUSH_TOKEN`→②写 askpass 脚本（`#!/bin/sh` + `echo "${GH_PUSH_TOKEN:-}"`，chmod 700）并 `export GIT_ASKPASS=<脚本路径>`→③`git -c credential.helper= push github master`→④`unset GH_PUSH_TOKEN`；CI 场景改用密钥管理器注入（如 GitHub Actions secrets），不用明文命令；禁止把真实 token 写进 remote 配置、MEMORY 或任何仓库文件（文档一律用 `<token>` 占位）
+  - GitHub 推送凭据由用户逐次提供 token。推荐 GIT_ASKPASS + 子 shell 方式（token 不进命令参数/进程列表/git 配置/shell 历史，且中断时不残留父 shell 环境）：①先写 askpass 脚本（`#!/bin/sh` + `echo "${GH_PUSH_TOKEN:-}"`，chmod 700）→②整段包在子 shell 里执行：`( read -r -s GH_PUSH_TOKEN && export GH_PUSH_TOKEN && export GIT_ASKPASS=<脚本路径> && git -c credential.helper= push github master )`，token 只存在于子 shell，子 shell 退出即销毁（Ctrl+C 中断也不会留在父 shell，无需依赖后续 unset/trap）；CI 场景改用密钥管理器注入（如 GitHub Actions secrets），不用明文命令；禁止把真实 token 写进 remote 配置、MEMORY 或任何仓库文件（文档一律用 `<token>` 占位）
   - 本地 .git 曾出现历史对象缺失（`error: Could not read <sha>` / fsck `missing commit`，旧提交断链）：修复命令 `git fetch origin --refetch master`（git ≥2.36），修复后 `git fsck --connectivity-only` 应干净、`git rev-list --count HEAD` 恢复 40
   - 若本地无法修复且需立即外推：`mktemp -d` 建私有临时目录从 gitlab 全量克隆后从克隆目录推送（gitlab 端历史完整）；克隆的 .git/config 含 gitlab 凭据，用完立即删除该目录
 

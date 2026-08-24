@@ -35,6 +35,8 @@ start.sh / stop.sh 开发环境启停脚本
 
 ## 快速开始
 
+> 环境要求：Node.js >= 22（根目录 `.nvmrc` 固定为 22.22.0，本地用 `nvm use` 切换；CI 亦从 `.nvmrc` 读取，与 `tianji-app` 的 `engines` 约束保持一致）。
+
 ### 开发模式（前后端分离，Vite 代理 /api）
 
 ```bash

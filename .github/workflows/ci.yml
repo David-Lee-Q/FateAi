@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: 前端 类型/lint/测试/构建
+        working-directory: tianji-app
+        run: |
+          npm ci
+          npx tsc -b --force
+          npx oxlint src/ tests/
+          npm test
+          npm run build
+
+      - name: 后端 类型/测试
+        working-directory: tianji-server
+        run: |
+          npm ci
+          npx tsc --noEmit
+          npm test
