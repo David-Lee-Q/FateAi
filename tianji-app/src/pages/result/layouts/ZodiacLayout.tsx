@@ -2,6 +2,23 @@
  * 星座布局（自 ResultPage.tsx SmartContentCard 拆分）
  */
 
+/**
+ * 提取 0-100 分值：兼容后端 { score, description } 对象与纯数字两种形态
+ */
+function scoreOf(value: unknown): number {
+  if (value !== null && typeof value === 'object') {
+    const sc = (value as Record<string, unknown>).score;
+    if (typeof sc === 'number' && Number.isFinite(sc)) return sc;
+    return 0;
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return 0;
+}
+
 export default function ZodiacLayout({ data }: { data: Record<string, unknown>; system?: string }) {
     const signData = data.sign || data;
     const signObj = typeof signData === 'object' && signData !== null ? signData as Record<string, unknown> : null;
@@ -9,11 +26,11 @@ export default function ZodiacLayout({ data }: { data: Record<string, unknown>; 
     const element = signObj ? String(signObj.element || signObj.元素 || data.element || '') : String(data.element || '');
     const rulingPlanet = signObj ? String(signObj.rulingPlanet || signObj.守护星 || '') : String(data.rulingPlanet || data.守护星 || '');
     const traits = signObj?.traits as string[] | undefined || data.traits as string[] | undefined;
-    const loveScore = Number(signObj?.loveScore ?? data.loveScore ?? data.爱情 ?? 0);
-    const careerScore = Number(signObj?.careerScore ?? data.careerScore ?? data.事业 ?? 0);
-    const wealthScore = Number(signObj?.wealthScore ?? data.wealthScore ?? data.财富 ?? 0);
-    const healthScore = Number(signObj?.healthScore ?? data.healthScore ?? data.健康 ?? 0);
-    const overallScore = Number(signObj?.overallScore ?? data.overallScore ?? data.综合 ?? 0);
+    const loveScore = scoreOf(signObj?.loveScore ?? data.loveScore ?? data.love ?? data.爱情);
+    const careerScore = scoreOf(signObj?.careerScore ?? data.careerScore ?? data.career ?? data.事业);
+    const wealthScore = scoreOf(signObj?.wealthScore ?? data.wealthScore ?? data.wealth ?? data.财富);
+    const healthScore = scoreOf(signObj?.healthScore ?? data.healthScore ?? data.health ?? data.健康);
+    const overallScore = scoreOf(signObj?.overallScore ?? data.overallScore ?? data.综合);
     
     if (sign) {
       const elementColors: Record<string, string> = { 火: '#ef4444', 土: '#c4a878', 风: '#3b82f6', 水: '#06b6d4' };
