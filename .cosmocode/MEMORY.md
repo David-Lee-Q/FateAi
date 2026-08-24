@@ -31,6 +31,16 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 
 ## 条目
 
+[GitHub 镜像推送与本地对象库缺失修复]
+- Date: 2026-08-24
+- Context: Agent 执行用户"推送到 GitHub"指令时发现本地 .git 历史断裂
+- Category: 运维部署
+- Instructions:
+  - 项目镜像在 GitHub：`github` remote → `https://github.com/David-Lee-Q/FateAi.git`（分支 master）；每次提交推 origin 后需同步 `git push github master`
+  - GitHub 推送凭据由用户逐次提供 token，用一次性 URL 推送（`git push https://x-access-token:<token>@github.com/David-Lee-Q/FateAi.git master`），禁止把 token 写进 remote 配置或任何文件
+  - 本地 .git 曾出现历史对象缺失（`error: Could not read <sha>` / fsck `missing commit`，旧提交断链）：修复命令 `git fetch origin --refetch master`（git ≥2.36），修复后 `git fsck --connectivity-only` 应干净、`git rev-list --count HEAD` 恢复 40
+  - 若本地无法修复且需立即外推：从 gitlab 全量克隆到 /tmp 后从克隆目录推送（gitlab 端历史完整）
+
 [后端改码不生效：孤儿 nodemon/tsx 占用 3000 端口]
 - Date: 2026-08-22
 - Context: Agent 在验证登录限流时发现"服务器不加载新代码"
