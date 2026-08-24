@@ -31,33 +31,47 @@ vi.mock('@/services/api', () => ({
   submitFollowUp: vi.fn().mockResolvedValue({ data: {} }),
 }));
 
+function renderResultPage() {
+  return render(
+    <MemoryRouter initialEntries={['/result/zodiac/zodiac-test-1']}>
+      <Routes>
+        <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
+function renderResultPageFor(id: string) {
+  return render(
+    <MemoryRouter initialEntries={[`/result/zodiac/${id}`]}>
+      <Routes>
+        <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 describe('星座结果页 sign 对象渲染（回归：[object Object]）', () => {
   afterEach(cleanup);
 
   it('sign 为对象时渲染星座中文名，无 [object Object]', async () => {
-    render(
-      <MemoryRouter initialEntries={['/result/zodiac/zodiac-test-1']}>
-        <Routes>
-          <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    renderResultPage();
 
-    // 异步等待星座名渲染完成，替代固定 sleep
-    await screen.findByText('双子座', {}, { timeout: 3000 });
-
-    const text = document.body.textContent || '';
-    expect(text).not.toContain('[object Object]');
-    // 星座名正确渲染（标题 + 行星卡共 4 处）
-    expect(text.match(/双子座/g)?.length).toBeGreaterThanOrEqual(4);
+    // 星座名在标题等处出现，findAllByText 避免多匹配抛异常
+    const signMatches = await screen.findAllByText('双子座', {}, { timeout: 3000 });
+    expect(signMatches.length).toBeGreaterThanOrEqual(1);
+    // 三张行星卡各含"在双子座"
+    expect(screen.getAllByText(/在双子座/)).toHaveLength(3);
     // signMap 命中（回退前会显示狮子座的 7月23日 - 8月22日）
-    expect(text).toContain('5月21日 - 6月21日');
-    expect(text).toContain('风象星座');
-    expect(text).not.toContain('7月23日 - 8月22日');
-    // 评分/幸运信息正常
-    expect(text).toContain('幸运色：粉色');
-    expect(text).toContain('幸运数字：4');
-    expect(text).toContain('保持积极心态，抓住机遇。');
+    expect(screen.getByText(/5月21日 - 6月21日/)).toBeTruthy();
+    expect(screen.getByText(/风象星座/)).toBeTruthy();
+    expect(screen.queryByText(/7月23日 - 8月22日/)).toBeNull();
+    // 幸运信息与建议
+    expect(screen.getByText('幸运色：粉色')).toBeTruthy();
+    expect(screen.getByText('幸运数字：4')).toBeTruthy();
+    expect(screen.getByText('保持积极心态，抓住机遇。')).toBeTruthy();
+    // 无 [object Object]
+    expect(screen.queryAllByText(/\[object Object\]/)).toHaveLength(0);
   });
 
   it('data.sign 缺失时回退 input.sign（对象），同样取 name', async () => {
@@ -73,19 +87,13 @@ describe('星座结果页 sign 对象渲染（回归：[object Object]）', () =
       },
     });
 
-    render(
-      <MemoryRouter initialEntries={['/result/zodiac/zodiac-test-2']}>
-        <Routes>
-          <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    renderResultPageFor('zodiac-test-2');
 
-    await screen.findByText('天蝎座', {}, { timeout: 3000 });
-
-    const text = document.body.textContent || '';
-    expect(text).not.toContain('[object Object]');
-    expect(text).toContain('10月24日 - 11月22日');
-    expect(text).toContain('水象星座');
+    const signMatches = await screen.findAllByText('天蝎座', {}, { timeout: 3000 });
+    expect(signMatches.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/在天蝎座/)).toHaveLength(3);
+    expect(screen.getByText(/10月24日 - 11月22日/)).toBeTruthy();
+    expect(screen.getByText(/水象星座/)).toBeTruthy();
+    expect(screen.queryAllByText(/\[object Object\]/)).toHaveLength(0);
   });
 });

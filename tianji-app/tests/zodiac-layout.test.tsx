@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import ZodiacLayout from '../src/pages/result/layouts/ZodiacLayout';
 
 // 后端星座数据真实形状：love/career/wealth/health 为 { score, description } 对象
@@ -28,17 +28,16 @@ describe('ZodiacLayout 五维评分（回归：后端 {score} 对象形态）', 
 
   it('love/career/wealth/health 对象正确取 score，无 0 分条', () => {
     render(<ZodiacLayout data={backendData} system="zodiac" />);
-    const text = document.body.textContent || '';
 
-    expect(text).not.toContain('[object Object]');
-    expect(text).toContain('双子座');
-    expect(text).toContain('风象星座');
-    expect(text).toContain('56分');
-    expect(text).toContain('93分');
-    expect(text).toContain('69分');
-    expect(text).toContain('96分');
-    expect(text).toContain('79分');
-    expect(text).not.toContain('0分');
+    expect(screen.getByText('双子座')).toBeTruthy();
+    expect(screen.getByText(/风象星座/)).toBeTruthy();
+    expect(screen.getByText('56分')).toBeTruthy();
+    expect(screen.getByText('93分')).toBeTruthy();
+    expect(screen.getByText('69分')).toBeTruthy();
+    expect(screen.getByText('96分')).toBeTruthy();
+    expect(screen.getByText('79分')).toBeTruthy();
+    expect(screen.queryByText('0分')).toBeNull();
+    expect(screen.queryAllByText(/\[object Object\]/)).toHaveLength(0);
   });
 
   it('纯数字形态（旧数据）仍兼容', () => {
@@ -55,13 +54,12 @@ describe('ZodiacLayout 五维评分（回归：后端 {score} 对象形态）', 
         system="zodiac"
       />,
     );
-    const text = document.body.textContent || '';
 
-    expect(text).toContain('狮子座');
-    expect(text).toContain('72分');
-    expect(text).toContain('61分');
-    expect(text).toContain('80分');
-    expect(text).toContain('90分');
-    expect(text).toContain('88分');
+    expect(screen.getByText('狮子座')).toBeTruthy();
+    expect(screen.getByText('72分')).toBeTruthy();
+    expect(screen.getByText('61分')).toBeTruthy();
+    expect(screen.getByText('80分')).toBeTruthy();
+    expect(screen.getByText('90分')).toBeTruthy();
+    expect(screen.getByText('88分')).toBeTruthy();
   });
 });
