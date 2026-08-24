@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createRoot } from 'react-dom/client';
-import React from 'react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ZodiacResultPage from '../src/pages/ZodiacResultPage';
+import { getFortuneResult } from '@/services/api';
 
 // 后端星座数据真实形状：sign 为对象（name/nameEn/symbol/dateRange）
 vi.mock('@/services/api', () => ({
@@ -31,37 +31,24 @@ vi.mock('@/services/api', () => ({
   submitFollowUp: vi.fn().mockResolvedValue({ data: {} }),
 }));
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 describe('星座结果页 sign 对象渲染（回归：[object Object]）', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-  });
+  afterEach(cleanup);
 
   it('sign 为对象时渲染星座中文名，无 [object Object]', async () => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    const root = createRoot(container);
-    root.render(
-      React.createElement(
-        MemoryRouter,
-        { initialEntries: ['/result/zodiac/zodiac-test-1'] },
-        React.createElement(
-          Routes,
-          null,
-          React.createElement(Route, {
-            path: '/result/zodiac/:id',
-            element: React.createElement(ZodiacResultPage),
-          }),
-        ),
-      ),
+    render(
+      <MemoryRouter initialEntries={['/result/zodiac/zodiac-test-1']}>
+        <Routes>
+          <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
+        </Routes>
+      </MemoryRouter>,
     );
-    await sleep(400);
 
-    const text = container.textContent || '';
+    // 异步等待星座名渲染完成，替代固定 sleep
+    await screen.findByText('双子座', {}, { timeout: 3000 });
+
+    const text = document.body.textContent || '';
     expect(text).not.toContain('[object Object]');
     // 星座名正确渲染（标题 + 行星卡共 4 处）
-    expect(text).toContain('双子座');
     expect(text.match(/双子座/g)?.length).toBeGreaterThanOrEqual(4);
     // signMap 命中（回退前会显示狮子座的 7月23日 - 8月22日）
     expect(text).toContain('5月21日 - 6月21日');
@@ -71,8 +58,34 @@ describe('星座结果页 sign 对象渲染（回归：[object Object]）', () =
     expect(text).toContain('幸运色：粉色');
     expect(text).toContain('幸运数字：4');
     expect(text).toContain('保持积极心态，抓住机遇。');
+  });
 
-    root.unmount();
-    container.remove();
+  it('data.sign 缺失时回退 input.sign（对象），同样取 name', async () => {
+    // 覆盖本次调用的返回值：sign 只在 input 里且为对象
+    vi.mocked(getFortuneResult).mockResolvedValueOnce({
+      data: {
+        id: 'zodiac-test-2',
+        system: 'zodiac',
+        createdAt: '2026-08-22T08:00:00.000Z',
+        status: 'completed',
+        input: { sign: { name: '天蝎座', nameEn: 'Scorpio', symbol: '♏' } },
+        data: { overallScore: 70, luckyColor: '黑色', luckyNumber: 7 },
+      },
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/result/zodiac/zodiac-test-2']}>
+        <Routes>
+          <Route path="/result/zodiac/:id" element={<ZodiacResultPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByText('天蝎座', {}, { timeout: 3000 });
+
+    const text = document.body.textContent || '';
+    expect(text).not.toContain('[object Object]');
+    expect(text).toContain('10月24日 - 11月22日');
+    expect(text).toContain('水象星座');
   });
 });

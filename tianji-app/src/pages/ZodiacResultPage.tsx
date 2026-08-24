@@ -129,6 +129,20 @@ function AIDeepDive({ interpretation, resultId }: { interpretation: string; resu
   );
 }
 
+/**
+ * 解析星座名：兼容后端 sign 对象（{ name, nameEn, symbol, dateRange }）与纯字符串两种形态
+ */
+function resolveSignName(value: unknown): string {
+  if (value !== null && typeof value === 'object') {
+    const name = (value as Record<string, unknown>).name;
+    return typeof name === 'string' ? name : '';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return '';
+}
+
 // 星座结果页面
 export default function ZodiacResultPage() {
   const { result, data, interpretation, loading, error, retry } = useFortuneResult();
@@ -181,14 +195,9 @@ export default function ZodiacResultPage() {
     双鱼座: { emoji: '♓', date: '2月19日 - 3月20日', element: '水象星座', symbol: '♓' },
   };
 
-  const signRaw = zodiacData.sign;
   const signName =
-    (typeof signRaw === 'object' && signRaw !== null
-      ? String((signRaw as Record<string, unknown>).name || '')
-      : typeof signRaw === 'string'
-        ? signRaw
-        : '') ||
-    String(result.input?.sign || '') ||
+    resolveSignName(zodiacData.sign) ||
+    resolveSignName(result.input?.sign) ||
     '狮子座';
   const signInfo = signMap[signName] || signMap['狮子座'];
 
