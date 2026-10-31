@@ -7,7 +7,11 @@ export default function MoonphaseLayout({ data }: { data: Record<string, unknown
     const energy = data.energy as string | undefined;
     const energyIndex = data.energyIndex as number | undefined;
     const moonAge = data.moonAge as string | number | undefined;
-    const illumination = Number(data.illumination || data.月光照度 || 50);
+    const illumination = typeof data.illuminationPercent === 'number'
+      ? data.illuminationPercent
+      : (Number(String(data.illumination ?? '').replace('%', '')) || 50);
+    const newMoonAt = typeof data.newMoonAt === 'string' ? data.newMoonAt : '';
+    const waxing = typeof data.waxing === 'boolean' ? data.waxing : undefined;
     const suitableActivities = data.suitableActivities as string[] | undefined;
     const avoidActivities = data.avoidActivities as string[] | undefined;
     const suggestions = data.suggestions as string[] | undefined;
@@ -51,11 +55,21 @@ export default function MoonphaseLayout({ data }: { data: Record<string, unknown
               <i className="fas fa-calendar mr-1"></i>{String(displayDate)}
             </span>
             <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(100, 116, 139, 0.2)', color: 'rgba(203, 213, 225, 0.9)', border: '1px solid rgba(100, 116, 139, 0.4)' }}>
-              <i className="fas fa-percentage mr-1"></i>月龄：{moonAge || `${(illumination / 3.7).toFixed(1)}天`}
+              <i className="fas fa-percentage mr-1"></i>月龄：{moonAge !== undefined && moonAge !== '' ? `${moonAge}天` : `${(illumination / 3.7).toFixed(1)}天`}
             </span>
             <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.4)' }}>
-              <i className="fas fa-bolt mr-1"></i>能量指数：{energyIndex || illumination}%
+              <i className="fas fa-bolt mr-1"></i>照明度：{energyIndex || illumination.toFixed(0)}%
             </span>
+            {waxing !== undefined && (
+              <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(96, 165, 250, 0.2)', color: '#60a5fa', border: '1px solid rgba(96, 165, 250, 0.4)' }}>
+                {waxing ? '渐盈' : '渐亏'}
+              </span>
+            )}
+            {newMoonAt && (
+              <span className="px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(100, 116, 139, 0.2)', color: 'rgba(203, 213, 225, 0.9)', border: '1px solid rgba(100, 116, 139, 0.4)' }}>
+                <i className="fas fa-moon mr-1"></i>本月朔：{newMoonAt}
+              </span>
+            )}
           </div>
         </div>
 

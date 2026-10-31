@@ -419,7 +419,14 @@ export interface MoonphaseResult extends BaseFortuneResult {
   details: {
     moonPhase: string;            // 月相名称
     moonEmoji: string;            // 月相符号
-    illumination: string;         // 亮度描述
+    illumination: string;         // 亮度描述（百分比）
+    illuminationPercent?: number; // 真实照明度
+    moonAge?: number;             // 月龄（天）
+    phaseAngle?: number;          // 相位角（0-360）
+    waxing?: boolean;             // 是否渐盈
+    newMoonAt?: string;           // 本月朔日时刻
+    nextNewMoonAt?: string;       // 下个朔日时刻
+    birthDate?: string;
     traits: string[];             // 个人特质
     emotionalPattern: string;     // 情感模式
     advice: string;               // 建议
