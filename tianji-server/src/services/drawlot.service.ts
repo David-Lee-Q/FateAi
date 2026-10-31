@@ -1,7 +1,8 @@
 /**
  * 求签服务（观音灵签）
  * 随机抽取签号，返回签诗与解签
- * 当前为模拟数据实现
+ * 说明：签库当前收录 LOT_POOL 中的签文（整理版），未收录的签号不会伪造签诗；
+ *      结果中通过 lotPoolSize / totalLots 标注收录范围，接入完整 100 签真本后移除该限制。
  */
 
 import type { DrawlotResult } from '../types';
@@ -62,6 +63,12 @@ export function drawLot(): DrawlotResult {
       poem: lot.poem,
       interpretation: lot.interpretation,
       advice: lot.advice,
+      lotPoolSize: LOT_POOL.length,
+      totalLots: 100,
+      sourceNote:
+        LOT_POOL.length < 100
+          ? `当前签库收录 ${LOT_POOL.length} 支（共 100 支），签文为整理版；其余签号待接入完整签本。`
+          : '签库完整。',
     },
   };
 }

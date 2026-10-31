@@ -482,6 +482,8 @@ export interface NametestResult extends BaseFortuneResult {
     sanCai: string;                // 三才配置
     sanCaiMeaning: string;         // 三才含义
     score: number;                 // 综合评分（满分100）
+    unresolvedChars?: string[];    // 未收录康熙笔画的字
+    lucky?: { numbers: number[]; elements: string[] }; // 吉数与五行
   };
 }
 
@@ -561,6 +563,9 @@ export interface DrawlotResult extends BaseFortuneResult {
     poem: string;            // 签诗
     interpretation: string;   // 解签
     advice: string;          // 建议
+    lotPoolSize?: number;    // 当前收录签数
+    totalLots?: number;      // 传统总签数
+    sourceNote?: string;     // 数据来源说明
   };
 }
 

@@ -1,84 +1,95 @@
 /**
  * 姓名测试服务（五格剖象法）
- * 根据姓名笔画分析五格、三才配置
- * 当前为模拟数据实现，后续可接入完整康熙笔画字典
+ * 康熙笔画 + 标准五格公式（天格/人格/地格/外格/总格）+ 三才配置
+ * 说明：内置常用字康熙笔画表；未收录字会标记 unresolved，五格结果为近似值
  */
 
 import type { NametestResult } from '../types';
 
-/** 五格含义对照 */
-const WUGE_MEANINGS: Record<number, string> = {
-  1: '大吉，万物开泰，最大吉数。',
-  2: '不吉，动摇不安，一荣一枯。',
-  3: '大吉，如意吉祥，阴阳和合。',
-  4: '凶，万事休止，吉凶参半。',
-  5: '大吉，福禄长寿，阴阳和合。',
-  6: '大吉，安稳余庆，吉人天相。',
-  7: '吉，精力旺盛，刚毅果断。',
-  8: '吉，坚刚志强，突破万难。',
-  9: '凶，虽抱奇才，有才无运。',
-  10: '凶，万事终局，零暗不止。',
-  11: '大吉，旱苗逢雨，挽回吉运。',
-  12: '凶，薄弱无力，外观平静。',
-  13: '大吉，智慧出众，奇才横溢。',
-  14: '凶，浮沉不定，因祸得福。',
-  15: '大吉，福寿圆满，富贵荣誉。',
-  16: '大吉，贵人相助，厚望成就。',
-  17: '半吉，突破万难，有贵人助。',
-  18: '大吉，有志竟成，内外有运。',
-  19: '凶，多难困苦，有智有谋。',
-  20: '凶，非业破运，灾难不绝。',
-  21: '大吉，明月光照，独立权威。',
-  22: '凶，秋草逢霜，百事不如。',
-  23: '大吉，旭日东升，壮丽壮观。',
-  24: '大吉，金钱丰盈，白手起家。',
-  25: '大吉，英俊刚毅，资性聪敏。',
+/** 康熙笔画（常用姓氏与名字用字，含繁简差异校正；未收录者会在结果中标记） */
+const KANGXI_STROKES: Record<string, number> = {
+  // 常见单姓
+  王: 4, 李: 7, 张: 11, 刘: 15, 陈: 16, 杨: 13, 黄: 12, 赵: 14, 吴: 7, 周: 8,
+  徐: 10, 孙: 10, 马: 10, 朱: 6, 胡: 11, 郭: 15, 何: 7, 高: 10, 林: 8, 罗: 20,
+  郑: 19, 梁: 11, 谢: 17, 宋: 7, 唐: 10, 许: 11, 韩: 17, 冯: 12, 邓: 19, 曹: 11,
+  彭: 12, 曾: 12, 萧: 18, 田: 5, 董: 15, 袁: 10, 潘: 16, 于: 3, 蒋: 17, 蔡: 17,
+  余: 7, 杜: 7, 叶: 15, 程: 12, 苏: 22, 魏: 18, 吕: 7, 丁: 2, 任: 6, 沈: 8,
+  姚: 9, 卢: 16, 姜: 9, 崔: 11, 钟: 17, 谭: 19, 陆: 16, 汪: 8, 范: 15, 金: 8,
+  石: 5, 廖: 14, 贾: 13, 夏: 10, 韦: 9, 付: 5, 方: 4, 白: 5, 邹: 17, 孟: 8,
+  熊: 14, 秦: 10, 邱: 12, 江: 7, 尹: 4, 薛: 19, 闫: 11, 段: 9, 雷: 13, 侯: 9,
+  龙: 16, 史: 5, 陶: 16, 黎: 15, 贺: 12, 顾: 21, 毛: 4, 郝: 14, 龚: 22, 邵: 12,
+  万: 15, 钱: 16, 严: 20, 覃: 12, 武: 8, 戴: 18, 莫: 13, 孔: 4, 向: 6, 汤: 13,
+  // 常见名字用字
+  明: 8, 华: 14, 文: 4, 志: 7, 国: 11, 建: 9, 伟: 11, 海: 11, 平: 5, 东: 8,
+  德: 15, 强: 11, 军: 9, 成: 7, 安: 6, 辉: 15, 庆: 15, 刚: 10, 飞: 9, 鹏: 19,
+  博: 12, 宇: 6, 浩: 11, 天: 4, 云: 12, 杰: 12, 涛: 18, 勇: 9, 敏: 11, 静: 16,
+  丽: 19, 芳: 10, 秀: 7, 美: 9, 婷: 12, 雪: 11, 慧: 15, 雅: 12, 红: 9, 玉: 5,
+  玲: 10, 桂: 10, 春: 9, 兰: 23, 凤: 14, 娇: 15, 心: 4, 怡: 9, 欣: 8, 悦: 11,
+  思: 9, 雨: 8, 晨: 11, 阳: 17, 子: 3, 涵: 12, 轩: 10, 睿: 14, 泽: 17, 楠: 13,
+  琳: 13, 佳: 8, 嘉: 14, 琪: 13, 鑫: 24, 昊: 8, 航: 10, 钧: 12, 铭: 14, 一: 1,
+  三: 3, 五: 5, 九: 9, 百: 6, 千: 3, 祥: 11, 瑞: 14, 福: 14, 禄: 13, 寿: 14,
+  喜: 12, 乐: 15, 康: 11, 健: 11, 宁: 14, 泰: 9, 和: 8, 顺: 12, 达: 16, 通: 14,
+  远: 17, 进: 15, 超: 12, 立: 5, 新: 13, 正: 5, 中: 4, 大: 3, 小: 3, 光: 6,
+  宗: 8, 祖: 10, 业: 13, 世: 5, 家: 10, 学: 16, 生: 5, 长: 8, 元: 4, 亨: 7,
+  利: 7, 贞: 9, 仁: 4, 义: 13, 礼: 18, 智: 12, 信: 9, 忠: 8, 孝: 7, 廉: 13,
+  勤: 13, 俭: 15, 诚: 14, 俊: 9, 凯: 8, 峰: 10, 磊: 15, 毅: 15, 鹤: 15, 麟: 23,
+  曦: 20, 瑶: 15, 璇: 16, 珊: 10, 珂: 10, 瑾: 16, 璟: 17, 萌: 14, 萱: 15, 蕾: 19,
+  薇: 19, 蕊: 18, 菲: 14, 莹: 15, 颖: 16, 倩: 10, 依: 8, 若: 11, 晴: 12, 语: 14,
+  诗: 13, 书: 10, 画: 12, 琴: 13, 棋: 12, 墨: 15, 砚: 12, 竹: 6, 松: 8, 柏: 9,
+  桐: 10, 楷: 13, 森: 12, 清: 12, 澈: 16, 溪: 14, 澜: 21, 晓: 16,
+  // 复姓用字
+  欧: 15, 司: 5, 上: 3, 官: 8, 诸: 16, 葛: 15, 皇: 9, 甫: 7, 令: 5, 狐: 9,
+  慕: 15, 容: 10, 尉: 11, 迟: 19, 相: 9, 如: 6, 修: 10, 端: 14, 木: 4,
 };
 
-/** 三才配置含义 */
-const SANCAI_MEANINGS: Record<string, string> = {
-  '木木木': '三才皆木，生机旺盛，富有创造力，但需注意过刚易折。',
-  '木木火': '木生火旺，才华横溢，热情洋溢，贵人运强。',
-  '木木土': '木克土重，需防身体劳损，宜修心养性。',
-  '火火火': '三才皆火，热情如火，运势旺盛，但需防急躁。',
-  '火土金': '火生土、土生金，五行相生，运势顺遂。',
-  '土土土': '三才皆土，稳重踏实，根基深厚，但变化较少。',
-  '金金金': '三才皆金，刚毅果断，执行力强，但需防过于固执。',
-  '水水水': '三才皆水，智慧灵秀，适应力强，但需防优柔寡断。',
-};
-
-/** 简化版汉字笔画映射（实际应使用康熙字典笔画） */
-function getStrokeCount(char: string): number {
-  // 简化：用字符编码模拟笔画，实际应使用康熙字典
-  const commonStrokes: Record<string, number> = {
-    '王': 4, '李': 7, '张': 7, '刘': 6, '陈': 7, '杨': 7, '赵': 7, '黄': 11,
-    '周': 8, '吴': 7, '徐': 10, '孙': 6, '胡': 9, '朱': 6, '高': 10, '林': 8,
-    '何': 7, '郭': 8, '马': 3, '罗': 8, '梁': 11, '宋': 7, '郑': 8, '谢': 12,
-    '韩': 9, '唐': 10, '冯': 5, '于': 3, '董': 12, '萧': 11, '程': 12, '曹': 11,
-    '袁': 6, '邓': 4, '许': 6, '傅': 12, '沈': 7, '曾': 12, '彭': 12, '吕': 6,
-    '苏': 7, '卢': 5, '蒋': 12, '蔡': 14, '贾': 10, '丁': 2, '魏': 17, '薛': 16,
-    '明': 8, '华': 6, '金': 8, '文': 4, '志': 7, '国': 8, '建': 9, '伟': 11,
-    '海': 10, '平': 5, '东': 5, '德': 15, '强': 12, '军': 6, '成': 6, '安': 6,
-    '辉': 12, '庆': 6, '刚': 6, '龙': 5, '飞': 3, '鹏': 13, '博': 12, '宇': 6,
-    '浩': 11, '天': 4, '云': 4, '杰': 8, '涛': 10, '勇': 9, '敏': 11, '静': 14,
-    '丽': 7, '芳': 7, '秀': 7, '美': 9, '婷': 12, '雪': 11, '慧': 15, '雅': 12,
-    '红': 6, '玉': 5, '玲': 9, '桂': 10, '春': 9, '兰': 5, '凤': 4, '娇': 9,
-  };
-  return commonStrokes[char] || (char.charCodeAt(0) % 20 + 3);
+/** 三才五行：按数理尾数（1,2木 3,4火 5,6土 7,8金 9,0水） */
+function elementOfNumber(n: number): string {
+  const last = n % 10;
+  if (last === 1 || last === 2) return '木';
+  if (last === 3 || last === 4) return '火';
+  if (last === 5 || last === 6) return '土';
+  if (last === 7 || last === 8) return '金';
+  return '水';
 }
 
-/** 五格数理：将数字缩减到1-25之间 */
-function wugeNumber(num: number): number {
-  while (num > 25) {
-    num = String(num).split('').reduce((s, d) => s + parseInt(d), 0);
-  }
-  return num;
+/** 数理归一：超过 81 者减 80 */
+function normalizeNumber(n: number): number {
+  let v = n;
+  while (v > 81) v -= 80;
+  return v === 0 ? 81 : v;
+}
+
+/** 常用吉数（传统五格数理） */
+const LUCKY_NUMBERS = new Set([
+  1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 17, 18, 21, 23, 24, 25, 29, 31, 32, 33,
+  35, 37, 39, 41, 45, 47, 48, 52, 57, 61, 63, 65, 67, 68, 81,
+]);
+
+/** 三才配置吉凶（简表：以相生为吉、相克为凶） */
+const SHENG: Record<string, string> = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+const KE: Record<string, string> = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+
+function sanCaiText(a: string, b: string, c: string): { text: string; lucky: boolean } {
+  const rel = (x: string, y: string) => (x === y ? '同' : SHENG[x] === y ? '生' : KE[x] === y ? '克' : '被生');
+  const r1 = rel(a, b);
+  const r2 = rel(b, c);
+  const lucky = r1 !== '克' && r2 !== '克';
+  const desc = `${a}${b}${c}`;
+  if (r1 === '克' || r2 === '克') return { text: `${desc}：三才相克，宜以名字补益、行事求稳`, lucky: false };
+  if (r1 === '生' && r2 === '生') return { text: `${desc}：三才相生，基础稳固、进退有据`, lucky: true };
+  return { text: `${desc}：三才和顺，平稳发展`, lucky: true };
+}
+
+export interface WugeDetail {
+  number: number;
+  element: string;
+  lucky: boolean;
 }
 
 /**
  * 姓名测试分析
- * @param surname 姓
- * @param givenName 名
+ * @param surname 姓（1-2 字）
+ * @param givenName 名（1-3 字）
  * @param gender 性别
  */
 export function analyzeName(
@@ -86,48 +97,83 @@ export function analyzeName(
   givenName: string,
   gender: 'male' | 'female'
 ): NametestResult {
-  // 计算笔画数
-  const surnameStrokes = surname.split('').reduce((sum, c) => sum + getStrokeCount(c), 0);
-  const givenNameStrokes = givenName.split('').reduce((sum, c) => sum + getStrokeCount(c), 0);
+  const surnameChars = surname.split('');
+  const givenChars = givenName.split('');
+
+  const unresolved: string[] = [];
+  const strokeOf = (char: string): number => {
+    const s = KANGXI_STROKES[char];
+    if (typeof s === 'number') return s;
+    unresolved.push(char);
+    return 0;
+  };
+
+  const surnameStrokesArr = surnameChars.map(strokeOf);
+  const givenStrokesArr = givenChars.map(strokeOf);
+  const surnameStrokes = surnameStrokesArr.reduce((a, b) => a + b, 0);
+  const givenNameStrokes = givenStrokesArr.reduce((a, b) => a + b, 0);
   const totalStrokes = surnameStrokes + givenNameStrokes;
 
-  // 五格计算
-  // 天格 = 姓笔画 + 1（单姓）或 姓两字笔画之和（复姓）
-  const tianGe = wugeNumber(surnameStrokes + 1);
-  // 人格 = 姓最后一字 + 名第一字
-  const renGe = wugeNumber(surnameStrokes + (givenName.length > 0 ? getStrokeCount(givenName[0]) : 0));
-  // 地格 = 名字笔画之和 + 1
-  const diGe = wugeNumber(givenNameStrokes + 1);
-  // 外格 = 总格 - 人格 + 1
-  const waiGe = wugeNumber(totalStrokes - renGe + 1);
-  // 总格 = 姓+名总笔画
-  const zongGe = wugeNumber(totalStrokes);
+  const isCompoundSurname = surnameChars.length >= 2;
+  const isCompoundGiven = givenChars.length >= 2;
 
-  // 三才配置（根据天格、人格、地格的五行）
-  const wuXingMap = (n: number): string => {
-    if (n % 5 === 1 || n % 5 === 2) return '木';
-    if (n % 5 === 3 || n % 5 === 4) return '火';
-    if (n % 5 === 0 || n % 5 === 5) return '土';
-    return '金';
-  };
-  const sanCai = `${wuXingMap(tianGe)}${wuXingMap(renGe)}${wuXingMap(diGe)}`;
+  // 天格：单姓 = 姓 + 1；复姓 = 姓两字笔画和
+  const tianRaw = isCompoundSurname ? surnameStrokes : surnameStrokes + 1;
+  // 人格：姓末字 + 名首字
+  const renRaw = surnameStrokesArr[surnameStrokesArr.length - 1] + (givenStrokesArr[0] ?? 0);
+  // 地格：单名 = 名 + 1；双名及以上 = 名笔画和
+  const diRaw = isCompoundGiven ? givenNameStrokes : givenNameStrokes + 1;
+  // 外格
+  const waiRaw = (() => {
+    if (!isCompoundSurname && !isCompoundGiven) return 2;
+    if (!isCompoundSurname && isCompoundGiven) return (givenStrokesArr[givenStrokesArr.length - 1] ?? 0) + 1;
+    if (isCompoundSurname && !isCompoundGiven) return (surnameStrokesArr[0] ?? 0) + 1;
+    return (surnameStrokesArr[0] ?? 0) + (givenStrokesArr[givenStrokesArr.length - 1] ?? 0);
+  })();
+  // 总格
+  const zongRaw = totalStrokes;
 
-  // 评分（基于五格吉凶综合计算）
-  let score = 70;
-  if ([1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 17, 18, 21, 23, 24, 25].includes(tianGe)) score += 5;
-  if ([1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 17, 18, 21, 23, 24, 25].includes(renGe)) score += 10;
-  if ([1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 17, 18, 21, 23, 24, 25].includes(diGe)) score += 5;
-  if ([1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 17, 18, 21, 23, 24, 25].includes(zongGe)) score += 10;
-  score = Math.min(99, score);
+  const tianGe = normalizeNumber(tianRaw);
+  const renGe = normalizeNumber(renRaw);
+  const diGe = normalizeNumber(diRaw);
+  const waiGe = normalizeNumber(waiRaw);
+  const zongGe = normalizeNumber(zongRaw);
+
+  const detail = (n: number): WugeDetail => ({
+    number: n,
+    element: elementOfNumber(n),
+    lucky: LUCKY_NUMBERS.has(n),
+  });
+
+  const sanCai = `${elementOfNumber(tianGe)}${elementOfNumber(renGe)}${elementOfNumber(diGe)}`;
+  const sanCaiInfo = sanCaiText(
+    elementOfNumber(tianGe),
+    elementOfNumber(renGe),
+    elementOfNumber(diGe)
+  );
+
+  // 评分：人格/总格权重最高
+  let score = 60;
+  if (LUCKY_NUMBERS.has(renGe)) score += 15;
+  if (LUCKY_NUMBERS.has(zongGe)) score += 12;
+  if (LUCKY_NUMBERS.has(diGe)) score += 7;
+  if (LUCKY_NUMBERS.has(tianGe)) score += 4;
+  if (LUCKY_NUMBERS.has(waiGe)) score += 2;
+  if (sanCaiInfo.lucky) score += 5;
+  if (unresolved.length > 0) score = Math.min(score, 75);
+  score = Math.max(40, Math.min(99, score));
 
   const fullName = `${surname}${givenName}`;
-  const sanCaiMeaning = SANCAI_MEANINGS[sanCai] || `${sanCai}配置，五行${sanCai.includes('木') || sanCai.includes('水') ? '相生为吉' : '基本平衡'}。`;
+  const genderText = gender === 'male' ? '男' : '女';
+  const unresolvedNote = unresolved.length > 0
+    ? `（注：${unresolved.join('、')}未收录康熙笔画，五格为近似值）`
+    : '';
 
-  const summary = `"${fullName}"姓名测试结果：`
-    + `姓名笔画${totalStrokes}画，五格评分${score}分。`
-    + `天格${tianGe}（${WUGE_MEANINGS[tianGe]?.slice(0, 10) || '中平'}），`
-    + `人格${renGe}（${WUGE_MEANINGS[renGe]?.slice(0, 10) || '中平'}）。`
-    + `三才配置${sanCai}，${sanCaiMeaning}`;
+  const summary =
+    `「${fullName}」（${genderText}）五格测算${unresolvedNote}：`
+    + `天格${tianGe}（${detail(tianGe).element}）、人格${renGe}（${detail(renGe).element}）、`
+    + `地格${diGe}（${detail(diGe).element}）、外格${waiGe}、总格${zongGe}。`
+    + `三才${sanCaiInfo.text}。综合评分${score}分。`;
 
   return {
     summary,
@@ -137,15 +183,20 @@ export function analyzeName(
       givenNameStrokes,
       totalStrokes,
       wuGe: {
-        tianGe: { number: tianGe, meaning: WUGE_MEANINGS[tianGe] || '中平运势' },
-        renGe: { number: renGe, meaning: WUGE_MEANINGS[renGe] || '中平运势' },
-        diGe: { number: diGe, meaning: WUGE_MEANINGS[diGe] || '中平运势' },
-        waiGe: { number: waiGe, meaning: WUGE_MEANINGS[waiGe] || '中平运势' },
-        zongGe: { number: zongGe, meaning: WUGE_MEANINGS[zongGe] || '中平运势' },
+        tianGe: { number: tianGe, meaning: `${detail(tianGe).element}·${detail(tianGe).lucky ? '吉' : '凶'}` },
+        renGe: { number: renGe, meaning: `${detail(renGe).element}·${detail(renGe).lucky ? '吉' : '凶'}` },
+        diGe: { number: diGe, meaning: `${detail(diGe).element}·${detail(diGe).lucky ? '吉' : '凶'}` },
+        waiGe: { number: waiGe, meaning: `${detail(waiGe).element}·${detail(waiGe).lucky ? '吉' : '凶'}` },
+        zongGe: { number: zongGe, meaning: `${detail(zongGe).element}·${detail(zongGe).lucky ? '吉' : '凶'}` },
       },
       sanCai,
-      sanCaiMeaning,
+      sanCaiMeaning: sanCaiInfo.text,
       score,
+      unresolvedChars: unresolved,
+      lucky: {
+        numbers: [tianGe, renGe, diGe, waiGe, zongGe].filter((n) => LUCKY_NUMBERS.has(n)),
+        elements: [elementOfNumber(tianGe), elementOfNumber(renGe), elementOfNumber(diGe)],
+      },
     },
   };
 }
