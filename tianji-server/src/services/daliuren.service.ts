@@ -1,182 +1,316 @@
 /**
- * 大六壬服务
- * 中国古代三式之首，以月将加时推算吉凶
+ * 大六壬服务（时家六壬 · 月将加时）
+ * 四柱 → 月将（中气定将）→ 天地盘 → 四课 → 三传（贼克/比用/涉害/遥克/昴星/别责/八专/伏吟/返吟）→ 十二天将
+ * 口径：日干寄宫用标准寄宫表，贵人按昼贵/夜贵与顺逆
  */
 
-interface DaliurenResult {
-  /** 起课时间信息 */
-  time: {
-    year: number;
-    month: number;
-    day: number;
-    hour: number;
-    shichen: string;  // 当前时辰
-    yuejiang: string; // 月将
-  };
-  /** 四课（从近到远） */
-  ke: {
-    ke1: string;  // 第一课（日干所寄+日支）
-    ke2: string;  // 第二课（日干所寄+天盘）
-    ke3: string;  // 第三课（日支所寄+日支）
-    ke4: string;  // 第四课（日支所寄+天盘）
-  };
-  /** 三传（事情发展三个阶段） */
-  chuan: {
-    chuan1: string; // 初传
-    chuan2: string; // 中传
-    chuan3: string; // 末传
-    chuan1Desc: string;
-    chuan2Desc: string;
-    chuan3Desc: string;
-  };
-  /** 贵神（十二神将） */
-  shen: {
-    shen1: string;
-    shen2: string;
-    shen3: string;
-    shen4: string;
-  };
-  /** 六亲关系 */
-  liuqin: string[];
-  /** 天盘地盘 */
-  tianpan: Record<string, string>;
-  dipan: Record<string, string>;
-  /** 吉凶判断 */
-  judgments: {
-    overall: string;       // 总体判断
-    goodAspects: string[]; // 吉的方面
-    badAspects: string[];  // 需要注意的方面
-    fortune: string;       // 运势等级
-  };
-  /** 详细解读 */
-  interpretation: string;
+import { Solar } from 'lunar-typescript';
+import { getDayPillar, getMonthPillar, getShiChen, getYearPillar } from '../utils/lunar';
+import type { DaliurenResult } from '../types';
+
+const GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+const ZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+/** 五行 */
+const ZHI_WUXING: Record<string, string> = {
+  子: '水', 丑: '土', 寅: '木', 卯: '木', 辰: '土', 巳: '火',
+  午: '火', 未: '土', 申: '金', 酉: '金', 戌: '土', 亥: '水',
+};
+const GAN_WUXING: Record<string, string> = {
+  甲: '木', 乙: '木', 丙: '火', 丁: '火', 戊: '土',
+  己: '土', 庚: '金', 辛: '金', 壬: '水', 癸: '水',
+};
+const SHENG: Record<string, string> = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+const KE: Record<string, string> = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+
+/** 日干寄宫（十干寄十二支） */
+const GAN_JI_GONG: Record<string, string> = {
+  甲: '寅', 乙: '辰', 丙: '巳', 丁: '未', 戊: '巳',
+  己: '未', 庚: '申', 辛: '戌', 壬: '亥', 癸: '丑',
+};
+
+/** 中气 → 月将（太阳过宫） */
+const ZHONGQI_YUEJIANG: Array<[string, string]> = [
+  ['雨水', '亥'], ['春分', '戌'], ['谷雨', '酉'], ['小满', '申'],
+  ['夏至', '未'], ['大暑', '午'], ['处暑', '巳'], ['秋分', '辰'],
+  ['霜降', '卯'], ['小雪', '寅'], ['冬至', '丑'], ['大寒', '子'],
+];
+
+/** 月将名 */
+const YUEJIANG_NAME: Record<string, string> = {
+  亥: '登明', 戌: '河魁', 酉: '从魁', 申: '传送', 未: '小吉', 午: '胜光',
+  巳: '太乙', 辰: '天罡', 卯: '太冲', 寅: '功曹', 丑: '大吉', 子: '神后',
+};
+
+/** 十二天将（顺布次序） */
+const TIANJIANG = ['贵人', '腾蛇', '朱雀', '六合', '勾陈', '青龙', '天空', '白虎', '太常', '玄武', '太阴', '天后'];
+
+/** 昼贵/夜贵（日干 → [昼贵支, 夜贵支]） */
+const GUI_REN: Record<string, [string, string]> = {
+  甲: ['丑', '未'], 戊: ['丑', '未'], 庚: ['丑', '未'],
+  乙: ['子', '申'], 己: ['子', '申'],
+  丙: ['亥', '酉'], 丁: ['亥', '酉'],
+  辛: ['午', '寅'],
+  壬: ['巳', '卯'], 癸: ['巳', '卯'],
+};
+
+/** 地支序差（0-11） */
+function zhiDiff(a: string, b: string): number {
+  return ((ZHI.indexOf(a) - ZHI.indexOf(b)) % 12 + 12) % 12;
+}
+
+/** 某支的旬空（按日柱） */
+function xunKong(dayGan: string, dayZhi: string): [string, string] {
+  const g = GAN.indexOf(dayGan);
+  const z = ZHI.indexOf(dayZhi);
+  let idx = 0;
+  for (let i = 0; i < 60; i++) {
+    if (i % 10 === g && i % 12 === z) { idx = i; break; }
+  }
+  const start = idx - (idx % 10);
+  return [ZHI[(start + 10) % 12], ZHI[(start + 11) % 12]];
+}
+
+/** 取当前已过的中气对应的月将 */
+function currentYuejiang(now: Date): { yuejiang: string; zhongqi: string } {
+  const lunar = Solar.fromYmdHms(
+    now.getFullYear(), now.getMonth() + 1, now.getDate(),
+    now.getHours(), now.getMinutes(), now.getSeconds()
+  ).getLunar();
+  const table = lunar.getJieQiTable();
+  const names = ZHONGQI_YUEJIANG.map(([n]) => n);
+  let best: { name: string; time: number } | null = null;
+  for (const [name, solar] of Object.entries(table)) {
+    if (!names.includes(name)) continue;
+    const t = new Date(
+      solar.getYear(), solar.getMonth() - 1, solar.getDay(),
+      solar.getHour(), solar.getMinute(), solar.getSecond()
+    ).getTime();
+    if (t <= now.getTime() && (!best || t > best.time)) best = { name, time: t };
+  }
+  // 表内未覆盖（年初）时回落到上一年冬至/大寒
+  if (!best) {
+    const prev = Solar.fromYmd(now.getFullYear() - 1, 12, 25).getLunar();
+    for (const [name, solar] of Object.entries(prev.getJieQiTable())) {
+      if (!names.includes(name)) continue;
+      const t = new Date(
+        solar.getYear(), solar.getMonth() - 1, solar.getDay(),
+        solar.getHour(), solar.getMinute(), solar.getSecond()
+      ).getTime();
+      if (t <= now.getTime() && (!best || t > best.time)) best = { name, time: t };
+    }
+  }
+  const zhongqi = best?.name ?? '冬至';
+  const yuejiang = ZHONGQI_YUEJIANG.find(([n]) => n === zhongqi)?.[1] ?? '丑';
+  return { yuejiang, zhongqi };
+}
+
+/** 五行生克关系（上神对下神） */
+function relationOf(upper: string, lower: string): '克' | '贼' | '生' | '被生' | '同' {
+  const up = ZHI_WUXING[upper];
+  const low = ZHI_WUXING[lower];
+  if (up === low) return '同';
+  if (KE[up] === low) return '克';
+  if (KE[low] === up) return '贼';
+  if (SHENG[up] === low) return '生';
+  return '被生';
+}
+
+export interface DaliurenChuan {
+  zhi: string;
+  gan?: string;
+  liuqin?: string;
+  jiang?: string;
+  kong?: boolean;
 }
 
 /**
- * 时辰对应地支
- */
-const SHICHEN_ZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-
-/**
- * 月将对应地支（正月建寅，月将在亥）
- */
-const YUEJIANG_ZHI = ['亥', '子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌'];
-
-/**
- * 贵神排列顺序
- */
-const GUISHEN_ORDER = ['贵', '蛇', '龙', '空', '虎', '常', '玄', '阴', '蛇', '贵', '后', '玄'];
-
-/**
- * 十二天将对应地支
- */
-const TIANJIANG = {
-  子: '贵神',
-  丑: '腾蛇',
-  寅: '青龙',
-  卯: '六合',
-  辰: '勾陈',
-  巳: '朱雀',
-  午: '白虎',
-  未: '玄武',
-  申: '太阴',
-  酉: '太常',
-  戌: '天空',
-  亥: '贵人',
-};
-
-/**
- * 大六壬九宗门
- */
-const JIU_ZONGMEN = [
-  '元首课',  // 三上克下
-  '重审课',  // 三下克上
-  '知一课',  // 一下克上，余上克下
-  '涉害课',  // 上下皆有克
-  '遥克课',  // 课无克，先取遥克
-  '昴星课',  // 课无克，取日干或日支上神
-  '别责课',  // 阳日取干上神，阴日取支上神
-  '八专课',  // 干支同宫
-  '伏吟课',  // 天地盘相同
-  '返吟课',  // 天地盘相冲
-];
-
-/**
- * 计算大六壬
- * @param year 年份
- * @param month 月份
- * @param day 日期
- * @param hour 小时
- * @param gender 性别（备用）
+ * 大六壬起课
+ * @param now 起课时间
  */
 export function calculateDaliuren(
   year: number,
   month: number,
   day: number,
   hour: number,
-  gender: string
+  gender: string,
+  now: Date = new Date(year, month - 1, day, hour)
 ): DaliurenResult {
-  // 计算时辰地支
-  const hourZhiIndex = Math.floor(hour / 2) % 12;
-  const hourZhi = SHICHEN_ZHI[hourZhiIndex];
+  // 1. 四柱
+  const yp = getYearPillar(year, month, day);
+  const mp = getMonthPillar(year, month, day, hour);
+  const dp = getDayPillar(year, month, day);
+  const hourZhi = ZHI[getShiChen(hour)];
+  const hourGanIndex = ((GAN.indexOf(dp.gan) % 5) * 2 + ZHI.indexOf(hourZhi)) % 10;
+  const hp = { gan: GAN[hourGanIndex], zhi: hourZhi };
 
-  // 计算月将（正月建寅，月将亥）
-  const yuejiangIndex = (month + 9) % 12; // 正月月将为亥(9)，故 +9 取余
-  const yuejiang = YUEJIANG_ZHI[(month - 1) % 12];
+  // 2. 月将
+  const { yuejiang, zhongqi } = currentYuejiang(now);
 
-  // 计算日干天支
-  const dayGanIndex = (day % 10 + 9) % 10; // 简化计算
-  const dayZhiIndex = (day % 12 + 10) % 12; // 简化计算
-  const TIANGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-  const dayGan = TIANGAN[dayGanIndex];
-  const dayZhi = SHICHEN_ZHI[dayZhiIndex];
+  // 3. 天地盘：天盘 = 地盘 + (月将 - 占时)
+  const shift = zhiDiff(yuejiang, hourZhi);
+  const tianOf = (diZhi: string): string => ZHI[(ZHI.indexOf(diZhi) + shift) % 12];
+  const tianpan: Record<string, string> = {};
+  const dipan: Record<string, string> = {};
+  for (const z of ZHI) {
+    tianpan[z] = tianOf(z);
+    dipan[z] = z;
+  }
 
-  // 日干所寄地支（甲寄寅、乙寄辰等）
-  const dayGanZhiMap: Record<string, string> = {
-    甲: '寅', 乙: '辰', 丙: '巳', 丁: '未', 戊: '巳',
-    己: '未', 庚: '申', 辛: '酉', 壬: '亥', 癸: '丑',
+  // 4. 四课
+  const ganGong = GAN_JI_GONG[dp.gan];
+  const ke1Upper = tianOf(ganGong);
+  const ke2Upper = tianOf(ke1Upper);
+  const ke3Upper = tianOf(dp.zhi);
+  const ke4Upper = tianOf(ke3Upper);
+  const kePairs: Array<{ lower: string; upper: string; label: string }> = [
+    { lower: ganGong, upper: ke1Upper, label: '干阳' },
+    { lower: ke1Upper, upper: ke2Upper, label: '干阴' },
+    { lower: dp.zhi, upper: ke3Upper, label: '支阳' },
+    { lower: ke3Upper, upper: ke4Upper, label: '支阴' },
+  ];
+
+  // 5. 三传（九宗门）
+  const relations = kePairs.map((k) => relationOf(k.upper, k.lower));
+  const keIdx = relations.map((r, i) => (r === '克' ? i : -1)).filter((i) => i >= 0);
+  const zeiIdx = relations.map((r, i) => (r === '贼' ? i : -1)).filter((i) => i >= 0);
+
+  let chuanUpper: string[] = [];
+  let zongmen = '';
+
+  if (shift === 0) {
+    // 伏吟：天地盘相同
+    zongmen = '伏吟课';
+    const xing = ke1Upper;
+    chuanUpper = [xing, tianOf(xing), tianOf(tianOf(xing))];
+  } else if (shift === 6) {
+    // 返吟：天地盘相冲
+    zongmen = '返吟课';
+    const xing = ke1Upper;
+    chuanUpper = [xing, tianOf(xing), tianOf(tianOf(xing))];
+  } else if (keIdx.length === 1 && zeiIdx.length === 0) {
+    zongmen = '元首课';
+    chuanUpper = [kePairs[keIdx[0]].upper];
+  } else if (zeiIdx.length === 1 && keIdx.length === 0) {
+    zongmen = '重审课';
+    chuanUpper = [kePairs[zeiIdx[0]].upper];
+  } else if (keIdx.length + zeiIdx.length > 1) {
+    // 比用：取与日干阴阳相同者
+    const ganYang = GAN.indexOf(dp.gan) % 2 === 0;
+    const all = [...keIdx.map((i) => ({ i, type: '克' })), ...zeiIdx.map((i) => ({ i, type: '贼' }))]
+      .map((o) => ({ ...o, zhi: kePairs[o.i].upper }))
+      .filter((o) => {
+        const yang = ZHI.indexOf(o.zhi) % 2 === 0;
+        return yang === ganYang;
+      });
+    if (all.length === 1) {
+      zongmen = '知一课';
+      chuanUpper = [all[0].zhi];
+    } else {
+      // 涉害：取涉害最深者（按地支序差计）
+      zongmen = '涉害课';
+      const scored = all.map((o) => ({ ...o, depth: zhiDiff(o.zhi, ganGong) + zhiDiff(o.zhi, dp.zhi) }));
+      scored.sort((a, b) => b.depth - a.depth);
+      chuanUpper = [scored[0]?.zhi ?? ke1Upper];
+    }
+  } else {
+    // 无克：遥克（上神克日干或日干克上神），否则昴星
+    const ganWx = GAN_WUXING[dp.gan];
+    const yaoKe = kePairs.filter((k) => {
+      const up = ZHI_WUXING[k.upper];
+      return (KE[up] === ganWx) || (KE[ganWx] === up);
+    });
+    if (yaoKe.length > 0) {
+      zongmen = '遥克课';
+      chuanUpper = [yaoKe[0].upper];
+    } else if (ganGong === dp.zhi) {
+      zongmen = '八专课';
+      chuanUpper = [ke3Upper];
+    } else {
+      zongmen = '昴星课';
+      chuanUpper = [ke1Upper];
+    }
+  }
+
+  // 三传：初传 → 中传（天盘所临）→ 末传
+  const chuanZhi: string[] = [chuanUpper[0]];
+  if (chuanUpper[1]) chuanZhi.push(chuanUpper[1]);
+  else chuanZhi.push(tianOf(chuanZhi[0]));
+  if (chuanUpper[2]) chuanZhi.push(chuanUpper[2]);
+  else chuanZhi.push(tianOf(chuanZhi[1]));
+
+  // 6. 遁干（按日柱旬）
+  const dpIndex = (() => {
+    for (let i = 0; i < 60; i++) {
+      if (i % 10 === GAN.indexOf(dp.gan) && i % 12 === ZHI.indexOf(dp.zhi)) return i;
+    }
+    return 0;
+  })();
+  const xunStart = dpIndex - (dpIndex % 10);
+  const dunGanOf = (zhi: string): string => {
+    const offset = (ZHI.indexOf(zhi) - ZHI.indexOf(ZHI[xunStart % 12]) + 12) % 12;
+    return GAN[(xunStart % 10 + offset) % 10];
   };
-  const dayGanZhi = dayGanZhiMap[dayGan];
 
-  // 日支所寄地支（子寄于本宫，丑寄于癸等）
-  const dayZhiZhiMap: Record<string, string> = {
-    子: '子', 丑: '亥', 寅: '亥', 卯: '子',
-    辰: '丑', 巳: '寅', 午: '卯', 未: '辰',
-    申: '巳', 酉: '午', 戌: '未', 亥: '申',
-  };
-  const dayZhiZhi = dayZhiZhiMap[dayZhi];
+  // 7. 旬空
+  const [kong1, kong2] = xunKong(dp.gan, dp.zhi);
 
-  // 计算四课
-  const ke1 = `${dayGanZhi}${dayZhi}`;
-  const ke2 = `${dayGanZhi}${yuejiang}`;
-  const ke3 = `${dayZhiZhi}${dayZhi}`;
-  const ke4 = `${dayZhiZhi}${yuejiang}`;
+  // 8. 十二天将：昼贵/夜贵 + 顺逆
+  const isDay = ['卯', '辰', '巳', '午', '未', '申'].includes(hourZhi);
+  const [dayGui, nightGui] = GUI_REN[dp.gan] ?? ['丑', '未'];
+  const guiZhi = isDay ? dayGui : nightGui;
+  const guiPalace = ZHI.indexOf(guiZhi);
+  // 贵人所临地盘的支 → 顺逆：亥子丑寅卯辰顺行
+  const guiOnEarth = ZHI[(ZHI.indexOf(guiZhi) - shift + 12) % 12];
+  const forward = ['亥', '子', '丑', '寅', '卯', '辰'].includes(guiOnEarth);
+  const jiangAt: Record<string, string> = {};
+  for (let i = 0; i < 12; i++) {
+    const zhi = ZHI[(guiPalace + (forward ? i : -i) + 24) % 12];
+    jiangAt[zhi] = TIANJIANG[i];
+  }
 
-  // 计算贵神排列
-  // 贵神起法：子在亥，丑在子，寅在丑...（顺时针）
-  const guiStartIndex = hourZhiIndex;
-  const shen1 = GUISHEN_ORDER[(guiStartIndex + 9) % 12];  // 子上贵人
-  const shen2 = GUISHEN_ORDER[(guiStartIndex + 10) % 12];
-  const shen3 = GUISHEN_ORDER[(guiStartIndex + 8) % 12];
-  const shen4 = GUISHEN_ORDER[(guiStartIndex + 7) % 12];
-
-  // 计算三传（简化版：基于四课关系）
-  const { chuan, zongmen } = calculateThreeChuan(ke1, ke2, ke3, ke4, dayGan);
-
-  // 计算地盘
-  const dipan: Record<string, string> = {
-    巽: '辰', 离: '午', 坤: '未', 兑: '酉',
-    乾: '戌', 坎: '子', 艮: '丑', 震: '卯',
+  // 9. 六亲（以日干五行为我）
+  const ganWx = GAN_WUXING[dp.gan];
+  const liuQinOf = (zhi: string): string => {
+    const wx = ZHI_WUXING[zhi];
+    if (wx === ganWx) return '兄弟';
+    if (SHENG[wx] === ganWx) return '父母';
+    if (SHENG[ganWx] === wx) return '子孙';
+    if (KE[wx] === ganWx) return '官鬼';
+    return '妻财';
   };
 
-  // 计算天盘（地盘+月将）
-  const tianpan = calculateTianPan(dipan, yuejiang);
+  const chuanDetail: DaliurenChuan[] = chuanZhi.map((zhi) => ({
+    zhi,
+    gan: dunGanOf(zhi),
+    liuqin: liuQinOf(zhi),
+    jiang: jiangAt[zhi],
+    kong: zhi === kong1 || zhi === kong2,
+  }));
 
-  // 吉凶判断
-  const judgments = analyzeJudgments(zongmen, chuan, shen1);
+  // 10. 结构摘要
+  const keText = kePairs.map((k) => `${k.lower}→${k.upper}`).join('  ');
+  const chuanText = chuanDetail
+    .map((c) => `${c.gan}${c.zhi}(${c.liuqin}${c.jiang ? '·' + c.jiang : ''}${c.kong ? '·空' : ''})`)
+    .join(' → ');
 
-  // 生成解读
-  const interpretation = generateInterpretation(year, month, day, zongmen, chuan, shen1);
+  const judgments = {
+    overall: `${zongmen}，初传${chuanDetail[0].gan}${chuanDetail[0].zhi}（${chuanDetail[0].liuqin}）`,
+    goodAspects: chuanDetail
+      .filter((c) => ['父母', '子孙', '妻财', '兄弟'].includes(c.liuqin ?? ''))
+      .map((c) => `${c.zhi}临${c.jiang ?? '—'}（${c.liuqin}）`),
+    badAspects: chuanDetail
+      .filter((c) => c.liuqin === '官鬼')
+      .map((c) => `${c.zhi}临${c.jiang ?? '—'}（官鬼）需防是非`),
+    fortune: chuanDetail.some((c) => c.kong) ? '中平（三传有落空，事多虚耗）' : '顺（三传不空）',
+  };
+
+  const interpretation =
+    `${yp.gan}${yp.zhi}年 ${mp.gan}${mp.zhi}月 ${dp.gan}${dp.zhi}日 ${hp.gan}${hp.zhi}时占。`
+    + `${zhongqi}后月将${yuejiang}（${YUEJIANG_NAME[yuejiang]}）加${hourZhi}时。`
+    + `四课：${keText}。`
+    + `${zongmen}，三传：${chuanText}。`
+    + `日干${dp.gan}${ganWx}，旬空${kong1}${kong2}，${isDay ? '昼' : '夜'}占，贵人${guiZhi}，天将${forward ? '顺行' : '逆行'}。`;
 
   return {
     time: {
@@ -186,222 +320,41 @@ export function calculateDaliuren(
       hour,
       shichen: `${hourZhi}时`,
       yuejiang,
+      fourPillars: `${yp.gan}${yp.zhi} ${mp.gan}${mp.zhi} ${dp.gan}${dp.zhi} ${hp.gan}${hp.zhi}`,
+      zhongqi,
+      yuejiangName: YUEJIANG_NAME[yuejiang],
     },
     ke: {
-      ke1,
-      ke2,
-      ke3,
-      ke4,
+      ke1: `${ke1Upper}`,
+      ke2: `${ke2Upper}`,
+      ke3: `${ke3Upper}`,
+      ke4: `${ke4Upper}`,
+      detail: kePairs.map((k) => `${k.label}：${k.lower}上${k.upper}`),
     },
     chuan: {
-      chuan1: chuan[0],
-      chuan2: chuan[1],
-      chuan3: chuan[2],
-      chuan1Desc: describeChuanElement(chuan[0]),
-      chuan2Desc: describeChuanElement(chuan[1]),
-      chuan3Desc: describeChuanElement(chuan[2]),
+      chuan1: `${dunGanOf(chuanZhi[0])}${chuanZhi[0]}`,
+      chuan2: `${dunGanOf(chuanZhi[1])}${chuanZhi[1]}`,
+      chuan3: `${dunGanOf(chuanZhi[2])}${chuanZhi[2]}`,
+      chuan1Desc: `${chuanDetail[0].liuqin}·${chuanDetail[0].jiang ?? '—'}${chuanDetail[0].kong ? '·旬空' : ''}`,
+      chuan2Desc: `${chuanDetail[1].liuqin}·${chuanDetail[1].jiang ?? '—'}${chuanDetail[1].kong ? '·旬空' : ''}`,
+      chuan3Desc: `${chuanDetail[2].liuqin}·${chuanDetail[2].jiang ?? '—'}${chuanDetail[2].kong ? '·旬空' : ''}`,
+      detail: chuanDetail,
+      text: chuanText,
+      zongmen,
     },
     shen: {
-      shen1,
-      shen2,
-      shen3,
-      shen4,
+      shen1: jiangAt[ke1Upper] ?? '',
+      shen2: jiangAt[ke2Upper] ?? '',
+      shen3: jiangAt[ke3Upper] ?? '',
+      shen4: jiangAt[ke4Upper] ?? '',
+      guiZhi,
+      guiEarth: guiOnEarth,
+      direction: forward ? '顺行' : '逆行',
     },
-    liuqin: generateLiuqin(chuan),
+    liuqin: chuanDetail.map((c) => `${c.zhi}：${c.liuqin}`),
     tianpan,
     dipan,
     judgments,
     interpretation,
   };
-}
-
-/**
- * 计算三传
- */
-function calculateThreeChuan(
-  ke1: string,
-  ke2: string,
-  ke3: string,
-  ke4: string,
-  dayGan: string
-): { chuan: string[]; zongmen: string } {
-  // 简化三传计算：基于日干和四课关系
-  // 实际六壬三传计算非常复杂，这里用简化逻辑
-  
-  const TIANGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-  const ganIndex = TIANGAN.indexOf(dayGan);
-  
-  // 根据日干确定三传
-  const chuanGans = [
-    TIANGAN[(ganIndex + 2) % 10],
-    TIANGAN[(ganIndex + 4) % 10],
-    TIANGAN[(ganIndex + 7) % 10],
-  ];
-  
-  const chuanZhis = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-  const chuanZhiIndex = (ganIndex + 3) % 12;
-  
-  const chuan = [
-    `${chuanGans[0]}${chuanZhis[chuanZhiIndex]}`,
-    `${chuanGans[1]}${chuanZhis[(chuanZhiIndex + 4) % 12]}`,
-    `${chuanGans[2]}${chuanZhis[(chuanZhiIndex + 7) % 12]}`,
-  ];
-
-  // 判断九宗门
-  let zongmen = '元首课';
-  if (ganIndex < 5) {
-    zongmen = Math.random() > 0.5 ? '重审课' : '知一课';
-  } else {
-    zongmen = Math.random() > 0.5 ? '涉害课' : '遥克课';
-  }
-
-  return { chuan, zongmen };
-}
-
-/**
- * 计算天盘
- */
-function calculateTianPan(
-  dipan: Record<string, string>,
-  yuejiang: string
-): Record<string, string> {
-  const zhiOrder = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-  const yuejiangIndex = zhiOrder.indexOf(yuejiang);
-  
-  const tianpan: Record<string, string> = {};
-  for (const [position, zhi] of Object.entries(dipan)) {
-    const zhiIndex = zhiOrder.indexOf(zhi);
-    const tianZhiIndex = (zhiIndex + yuejiangIndex) % 12;
-    tianpan[position] = zhiOrder[tianZhiIndex];
-  }
-  
-  return tianpan;
-}
-
-/**
- * 描述三传元素
- */
-function describeChuanElement(chuan: string): string {
-  const gan = chuan[0];
-  const zhi = chuan[1];
-  
-  const wuxing = {
-    甲: '木', 乙: '木', 丙: '火', 丁: '火', 戊: '土',
-    己: '土', 庚: '金', 辛: '金', 壬: '水', 癸: '水',
-  }[gan] || '土';
-  
-  const descriptions: Record<string, string> = {
-    木: '代表生发、成长，有开创进取之意',
-    火: '代表明快、上升，有积极主动之意',
-    土: '代表稳定、承载，有务实踏实之意',
-    金: '代表锐利、决断，有刚毅果断之意',
-    水: '代表流动、智慧，有灵活变通之意',
-  };
-  
-  return `${chuan}（五行属${wuxing}）：${descriptions[wuxing] || '需结合具体情况判断'}`;
-}
-
-/**
- * 生成六亲关系
- */
-function generateLiuqin(chuan: string[]): string[] {
-  return [
-    `初传${chuan[0]}代表事情的起因和动机`,
-    `中传${chuan[1]}代表事情的发展过程`,
-    `末传${chuan[2]}代表事情的结果和归宿`,
-  ];
-}
-
-/**
- * 分析吉凶判断
- */
-function analyzeJudgments(zongmen: string, chuan: string[], shen1: string): DaliurenResult['judgments'] {
-  // 吉神列表
-  const luckyShen = ['贵人', '青龙', '六合', '太阴', '太常'];
-  const unluckyShen = ['白虎', '玄武', '腾蛇', '勾陈'];
-  
-  const goodAspects: string[] = [];
-  const badAspects: string[] = [];
-
-  // 贵神吉凶
-  if (luckyShen.includes(shen1)) {
-    goodAspects.push(`贵神为${shen1}，主吉利，有贵人相助`);
-  } else if (unluckyShen.includes(shen1)) {
-    badAspects.push(`贵神为${shen1}，需要谨慎行事`);
-  }
-
-  // 九宗门吉凶
-  const zongmenFortune: Record<string, { good: string[]; bad: string[] }> = {
-    元首课: { good: ['主事顺遂，一上临下'], bad: [] },
-    重审课: { good: ['深思熟虑，谨慎行事'], bad: ['事多波折，需要耐心'] },
-    知一课: { good: ['事在眼前，择善而行'], bad: ['选择困难，需当机立断'] },
-    涉害课: { good: ['情况复杂，需要智慧'], bad: ['吉凶相半，谨慎为上'] },
-    遥克课: { good: ['事有外应，信息灵通'], bad: ['远而不实，需近取'] },
-    昴星课: { good: ['刚决果断，速战速决'], bad: ['动静皆宜，不宜拖延'] },
-    别责课: { good: ['专一坚定，不为外动'], bad: ['格局较弱，需借外力'] },
-    八专课: { good: ['专注一事，易有成就'], bad: ['格局特殊，需特殊对待'] },
-    伏吟课: { good: ['静待时机，蓄势待发'], bad: ['时机未到，不宜妄动'] },
-    返吟课: { good: ['变动活跃，机会较多'], bad: ['动荡不安，需稳住心神'] },
-  };
-
-  const fortune = zongmenFortune[zongmen] || { good: [], bad: [] };
-  goodAspects.push(...fortune.good);
-  badAspects.push(...fortune.bad);
-
-  // 判断运势等级
-  let overallFortune = '平';
-  if (goodAspects.length > badAspects.length + 1) {
-    overallFortune = '上吉';
-  } else if (goodAspects.length > badAspects.length) {
-    overallFortune = '吉';
-  } else if (badAspects.length > goodAspects.length + 1) {
-    overallFortune = '凶';
-  }
-
-  const overall = `${zongmen}，${overallFortune}。${goodAspects.length > 0 ? '吉利之处：' + goodAspects.join('；') + '。' : ''}${badAspects.length > 0 ? '需要注意：' + badAspects.join('；') + '。' : ''}`;
-
-  return {
-    overall,
-    goodAspects,
-    badAspects,
-    fortune: overallFortune,
-  };
-}
-
-/**
- * 生成详细解读
- */
-function generateInterpretation(
-  year: number,
-  month: number,
-  day: number,
-  zongmen: string,
-  chuan: string[],
-  shen1: string
-): string {
-  // 简化解读生成
-  let interpretation = `占事时间：${year}年${month}月${day}日。\n\n`;
-  interpretation += `课象分析：\n`;
-  interpretation += `1. 本课为${zongmen}，是六壬课中较为常见的课象。\n`;
-  interpretation += `2. 贵神为${shen1}，在六壬课象中具有重要意义。\n`;
-  interpretation += `3. 三传走势：${chuan.join(' → ')}，显示事情发展的三个阶段。\n\n`;
-  interpretation += `判断建议：\n`;
-  
-  // 根据九宗门给出建议
-  const suggestions: Record<string, string> = {
-    元首课: '事情发展较为顺遂，宜积极行动，把握时机。',
-    重审课: '需要深思熟虑，权衡利弊后再做决定。',
-    知一课: '选择明确，当机立断，不可犹豫不决。',
-    涉害课: '情况较为复杂，需要多角度分析问题。',
-    遥克课: '有外部信息介入，注意收集准确情报。',
-    昴星课: '宜快不宜慢，当速战速决。',
-    别责课: '宜专注一事，不宜分散精力。',
-    八专课: '有独特格局，需以特殊方式应对。',
-    伏吟课: '时机未到，宜静待时机，积蓄力量。',
-    返吟课: '变动较大，宜顺应变化，灵活应对。',
-  };
-  
-  interpretation += suggestions[zongmen] || '请结合具体问题综合判断。';
-  
-  return interpretation;
 }

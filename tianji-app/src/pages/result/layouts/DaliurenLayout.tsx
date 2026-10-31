@@ -1,124 +1,135 @@
 /**
- * 大六壬布局（自 ResultPage.tsx SmartContentCard 拆分）
+ * 大六壬布局（月将加时 · 四课三传）
+ * 数据来源：tianji-server daliuren.service
  */
 
+interface ChuanItem {
+  zhi: string;
+  gan?: string;
+  liuqin?: string;
+  jiang?: string;
+  kong?: boolean;
+}
+
+const LIUQIN_COLOR: Record<string, string> = {
+  父母: '#60a5fa',
+  兄弟: '#a78bfa',
+  子孙: '#34d399',
+  妻财: '#fbbf24',
+  官鬼: '#f87171',
+};
+
 export default function DaliurenLayout({ data }: { data: Record<string, unknown>; system?: string }) {
-    const chuan = Array.isArray(data.chuan) ? data.chuan as Array<Record<string, unknown>> : [];
-    const liuShen = data.liuShen as Record<string, string> | undefined;
-    const siKe = Array.isArray(data.siKe) ? data.siKe as Array<Record<string, unknown>> : [];
-    const monthJiang = data.monthJiang as string | undefined;
-    
-    return (
-      <div className="mb-6">
-        {/* 大六壬头部卡片 */}
-        <div className="p-6 rounded-2xl relative overflow-hidden" style={{ 
+  const time = (data.time || {}) as Record<string, unknown>;
+  const ke = (data.ke || {}) as Record<string, unknown>;
+  const chuan = (data.chuan || {}) as Record<string, unknown>;
+  const shen = (data.shen || {}) as Record<string, unknown>;
+
+  const keDetail = Array.isArray(ke.detail) ? (ke.detail as string[]) : [];
+  const chuanDetail = Array.isArray(chuan.detail) ? (chuan.detail as ChuanItem[]) : [];
+  const zongmen = typeof chuan.zongmen === 'string' ? chuan.zongmen : '';
+  const yuejiang = typeof time.yuejiang === 'string' ? time.yuejiang : '';
+  const yuejiangName = typeof time.yuejiangName === 'string' ? time.yuejiangName : '';
+  const fourPillars = typeof time.fourPillars === 'string' ? time.fourPillars : '';
+  const shichen = typeof time.shichen === 'string' ? time.shichen : '';
+
+  return (
+    <div className="mb-6">
+      {/* 头部 */}
+      <div
+        className="p-5 rounded-2xl"
+        style={{
           background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-          border: '1px solid rgba(251, 191, 36, 0.25)'
-        }}>
-          {/* 背景装饰 */}
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full opacity-5" style={{ background: 'radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, transparent 70%)' }} />
-          
-          {/* 头部信息 */}
-          <div className="relative z-10 flex items-center justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center" style={{ boxShadow: '0 4px 20px rgba(251, 191, 36, 0.4)' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                  <path d="M3 12h3M18 12h3M12 3v3M12 18v3" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-base font-bold" style={{ color: '#fbbf24', textShadow: '0 0 20px rgba(251, 191, 36, 0.5)' }}>六壬神课</h4>
-                <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>三传四课 · 壬学经典</p>
-              </div>
-            </div>
-            {monthJiang && (
-              <span className="px-4 py-2 rounded-full text-sm font-bold" style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.4)' }}>
-                {String(monthJiang)}
+          border: '1px solid rgba(251, 191, 36, 0.25)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h4 className="text-base font-bold" style={{ color: '#fbbf24' }}>六壬神课</h4>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+              月将加时 · {shichen}{fourPillars ? ` · ${fourPillars}` : ''}
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            {zongmen && (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.4)' }}>
+                {zongmen}
+              </span>
+            )}
+            {yuejiang && (
+              <span className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                月将 {yuejiang}{yuejiangName ? `（${yuejiangName}）` : ''}
               </span>
             )}
           </div>
-          
-          {/* 四课展示 */}
-          {siKe.length > 0 && (
-            <div className="relative z-10 mb-5">
-              <div className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: '#fcd34d' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                四课
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {siKe.map((k, i) => (
-                  <div key={i} className="p-3 rounded-xl" style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(251, 191, 36, 0.2)' }}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>第{i + 1}课</span>
-                      <span className="text-sm font-bold" style={{ color: '#fcd34d' }}>
-                        {String(k.gan || '')}{String(k.zhi || '')}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* 六神展示 */}
-          {liuShen ? (
-            <div className="relative z-10 mb-5">
-              <div className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: '#fcd34d' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
-                六神
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {Object.entries(liuShen).map(([shen, zhi], idx) => {
-                  const shenColors = ['#fbbf24', '#f59e0b', '#d97706', '#b45309', '#fcd34d', '#fde68a'];
-                  return (
-                    <div key={shen} className="flex items-center gap-2 p-2 rounded-xl transition-all duration-300 hover:-translate-y-1" 
-                      style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(128, 128, 128, 0.18)' }}>
-                      <span className="text-xs font-bold" style={{ color: shenColors[idx % shenColors.length] }}>{shen}</span>
-                      <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{zhi}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-          
-          {/* 三传展示 */}
-          {chuan.length > 0 && (
-            <div className="relative z-10">
-              <div className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: '#fcd34d' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                三传
-              </div>
-              <div className="space-y-2">
-                {chuan.map((c, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl transition-all duration-300" 
-                    style={{ 
-                      background: 'rgba(0, 0, 0, 0.2)',
-                      border: '1px solid rgba(251, 191, 36, 0.2)'
-                    }}>
-                    <span className="shrink-0 text-xs px-3 py-1.5 rounded-full font-medium" 
-                      style={{ background: 'rgba(251, 191, 36, 0.3)', color: '#fbbf24' }}>
-                      {String(c.chuan || ['初传', '中传', '末传'][i])}
-                    </span>
-                    <span className="text-lg font-bold" style={{ color: '#fcd34d' }}>
-                      {String(c.gan)}{String(c.zhi)}
-                    </span>
-                    {c.shen ? (
-                      <span className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24' }}>
-                        {String(c.shen)}
-                      </span>
-                    ) : null}
-                    <span className="text-xs flex-1 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-                      {String(c.description || '').substring(0, 50)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+
+        {Boolean(shen.guiZhi) && (
+          <div className="flex flex-wrap gap-2 text-[11px]" style={{ color: 'var(--color-text-secondary)' }}>
+            <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.25)' }}>
+              贵人 {String(shen.guiZhi)}（临地盘{String(shen.guiEarth)}）
+            </span>
+            <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.25)' }}>
+              天将{String(shen.direction)}
+            </span>
+          </div>
+        )}
       </div>
-    );
+
+      {/* 四课 */}
+      {keDetail.length > 0 && (
+        <div className="mt-3 p-4 rounded-2xl" style={{ background: 'rgba(30, 41, 59, 0.55)', border: '1px solid rgba(251, 191, 36, 0.18)' }}>
+          <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text)' }}>四课</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {keDetail.map((item, idx) => {
+              const [label, rest] = item.split('：');
+              return (
+                <div key={idx} className="p-2 rounded-lg text-center" style={{ background: 'rgba(0,0,0,0.22)' }}>
+                  <div className="text-[10px] mb-1" style={{ color: 'var(--color-text-tertiary)' }}>{label}</div>
+                  <div className="text-xs font-medium" style={{ color: '#fbbf24' }}>{rest || item}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 三传 */}
+      {chuanDetail.length > 0 && (
+        <div className="mt-3 p-4 rounded-2xl" style={{ background: 'rgba(30, 41, 59, 0.55)', border: '1px solid rgba(251, 191, 36, 0.18)' }}>
+          <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text)' }}>三传</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {['初传', '中传', '末传'].map((label, i) => {
+              const c = chuanDetail[i];
+              if (!c) return null;
+              return (
+                <div key={label} className="p-3 rounded-xl text-center" style={{ background: 'rgba(0,0,0,0.22)', border: `1px solid ${LIUQIN_COLOR[c.liuqin || ''] || '#64748b'}33` }}>
+                  <div className="text-[10px] mb-1" style={{ color: 'var(--color-text-tertiary)' }}>{label}</div>
+                  <div className="text-lg font-bold" style={{ color: '#fbbf24' }}>
+                    {c.gan || ''}{c.zhi}
+                  </div>
+                  <div className="text-[11px] mt-0.5" style={{ color: LIUQIN_COLOR[c.liuqin || ''] || 'var(--color-text-secondary)' }}>
+                    {c.liuqin || '—'}
+                  </div>
+                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
+                    {c.jiang || '—'}{c.kong ? ' · 旬空' : ''}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 天将四课对应 */}
+      {Boolean(shen.shen1 || shen.shen2 || shen.shen3 || shen.shen4) && (
+        <div className="mt-3 flex flex-wrap gap-2 text-[11px]" style={{ color: 'var(--color-text-secondary)' }}>
+          <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.2)' }}>干阳 {String(shen.shen1 || '—')}</span>
+          <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.2)' }}>干阴 {String(shen.shen2 || '—')}</span>
+          <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.2)' }}>支阳 {String(shen.shen3 || '—')}</span>
+          <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.2)' }}>支阴 {String(shen.shen4 || '—')}</span>
+        </div>
+      )}
+    </div>
+  );
 }

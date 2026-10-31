@@ -668,12 +668,16 @@ export interface DaliurenResult {
     hour: number;
     shichen: string;
     yuejiang: string;
+    fourPillars?: string;      // 四柱
+    zhongqi?: string;          // 定将中气
+    yuejiangName?: string;     // 月将名（登明/河魁…）
   };
   ke: {
     ke1: string;
     ke2: string;
     ke3: string;
     ke4: string;
+    detail?: string[];         // 四课明细（干支上下神）
   };
   chuan: {
     chuan1: string;
@@ -682,12 +686,18 @@ export interface DaliurenResult {
     chuan1Desc: string;
     chuan2Desc: string;
     chuan3Desc: string;
+    detail?: Array<{ zhi: string; gan?: string; liuqin?: string; jiang?: string; kong?: boolean }>;
+    text?: string;
+    zongmen?: string;          // 九宗门课体
   };
   shen: {
     shen1: string;
     shen2: string;
     shen3: string;
     shen4: string;
+    guiZhi?: string;           // 贵人支
+    guiEarth?: string;         // 贵人所临地盘
+    direction?: string;        // 天将顺逆
   };
   liuqin: string[];
   tianpan: Record<string, string>;
