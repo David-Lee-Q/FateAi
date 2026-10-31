@@ -3,6 +3,7 @@
  * 12星座信息、日期判断、模拟运势生成
  */
 
+import { calculateMoonphase } from './moonphase.service';
 import type { ZodiacSign, ZodiacResult } from '../types';
 
 /** 12星座基本信息 */
@@ -133,40 +134,87 @@ export function getZodiacByDate(birthDate: string): ZodiacSign {
   return ZODIAC_SIGNS[9];
 }
 
+/** 七曜对应星期（0=周日） */
+const WEEKDAY_PLANET: Array<{ name: string; boost: { career: number; wealth: number; love: number; health: number } }> = [
+  { name: '太阳', boost: { career: 4, wealth: 2, love: 2, health: 2 } },
+  { name: '月亮', boost: { career: 1, wealth: 1, love: 5, health: 3 } },
+  { name: '火星', boost: { career: 5, wealth: 1, love: 1, health: -2 } },
+  { name: '水星', boost: { career: 4, wealth: 4, love: 1, health: 1 } },
+  { name: '木星', boost: { career: 3, wealth: 6, love: 2, health: 2 } },
+  { name: '金星', boost: { career: 2, wealth: 4, love: 6, health: 2 } },
+  { name: '土星', boost: { career: 2, wealth: -2, love: 1, health: -1 } },
+];
+
+/** 星座元素（火土风水） */
+const SIGN_ELEMENT: Record<string, string> = {
+  白羊座: '火', 狮子座: '火', 射手座: '火',
+  金牛座: '土', 处女座: '土', 摩羯座: '土',
+  双子座: '风', 天秤座: '风', 水瓶座: '风',
+  巨蟹座: '水', 天蝎座: '水', 双鱼座: '水',
+};
+
 /**
- * 生成模拟运势数据
+ * 生成星座运势（确定性：真实月相 + 星期主星 + 星座元素，无随机）
  * @param sign 星座
  * @param type 运势类型：daily/weekly/monthly
+ * @param now 参考时间（默认当前，便于测试）
  */
 export function generateZodiacFortune(
   sign: ZodiacSign,
-  type: 'daily' | 'weekly' | 'monthly' = 'daily'
+  type: 'daily' | 'weekly' | 'monthly' = 'daily',
+  now: Date = new Date()
 ): ZodiacResult {
-  const typeMultiplier = type === 'daily' ? 1 : type === 'weekly' ? 0.9 : 0.8;
-  const seed = Math.random();
+  const weekday = WEEKDAY_PLANET[now.getDay()];
+  const element = SIGN_ELEMENT[sign.name] ?? '风';
 
-  // 生成各维度分数（50-100之间）
-  const loveScore = Math.floor(50 + seed * 50 * typeMultiplier);
-  const careerScore = Math.floor(50 + (1 - seed) * 50 * typeMultiplier);
-  const wealthScore = Math.floor(50 + (seed * 0.7 + 0.3) * 50 * typeMultiplier);
-  const healthScore = Math.floor(50 + (1 - seed * 0.5) * 50 * typeMultiplier);
+  // 真实月相：照明度越高，情绪与健康能量越强；渐亏偏内省
+  const iso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const moon = calculateMoonphase(iso).details;
+  const moonIllum = moon.illuminationPercent ?? 50;
+  const moonLove = Math.round((moonIllum - 50) * 0.12);
+  const moonHealth = Math.round((moonIllum - 50) * 0.10);
 
-  // 综合评分（四项平均）
+  // 元素自身的稳定偏置
+  const elementBoost: Record<string, { career: number; wealth: number; love: number; health: number }> = {
+    火: { career: 3, wealth: 1, love: 2, health: 1 },
+    土: { career: 2, wealth: 4, love: 1, health: 3 },
+    风: { career: 3, wealth: 1, love: 3, health: 0 },
+    水: { career: 1, wealth: 2, love: 4, health: 2 },
+  };
+  const eb = elementBoost[element];
+
+  // 周期波动（按年内周序，确定性）
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  const signIndex = (sign.name.charCodeAt(0) + sign.name.charCodeAt(1)) % 7;
+  const wave = ((dayOfYear + signIndex) % 11) - 5;
+
+  const clamp = (n: number) => Math.max(50, Math.min(97, Math.round(n)));
+  const base = type === 'daily' ? 68 : type === 'weekly' ? 70 : 72;
+
+  const loveScore = clamp(base + eb.love + weekday.boost.love + moonLove + wave);
+  const careerScore = clamp(base + eb.career + weekday.boost.career + wave - 1);
+  const wealthScore = clamp(base + eb.wealth + weekday.boost.wealth + Math.round(moonIllum * 0.03) + wave);
+  const healthScore = clamp(base + eb.health + weekday.boost.health + moonHealth - Math.round(wave / 2));
   const overallScore = Math.round((loveScore + careerScore + wealthScore + healthScore) / 4);
 
-  // 随机选取描述
-  const pickDesc = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+  // 描述按分数档位确定性选取
+  const tierOf = (score: number) => (score >= 88 ? 0 : score >= 76 ? 2 : score >= 64 ? 1 : 3);
+  const pick = (arr: string[], score: number) => arr[tierOf(score) % arr.length];
+
+  const luckyColorIndex = (dayOfYear + signIndex + (moonIllum > 50 ? 2 : 0)) % LUCKY_COLORS.length;
+  const luckyNumber = ((dayOfYear + signIndex) % 9) + 1;
 
   return {
     sign,
     overallScore,
-    love: { score: loveScore, description: pickDesc(FORTUNE_DESCRIPTIONS.love) },
-    career: { score: careerScore, description: pickDesc(FORTUNE_DESCRIPTIONS.career) },
-    wealth: { score: wealthScore, description: pickDesc(FORTUNE_DESCRIPTIONS.wealth) },
-    health: { score: healthScore, description: pickDesc(FORTUNE_DESCRIPTIONS.health) },
-    luckyColor: LUCKY_COLORS[Math.floor(Math.random() * LUCKY_COLORS.length)],
-    luckyNumber: Math.floor(Math.random() * 9) + 1,
-    advice: `今日${sign.name}的整体运势${overallScore >= 80 ? '极佳' : overallScore >= 60 ? '良好' : '一般'}，` +
-      `${overallScore >= 60 ? '保持积极心态，抓住机遇。' : '宜静不宜动，蓄势待发。'}`,
+    love: { score: loveScore, description: pick(FORTUNE_DESCRIPTIONS.love, loveScore) },
+    career: { score: careerScore, description: pick(FORTUNE_DESCRIPTIONS.career, careerScore) },
+    wealth: { score: wealthScore, description: pick(FORTUNE_DESCRIPTIONS.wealth, wealthScore) },
+    health: { score: healthScore, description: pick(FORTUNE_DESCRIPTIONS.health, healthScore) },
+    luckyColor: LUCKY_COLORS[luckyColorIndex],
+    luckyNumber,
+    advice: `${sign.name}（${element}象）${weekday.name}日，月相照明度${moonIllum.toFixed(0)}%（${moon.moonPhase}）。`
+      + `${overallScore >= 80 ? '整体运势极佳，宜主动出击。' : overallScore >= 65 ? '整体运势良好，按部就班即可。' : '整体运势偏平，宜稳守蓄力。'}`,
   };
 }
+

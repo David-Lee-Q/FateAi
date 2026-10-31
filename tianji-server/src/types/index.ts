@@ -497,21 +497,27 @@ export interface ShengxiaoInputParams {
 /** 生肖运势结果 */
 export interface ShengxiaoResult extends BaseFortuneResult {
   details: {
-    animal: string;                    // 生肖
-    benMingNian: string;              // 本命年信息
-    scores: {                          // 各维度运势评分
+    animal: string;
+    animalZhi?: string;
+    benMingNian: string;
+    yearPillar?: string;
+    monthPillar?: string;
+    dayPillar?: string;
+    relation?: { kind: string; target: string; score: number };
+    elementRelation?: string;
+    scores: {
       overall: number;
       career: number;
       wealth: number;
       love: number;
       health: number;
     };
-    luckyItems: {                     // 幸运元素
+    luckyItems: {
       color: string;
       number: number;
       direction: string;
     };
-    advice: string;                   // 建议
+    advice: string;
   };
 }
 
