@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createRoot } from 'react-dom/client';
 import React from 'react';
 import ShengxiaoPage from '../src/pages/ShengxiaoPage';
+import { getCurrentMonthIndex, getCurrentMonthRange, MONTH_META } from '../src/data/zodiac2026';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -21,10 +22,12 @@ describe('生肖页"本月"卡片（DOM 渲染）', () => {
     await sleep(300);
 
     const text = container.textContent || '';
-    // 当前处于 2026 七月（申月），区间 2026.08.13 - 2026.09.10
-    expect(text).toContain('2026.08.13 - 2026.09.10');
-    expect(text).toContain('农历七月');
-    expect(text).toContain('申月');
+    // 与页面同源推算当前农历月，避免写死日期导致跨月失效
+    const monthIndex = getCurrentMonthIndex();
+    const meta = MONTH_META[monthIndex];
+    expect(text).toContain(getCurrentMonthRange());
+    expect(text).toContain(`农历${meta.lunar}`);
+    expect(text).toContain(`${['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][meta.branch]}月`);
     // 旧的硬编码"本月"文案不应出现
     expect(text).not.toContain('2026.08.07 - 2026.09.07');
 

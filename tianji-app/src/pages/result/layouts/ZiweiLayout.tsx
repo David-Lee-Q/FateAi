@@ -6,6 +6,13 @@ export default function ZiweiLayout({ data }: { data: Record<string, unknown>; s
     const mg = (data.mingGong || data.命宫 || {}) as Record<string, unknown>;
     const palaces = data.twelvePalaces || data.十二宫位;
     const palaceList = Array.isArray(palaces) ? (palaces as Array<Record<string, unknown>>) : [];
+    const siHua = (data.siHua || {}) as Record<string, unknown>;
+    const horoscope = (data.horoscope || null) as Record<string, any> | null;
+    const metaChips: string[] = [
+      data.wuXingJu ? `五行局 ${String(data.wuXingJu)}` : '',
+      data.soul ? `命主 ${String(data.soul)}` : '',
+      data.body ? `身主 ${String(data.body)}` : '',
+    ].filter(Boolean);
     return (
       <div className="mb-6">
         {/* 紫微斗数头部卡片 */}
@@ -37,10 +44,59 @@ export default function ZiweiLayout({ data }: { data: Record<string, unknown>; s
             <div className="relative z-10 p-4 rounded-xl mb-5" style={{ background: 'rgba(0, 0, 0, 0.2)', border: '1px solid rgba(167, 139, 250, 0.2)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs font-medium" style={{ color: '#c4b5fd' }}>命宫主星</span>
+                {Boolean(mg.heavenlyStem || mg.earthlyBranch) && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(167,139,250,0.15)', color: '#c4b5fd' }}>
+                    {String(mg.heavenlyStem || '')}{String(mg.earthlyBranch || '')}
+                  </span>
+                )}
               </div>
               <div className="text-xl font-bold" style={{ color: '#a78bfa' }}>
                 {String(mg.mainStar || mg.stars || '—')}
               </div>
+              {metaChips.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {metaChips.map((chip) => (
+                    <span key={chip} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(139,92,246,0.15)', color: '#c4b5fd' }}>
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 生年四化 */}
+          {Object.keys(siHua).length > 0 && (
+            <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-2 mb-5">
+              {['化禄', '化权', '化科', '化忌'].map((key, i) => {
+                const colors = ['#4ade80', '#60a5fa', '#fbbf24', '#f87171'];
+                return (
+                  <div key={key} className="p-2 rounded-lg text-center" style={{ background: 'rgba(0,0,0,0.2)', border: `1px solid ${colors[i]}33` }}>
+                    <div className="text-[10px]" style={{ color: colors[i] }}>{key}</div>
+                    <div className="text-xs font-semibold truncate" style={{ color: 'var(--color-text)' }}>
+                      {siHua[key] ? String(siHua[key]) : '—'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* 大限 / 流年 */}
+          {horoscope && horoscope.decadal && (
+            <div className="relative z-10 flex flex-wrap items-center gap-2 mb-5 text-[11px]" style={{ color: 'var(--color-text-secondary)' }}>
+              <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(167,139,250,0.12)' }}>
+                大限 {String(horoscope.decadal.heavenlyStem || '')}{String(horoscope.decadal.earthlyBranch || '')}
+                {Array.isArray(horoscope.decadal.range) ? ` ${horoscope.decadal.range[0]}-${horoscope.decadal.range[1]}岁` : ''}
+              </span>
+              <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(167,139,250,0.12)' }}>
+                流年 {String(horoscope.yearly?.heavenlyStem || '')}{String(horoscope.yearly?.earthlyBranch || '')}
+              </span>
+              {Array.isArray(horoscope.yearly?.mutagen) && horoscope.yearly.mutagen.length > 0 && (
+                <span className="px-2 py-0.5 rounded" style={{ background: 'rgba(167,139,250,0.12)' }}>
+                  流年四化 {horoscope.yearly.mutagen.join('/')}
+                </span>
+              )}
             </div>
           )}
           
@@ -67,15 +123,26 @@ export default function ZiweiLayout({ data }: { data: Record<string, unknown>; s
                         border: '1px solid rgba(128, 128, 128, 0.18)'
                       }}
                     >
-                      <div className="text-xs mb-1.5" style={{ color: 'var(--color-text-tertiary)' }}>
-                        {String(palaceName)}
+                      <div className="text-xs mb-1.5 flex items-center justify-center gap-1" style={{ color: 'var(--color-text-tertiary)' }}>
+                        <span>{String(palaceName)}</span>
+                        {Boolean(palace.heavenlyStem || palace.earthlyBranch) && (
+                          <span className="text-[9px] opacity-70">{String(palace.heavenlyStem || '')}{String(palace.earthlyBranch || '')}</span>
+                        )}
+                        {palace.isBodyPalace === true && (
+                          <span className="text-[9px] px-1 rounded" style={{ background: 'rgba(74,222,128,0.2)', color: '#4ade80' }}>身</span>
+                        )}
                       </div>
                       <div className="text-sm font-bold truncate mb-1" style={{ color: colors[idx % colors.length] }}>
                         {String(mainStar)}
                       </div>
                       {stars && typeof stars === 'string' && (
                         <div className="text-[10px] truncate" style={{ color: 'var(--color-text-tertiary)' }}>
-                          {stars.substring(0, 15)}
+                          {stars.substring(0, 20)}
+                        </div>
+                      )}
+                      {Boolean(palace.decadal) && typeof palace.decadal === 'object' && Array.isArray((palace.decadal as Record<string, unknown>).range) && (
+                        <div className="text-[9px] mt-0.5" style={{ color: 'var(--color-text-tertiary)', opacity: 0.7 }}>
+                          {(palace.decadal as { range: number[] }).range[0]}-{(palace.decadal as { range: number[] }).range[1]}岁
                         </div>
                       )}
                     </div>

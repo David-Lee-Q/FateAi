@@ -160,18 +160,49 @@ export interface ZiweiInputParams {
   gender: 'male' | 'female';
 }
 
-/** 紫微斗数结果 */
+/** 紫微星曜（名称/亮度/四化） */
+export interface ZiweiStar {
+  name: string;
+  brightness?: string;
+  mutagen?: string;
+}
+
+/** 紫微斗数结果（基于 iztro 真实安星） */
 export interface ZiweiResult extends BaseFortuneResult {
   details: {
-    birthInfo: string;           // 出生信息
-    mingGong: { palace: string; star: string }; // 命宫及主星
+    birthInfo: string;           // 出生信息（公历/农历/四柱）
+    mingGong: {                  // 命宫及主星
+      palace: string;
+      star: string;
+      mainStar?: string;
+      heavenlyStem?: string;
+      earthlyBranch?: string;
+    };
     twelvePalaces: Array<{       // 十二宫位
       palace: string;
       mainStar: string;
-      subStars: string[];
+      stars?: string;
+      heavenlyStem?: string;
+      earthlyBranch?: string;
+      majorStars?: ZiweiStar[];
+      minorStars?: ZiweiStar[];
+      adjectiveStars?: string[];
+      isBodyPalace?: boolean;
+      isOriginalPalace?: boolean;
+      decadal?: { range: [number, number]; heavenlyStem: string; earthlyBranch: string };
+      ages?: number[];
     }>;
     siHua: Record<string, string>; // 四化（化禄/化权/化科/化忌）
     wuXingJu: string;              // 五行局
+    soul?: string;                 // 命主
+    body?: string;                 // 身主
+    sign?: string;                 // 星座
+    zodiac?: string;               // 生肖
+    palaceLine?: string;           // 十二宫一行摘要
+    horoscope?: {                  // 大限/流年
+      decadal: { heavenlyStem: string; earthlyBranch: string; range: [number, number] };
+      yearly: { heavenlyStem: string; earthlyBranch: string; mutagen: string[] };
+    };
   };
 }
 
