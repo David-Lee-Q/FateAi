@@ -5,148 +5,8 @@
  */
 
 import { getDayPillar, getMonthPillar, getYearPillar, getShiChen } from '../utils/lunar';
+import { BITS_TO_TRIGRAM, HEXAGRAMS, TRIGRAMS } from '../utils/bagua';
 import type { LiuyaoResult } from '../types';
-
-/** 八卦：先天数、名称、卦象（自下而上，1=阳） */
-const TRIGRAMS: Record<string, { name: string; symbol: string; bits: string; element: string }> = {
-  乾: { name: '乾', symbol: '☰', bits: '111', element: '金' },
-  兑: { name: '兑', symbol: '☱', bits: '110', element: '金' },
-  离: { name: '离', symbol: '☲', bits: '101', element: '火' },
-  震: { name: '震', symbol: '☳', bits: '100', element: '木' },
-  巽: { name: '巽', symbol: '☴', bits: '011', element: '木' },
-  坎: { name: '坎', symbol: '☵', bits: '010', element: '水' },
-  艮: { name: '艮', symbol: '☶', bits: '001', element: '土' },
-  坤: { name: '坤', symbol: '☷', bits: '000', element: '土' },
-};
-
-const BITS_TO_TRIGRAM: Record<string, string> = Object.fromEntries(
-  Object.entries(TRIGRAMS).map(([k, v]) => [v.bits, k])
-);
-
-/** 京房八宫卦序：[下卦, 上卦, 卦名, 世爻位] */
-const PALACES: Array<{ palace: string; element: string; gua: Array<[string, string, string, number]> }> = [
-  {
-    palace: '乾',
-    element: '金',
-    gua: [
-      ['乾', '乾', '乾为天', 6],
-      ['巽', '乾', '天风姤', 1],
-      ['艮', '乾', '天山遁', 2],
-      ['坤', '乾', '天地否', 3],
-      ['坤', '巽', '风地观', 4],
-      ['坤', '艮', '山地剥', 5],
-      ['坤', '离', '火地晋', 4],
-      ['乾', '离', '火天大有', 3],
-    ],
-  },
-  {
-    palace: '坎',
-    element: '水',
-    gua: [
-      ['坎', '坎', '坎为水', 6],
-      ['兑', '坎', '水泽节', 1],
-      ['震', '坎', '水雷屯', 2],
-      ['离', '坎', '水火既济', 3],
-      ['离', '兑', '泽火革', 4],
-      ['离', '震', '雷火丰', 5],
-      ['离', '坤', '地火明夷', 4],
-      ['坎', '坤', '地水师', 3],
-    ],
-  },
-  {
-    palace: '艮',
-    element: '土',
-    gua: [
-      ['艮', '艮', '艮为山', 6],
-      ['离', '艮', '山火贲', 1],
-      ['乾', '艮', '山天大畜', 2],
-      ['兑', '艮', '山泽损', 3],
-      ['兑', '离', '火泽睽', 4],
-      ['兑', '乾', '天泽履', 5],
-      ['兑', '巽', '风泽中孚', 4],
-      ['艮', '巽', '风山渐', 3],
-    ],
-  },
-  {
-    palace: '震',
-    element: '木',
-    gua: [
-      ['震', '震', '震为雷', 6],
-      ['坤', '震', '雷地豫', 1],
-      ['坎', '震', '雷水解', 2],
-      ['巽', '震', '雷风恒', 3],
-      ['巽', '坤', '地风升', 4],
-      ['巽', '坎', '水风井', 5],
-      ['巽', '兑', '泽风大过', 4],
-      ['震', '兑', '泽雷随', 3],
-    ],
-  },
-  {
-    palace: '巽',
-    element: '木',
-    gua: [
-      ['巽', '巽', '巽为风', 6],
-      ['乾', '巽', '风天小畜', 1],
-      ['离', '巽', '风火家人', 2],
-      ['震', '巽', '风雷益', 3],
-      ['震', '乾', '天雷无妄', 4],
-      ['震', '离', '火雷噬嗑', 5],
-      ['震', '艮', '山雷颐', 4],
-      ['巽', '艮', '山风蛊', 3],
-    ],
-  },
-  {
-    palace: '离',
-    element: '火',
-    gua: [
-      ['离', '离', '离为火', 6],
-      ['艮', '离', '火山旅', 1],
-      ['巽', '离', '火风鼎', 2],
-      ['坎', '离', '火水未济', 3],
-      ['坎', '艮', '山水蒙', 4],
-      ['坎', '巽', '风水涣', 5],
-      ['坎', '乾', '天水讼', 4],
-      ['离', '乾', '天火同人', 3],
-    ],
-  },
-  {
-    palace: '坤',
-    element: '土',
-    gua: [
-      ['坤', '坤', '坤为地', 6],
-      ['震', '坤', '地雷复', 1],
-      ['兑', '坤', '地泽临', 2],
-      ['乾', '坤', '地天泰', 3],
-      ['乾', '震', '雷天大壮', 4],
-      ['乾', '兑', '泽天夬', 5],
-      ['乾', '坎', '水天需', 4],
-      ['坤', '坎', '水地比', 3],
-    ],
-  },
-  {
-    palace: '兑',
-    element: '金',
-    gua: [
-      ['兑', '兑', '兑为泽', 6],
-      ['坎', '兑', '泽水困', 1],
-      ['坤', '兑', '泽地萃', 2],
-      ['艮', '兑', '泽山咸', 3],
-      ['艮', '坎', '水山蹇', 4],
-      ['艮', '坤', '地山谦', 5],
-      ['艮', '震', '雷山小过', 4],
-      ['兑', '震', '雷泽归妹', 3],
-    ],
-  },
-];
-
-/** 卦象（6 位，自下而上）→ 卦信息 */
-const GUA_INDEX = new Map<string, { name: string; palace: string; palaceElement: string; shi: number }>();
-for (const p of PALACES) {
-  for (const [lower, upper, name, shi] of p.gua) {
-    const bits = TRIGRAMS[lower].bits + TRIGRAMS[upper].bits;
-    GUA_INDEX.set(bits, { name, palace: p.palace, palaceElement: p.element, shi });
-  }
-}
 
 /** 纳甲：每卦 6 位（初爻→上爻）的天干地支 */
 const NA_JIA: Record<string, string[]> = {
@@ -287,8 +147,8 @@ export function castLiuyao(question: string, options: LiuyaoCastOptions = {}): L
   const originalBits = lines.map((l) => (l.yang ? '1' : '0')).join('');
   const changedBits = lines.map((l) => (l.moving ? (l.yang ? '0' : '1') : l.yang ? '1' : '0')).join('');
 
-  const original = GUA_INDEX.get(originalBits);
-  const changed = GUA_INDEX.get(changedBits);
+  const original = HEXAGRAMS[originalBits];
+  const changed = HEXAGRAMS[changedBits];
   if (!original || !changed) throw new Error('卦象解析失败');
 
   const lowerKey = BITS_TO_TRIGRAM[originalBits.slice(0, 3)];

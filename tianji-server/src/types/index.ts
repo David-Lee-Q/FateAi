@@ -278,11 +278,15 @@ export interface MeihuaInputParams {
 export interface MeihuaResult extends BaseFortuneResult {
   details: {
     method: string;
-    upperGua: { name: string; symbol: string };  // 上卦
-    lowerGua: { name: string; symbol: string };  // 下卦
-    mainGua: { name: string; symbol: string };    // 主卦
-    huGua: { name: string; symbol: string };      // 互卦
-    tiYong: { ti: string; yong: string };          // 体用关系
+    methodDetail?: string;                        // 起卦算式说明
+    upperGua: { name: string; symbol: string; number?: number };  // 上卦
+    lowerGua: { name: string; symbol: string; number?: number };  // 下卦
+    mainGua: { name: string; symbol: string; bits?: string; meaning?: string; palace?: string };  // 主卦
+    huGua: { name: string; symbol: string; bits?: string; meaning?: string };                     // 互卦
+    bianGua?: { name: string; symbol: string; bits?: string; meaning?: string };                  // 变卦
+    dongYao?: number;                             // 动爻（1-6）
+    dongYaoDesc?: string;                         // 动爻说明
+    tiYong: { ti: string; yong: string; relation?: string; lucky?: string; text?: string }; // 体用关系
     interpretation: string;                        // 断卦
   };
 }

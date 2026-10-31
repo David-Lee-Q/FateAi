@@ -11,6 +11,13 @@ export default function MeihuaLayout({ data }: { data: Record<string, unknown>; 
     const wuxingRelations = data.wuxingRelations as Record<string, string[]> | undefined;
     const guaName = String(mainGua.name || '');
     const guaSymbol = String(mainGua.symbol || '');
+    const method = typeof data.method === 'string' ? data.method : '';
+    const methodDetail = typeof data.methodDetail === 'string' ? data.methodDetail : '';
+    const dongYaoDesc = typeof data.dongYaoDesc === 'string' ? data.dongYaoDesc : '';
+    const tiYongRelation = typeof tiYong?.relation === 'string' ? tiYong.relation : '';
+    const tiYongLucky = typeof tiYong?.lucky === 'string' ? tiYong.lucky : '';
+    const tiYongText = typeof tiYong?.text === 'string' ? tiYong.text : '';
+    const luckyColor = tiYongLucky === '大吉' ? '#34d399' : tiYongLucky === '吉' ? '#10b981' : tiYongLucky === '平' ? '#fbbf24' : '#f87171';
     
     return (
       <div className="mb-6">
@@ -50,7 +57,22 @@ export default function MeihuaLayout({ data }: { data: Record<string, unknown>; 
                 变卦：{String(bianGua.name)}
               </span>
             ) : null}
+            {dongYaoDesc && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.4)' }}>
+                {dongYaoDesc}
+              </span>
+            )}
+            {tiYongRelation && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(0,0,0,0.25)', color: luckyColor, border: `1px solid ${luckyColor}55` }}>
+                {tiYongRelation} · {tiYongLucky}
+              </span>
+            )}
           </div>
+          {(method || methodDetail) && (
+            <p className="relative z-10 mt-3 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
+              {method}{method ? '：' : ''}{methodDetail}
+            </p>
+          )}
         </div>
 
         {/* 三卦展示 */}
@@ -71,6 +93,9 @@ export default function MeihuaLayout({ data }: { data: Record<string, unknown>; 
                 <span className="text-2xl font-bold" style={{ color: '#f472b6' }}>{guaSymbol}</span>
               </div>
               <span className="text-xs font-medium" style={{ color: '#ec4899' }}>{guaName}</span>
+              {Boolean(mainGua.meaning) && (
+                <div className="text-[10px] mt-0.5 px-1" style={{ color: 'var(--color-text-tertiary)' }}>{String(mainGua.meaning)}</div>
+              )}
             </div>
             
             {/* 箭头 */}
@@ -88,6 +113,9 @@ export default function MeihuaLayout({ data }: { data: Record<string, unknown>; 
                 <span className="text-2xl font-bold" style={{ color: '#c4b5fd' }}>{String(huGua?.symbol || '☰')}</span>
               </div>
               <span className="text-xs font-medium" style={{ color: '#a78bfa' }}>{String(huGua?.name || '互卦')}</span>
+              {Boolean(huGua?.meaning) && (
+                <div className="text-[10px] mt-0.5 px-1" style={{ color: 'var(--color-text-tertiary)' }}>{String(huGua?.meaning)}</div>
+              )}
             </div>
             
             {/* 箭头 */}
@@ -105,6 +133,9 @@ export default function MeihuaLayout({ data }: { data: Record<string, unknown>; 
                 <span className="text-2xl font-bold" style={{ color: '#34d399' }}>{String(bianGua?.symbol || '☰')}</span>
               </div>
               <span className="text-xs font-medium" style={{ color: '#10b981' }}>{String(bianGua?.name || '变卦')}</span>
+              {Boolean(bianGua?.meaning) && (
+                <div className="text-[10px] mt-0.5 px-1" style={{ color: 'var(--color-text-tertiary)' }}>{String(bianGua?.meaning)}</div>
+              )}
             </div>
           </div>
         </div>
@@ -132,6 +163,11 @@ export default function MeihuaLayout({ data }: { data: Record<string, unknown>; 
                   <p className="text-lg font-bold" style={{ color: '#10b981' }}>{String(tiYong.yong || '')}</p>
                 </div>
               </div>
+              {tiYongText && (
+                <p className="mt-3 text-xs leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+                  {tiYongText}
+                </p>
+              )}
             </div>
           )}
           
