@@ -151,7 +151,17 @@ router.post('/query', async (req: Request, res: Response) => {
           res.status(400).json({ success: false, message: '六爻卦象需要：question' });
           return;
         }
-        data = castLiuyao(params.question);
+        // 可选：手动录入六爻（6/7/8/9，初爻→上爻），为空则真实摇卦
+        let manualLines: number[] | undefined;
+        const rawLines = (params as unknown as { lines?: unknown }).lines;
+        if (Array.isArray(rawLines) && rawLines.length === 6) {
+          manualLines = rawLines.map((n) => Number(n));
+          if (!manualLines.every((n) => [6, 7, 8, 9].includes(n))) {
+            res.status(400).json({ success: false, message: '六爻数值必须为 6/7/8/9' });
+            return;
+          }
+        }
+        data = castLiuyao(params.question, { lines: manualLines });
         break;
       }
 

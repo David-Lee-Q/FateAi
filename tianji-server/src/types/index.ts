@@ -217,11 +217,50 @@ export interface LiuyaoInputParams {
 export interface LiuyaoResult extends BaseFortuneResult {
   details: {
     question: string;
-    originalGua: { name: string; symbol: string };   // 本卦
-    changedGua: { name: string; symbol: string };     // 变卦
-    sixLines: Array<{ position: number; yao: string; yinYang: string }>; // 六爻详情
+    originalGua: {                                    // 本卦
+      name: string;
+      symbol: string;
+      upperGua?: string;
+      lowerGua?: string;
+      lowerTrigram?: string;
+      upperTrigram?: string;
+      palace?: string;
+      palaceElement?: string;
+    };
+    changedGua: { name: string; symbol: string; upperGua?: string; lowerGua?: string; palace?: string }; // 变卦
+    sixLines: Array<{                                 // 六爻详情（纳甲装卦）
+      position: number;
+      ganZhi: string;
+      yinYang: '阳' | '阴';
+      isMoving: boolean;
+      liuQin: string;
+      liuShen: string;
+      element: string;
+      shiYing: '' | '世' | '应';
+      isKong: boolean;
+      monthRelation: string;
+      dayRelation: string;
+      changedGanZhi?: string;
+      changedLiuQin?: string;
+      changedRelation?: string;
+    }>;
     worldResponse: { world: number; response: number }; // 世应位置
     naJia: string[];                                     // 纳甲
+    castInfo?: {                                         // 起卦信息
+      time: string;
+      yearPillar: string;
+      monthPillar: string;
+      dayPillar: string;
+      monthBuild: string;
+      dayChen: string;
+      xunKong: string;
+      tosses: number[];
+    };
+    yongShen?: string;                                    // 用神建议
+    movingCount?: number;                                 // 动爻数
+    lineTable?: string;                                   // 六爻一行摘要
+    shiYing?: { shi: string; ying: string };              // 世应摘要
+    liuQin?: Record<string, string>;                      // 六亲映射
   };
 }
 
