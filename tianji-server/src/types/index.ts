@@ -303,15 +303,43 @@ export interface QimenInputParams {
 }
 
 /** 奇门遁甲结果 */
+export interface QimenPalaceData {
+  number: number;
+  trigram: string;
+  direction: string;
+  element: string;
+  earthStem: string;          // 地盘干
+  hostedStem?: string;        // 中五宫寄坤二的干
+  heavenStems: string[];      // 天盘干
+  stars: string[];            // 九星
+  door: string;               // 八门
+  deity: string;              // 八神
+  isVoid: boolean;
+  isHorse: boolean;
+}
+
 export interface QimenResult extends BaseFortuneResult {
   details: {
-    juShu: string;                              // 局数（阳遁/阴遁几局）
-    tianPan: Record<string, string>;           // 天盘（九星分布）
-    diPan: Record<string, string>;             // 地盘（三奇六仪分布）
-    baMen: Record<string, string>;             // 八门
-    jiuXing: Record<string, string>;           // 九星
-    baShen: Record<string, string>;             // 八神
-    suggestion: string;                         // 综合建议
+    time?: string;
+    fourPillars?: { year: string; month: string; day: string; hour: string };
+    solarTerm?: string;                          // 节气
+    dun?: string;                                // 阳遁/阴遁
+    yuan?: string;                               // 上/中/下元
+    juShu: string;                               // 局数（阳遁/阴遁几局）
+    ju?: number;                                 // 局数数字
+    xunHead?: string;                            // 旬首
+    hiddenStem?: string;                         // 旬首遁干
+    voidBranches?: string[];                     // 旬空
+    leaders?: { star: string; door: string; originalPalace: number; starPalace: number; doorPalace: number };
+    horse?: { branch: string; palace: number };  // 马星
+    palaces?: QimenPalaceData[];                 // 九宫完整盘
+    palaceLine?: string;                         // 一行摘要
+    tianPan?: Record<string, string>;            // 兼容旧字段（已废弃）
+    diPan?: Record<string, string>;
+    baMen?: Record<string, string>;
+    jiuXing?: Record<string, string>;
+    baShen?: Record<string, string>;
+    suggestion?: string;
   };
 }
 
