@@ -6,6 +6,7 @@
 import { ALL_TEMPLATES, SystemTemplates } from './mock-templates';
 import { fillTemplate } from './template-filler';
 import { selectKnowledgeChunks } from './knowledge.loader';
+import { buildFacts, buildRetrievalQuery } from './fact-builder';
 
 // ============================================================
 // Prompt 模板
@@ -858,15 +859,28 @@ export async function interpretFortune(
   data: Record<string, unknown>,
   inputParams: Record<string, unknown>
 ): Promise<string> {
-  // 注入该系统的专业知识库上下文（轻量 RAG：按系统分块加载）
-  const knowledgeCtx = selectKnowledgeChunks(system, '');
+  // 排盘事实（程序计算，模型不得改写）+ BM25 检索的知识库片段
+  const facts = buildFacts(system, data);
+  const question = typeof inputParams.question === 'string' ? inputParams.question : '';
+  const retrievalQuery = buildRetrievalQuery(system, data, question);
+  const knowledgeCtx = selectKnowledgeChunks(system, retrievalQuery);
   const withKnowledge = (prompt: string): Promise<string> => {
-    if (!knowledgeCtx) return callAI(prompt);
-    return callAI(
-      `以下是从本系统知识库中检索出的专业知识，请作为解读的事实依据，不要直接复述文档内容：\n\n` +
-      `===== 知识库资料 =====\n${knowledgeCtx}\n===== 知识库结束 =====\n\n` +
-      `${prompt}`
-    );
+    const blocks: string[] = [];
+    if (facts) {
+      blocks.push(
+        `以下是程序已算定的排盘事实（不得修改、不得自行推算新的事实，只能据此解读；`
+        + `若某项事实缺失就明确说明无法判断）：\n\n`
+        + `===== 排盘事实 =====\n${facts}\n===== 事实结束 =====`
+      );
+    }
+    if (knowledgeCtx) {
+      blocks.push(
+        `以下是从本系统知识库中检索出的专业知识，请作为解读依据，不要直接复述文档内容：\n\n`
+        + `===== 知识库资料 =====\n${knowledgeCtx}\n===== 知识库结束 =====`
+      );
+    }
+    if (blocks.length === 0) return callAI(prompt, system);
+    return callAI(`${blocks.join('\n\n')}\n\n${prompt}`, system);
   };
 
   if (system === 'bazi') {
@@ -1154,7 +1168,7 @@ export async function askAiAdvice(question: string, context?: string): Promise<s
  * @param prompt 构建好的 prompt
  * @returns AI 生成的解读文本
  */
-export async function callAI(prompt: string): Promise<string> {
+export async function callAI(prompt: string, system?: string): Promise<string> {
   const apiKey = process.env.AI_API_KEY;
   const apiBase = process.env.AI_API_BASE || 'https://api.openai.com/v1';
   const model = process.env.AI_MODEL || 'gpt-4o-mini';
@@ -1203,7 +1217,7 @@ export async function callAI(prompt: string): Promise<string> {
     } else {
       console.error('AI 调用异常:', error);
     }
-    return generateMockInterpretation(prompt);
+    return generateMockInterpretation(prompt, system);
   }
 }
 
@@ -1266,20 +1280,82 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildFromTemplate(sys: SystemTemplates, section: string): string {
+/** 占位符 → 盘面事实标签（尽量用真实数据替换） */
+/** 仅保留语义严格对应的映射；语义不匹配的占位符走通用替换，避免错误填值 */
+const PLACEHOLDER_FACT_LABEL: Record<string, string> = {
+  fourLessons: '四课',
+  guaJudgment: '课体',
+  guaName: '本卦',
+  shiYing: '世应',
+  yongShen: '用神',
+  juShu: '局',
+  jiuGong: '九宫',
+  zhiFu: '值符值使',
+};
+
+/** 清理模板中未被填充的占位符（优先用盘面事实替换，避免 {xxx} 泄漏） */
+function sweepPlaceholders(text: string, facts = ''): string {
+  const factMap: Record<string, string> = {};
+  for (const line of facts.split('\n')) {
+    const m = line.match(/^-\s*([^：]+)：(.*)$/);
+    if (m) factMap[m[1].trim()] = m[2].trim();
+  }
+  return text
+    .replace(/\{([A-Za-z0-9_]+)\}/g, (_all, key: string) => {
+      const label = PLACEHOLDER_FACT_LABEL[key];
+      return (label && factMap[label]) || '盘面所示';
+    })
+    .replace(/（\s*）/g, '')
+    .replace(/，\s*，/g, '，')
+    .replace(/。\s*。/g, '。');
+}
+
+function buildFromTemplate(sys: SystemTemplates, section: string, facts = ''): string {
   const intro = fillTemplate(pick(sys.intro), section);
   const sections = sys.sections.map(s => {
     return fillTemplate(s.heading, section) + '\n\n' + fillTemplate(pick(s.variants), section) + '\n';
   }).join('\n');
   const outro = fillTemplate(pick(sys.outro), section);
-  return intro + '\n\n' + sections + '\n' + fillTemplate(outro, section);
+  return sweepPlaceholders(intro + '\n\n' + sections + '\n' + fillTemplate(outro, section), facts);
 }
 
 /**
  * 模拟解读生成（无 API Key 或异常时的降级方案）
  * 根据不同占卜体系返回有针对性的模拟文本（每条 >= 100 字）
  */
-function generateMockInterpretation(prompt: string): string {
+/**
+ * 从注入文本中提取「排盘事实」区块，作为无 AI Key 时的解读依据
+ */
+function extractFactsBlock(text: string): string {
+  const start = text.indexOf('===== 排盘事实 =====');
+  const end = text.indexOf('===== 事实结束 =====');
+  if (start === -1 || end === -1 || end <= start) return '';
+  return text.slice(start + '===== 排盘事实 ====='.length, end).trim();
+}
+
+/** system → 模板键（与 ALL_TEMPLATES 对应） */
+const SYSTEM_TEMPLATE_KEY: Record<string, keyof typeof ALL_TEMPLATES> = {
+  bazi: 'bazi', tarot: 'tarot', zodiac: 'zodiac', ziwei: 'ziwei', shengxiao: 'shengxiao',
+  dream: 'dream', drawlot: 'drawlot', palm: 'palm', tieban: 'tieban', daliuren: 'daliuren',
+  liuyao: 'liuyao', meihua: 'meihua', qimen: 'qimen', fengshui: 'fengshui',
+  numerology: 'numerology', astrodice: 'astrodice', moonphase: 'moonphase', rune: 'rune',
+  nametest: 'nametest', almanac: 'almanac', report: 'report', compare: 'compare',
+};
+
+function generateMockInterpretation(prompt: string, system?: string): string {
+  const facts = extractFactsBlock(prompt);
+  // 优先按体系精确选模板，避免关键词误判（如六爻命中"八字"模板）
+  const tplKey = system ? SYSTEM_TEMPLATE_KEY[system] : undefined;
+  const body = tplKey && ALL_TEMPLATES[tplKey]
+    ? buildFromTemplate(ALL_TEMPLATES[tplKey], tplKey, facts)
+    : buildMockByKeyword(prompt);
+  if (facts) {
+    return `## 盘面事实\n${facts}\n\n## 解读\n${body}`;
+  }
+  return body;
+}
+
+function buildMockByKeyword(prompt: string): string {
   if (prompt.includes('八字') || prompt.includes('排盘')) {
     return buildFromTemplate(ALL_TEMPLATES.bazi, 'bazi');
 

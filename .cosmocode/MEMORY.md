@@ -31,6 +31,16 @@ Agent 在任务执行过程中发现的条目应遵循以下格式：
 
 ## 条目
 
+[玄学算法对拍与降级链路]
+- Date: 2026-11-01
+- Context: Agent 在把 mock 排盘改为真实算法时发现
+- Category: 测试方法
+- Instructions:
+  - 奇门遁甲可用 `@spensercai/qimen-rs` 作独立 oracle：临时装在 /tmp（`npm init -y && npm install @spensercai/qimen-rs`），调用 `calculateJson(JSON.stringify({year,month,day,hour,minute,second,utc_offset_minutes:480}))`，输出含通/元/局/旬/值符值使/九宫全量；用它生成黄金样本写进单测，依赖不进仓库
+  - 农历/干支类可用已装 `lunar-typescript` 作 oracle（`Solar.fromYmd(...).getLunar().getDayInGanZhi()`），比自研表更权威
+  - 大六壬、灵签等无可靠开源 oracle，只能做规则自洽性测试（天地盘位移、四课推导、三传串联、旬空/遁干），不要声称"对拍通过"
+  - AI 无 Key 时 `callAI` 内部 catch 并降级模板；降级文本会前置 `## 盘面事实`（由 `fact-builder.ts` 序列化真实排盘），模板按 system 精确路由并清理未填充占位符
+
 [GitHub 镜像推送与本地对象库缺失修复]
 - Date: 2026-08-24
 - Context: Agent 执行用户"推送到 GitHub"指令时发现本地 .git 历史断裂
