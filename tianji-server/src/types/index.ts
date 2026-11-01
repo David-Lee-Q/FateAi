@@ -349,6 +349,8 @@ export interface QimenResult extends BaseFortuneResult {
 export interface FengshuiInputParams {
   direction: 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
   buildingType: 'residential' | 'commercial' | 'office';
+  birthYear?: number;                                  // 屋主出生年（八宅命卦）
+  gender?: 'male' | 'female';
 }
 
 /** 风水罗盘结果 */
@@ -360,6 +362,22 @@ export interface FengshuiResult extends BaseFortuneResult {
     favorableAreas: string[];                  // 吉利方位
     unfavorableAreas: string[];               // 不利方位
     layoutAdvice: string[];                    // 布局建议
+    year?: number;                             // 参考年份
+    yearStarCenter?: { star: number; name: string; meaning: string }; // 年飞星入中
+    flyingStars?: Array<{                      // 九宫年飞星
+      palace: string;
+      direction: string;
+      star: number;
+      name: string;
+      nature: string;
+      meaning: string;
+    }>;
+    baZhai?: {                                 // 八宅
+      mingGua: string;
+      group: string;
+      goodDirections: string[];
+      badDirections: string[];
+    };
   };
 }
 

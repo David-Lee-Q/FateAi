@@ -214,7 +214,7 @@ router.post('/query', async (req: Request, res: Response) => {
           res.status(400).json({ success: false, message: '风水罗盘需要：direction, buildingType' });
           return;
         }
-        data = analyzeFengshui(params.direction, params.buildingType);
+        data = analyzeFengshui(params.direction, params.buildingType, params.birthYear, params.gender);
         break;
       }
 
