@@ -332,7 +332,7 @@ export default function BaziResultPage() {
         <div className="flex items-center gap-3 mb-6">
           <Link
             to="/bazi"
-            className="inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+            className="nav-back-btn inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
             style={{ color: 'var(--color-primary)', background: 'var(--color-primary-bg)' }}
           >
             <ChevronLeft className="w-4 h-4" />返回
@@ -517,18 +517,18 @@ export default function BaziResultPage() {
       </main>
 
       {/* 固定底部操作栏 */}
-      <div className="fixed bottom-0 left-0 right-0 z-40" style={{ background: 'var(--color-bg-elevated)', borderTop: '1px solid var(--color-border-light)' }}>
+      <div className="result-toolbar fixed bottom-0 left-0 right-0 z-40" style={{ background: 'var(--color-bg-elevated)', borderTop: '1px solid var(--color-border-light)' }}>
         <div className="mx-auto flex items-center justify-center gap-4 md:gap-8 px-6 py-3" style={{ maxWidth: 'var(--max-width)' }}>
-          <button className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <button className="tool-btn flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
             <Heart className="w-5 h-5" /><span className="text-xs">收藏</span>
           </button>
-          <button className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <button className="tool-btn flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
             <Share2 className="w-5 h-5" /><span className="text-xs">分享</span>
           </button>
-          <button className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <button className="tool-btn flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
             <FileText className="w-5 h-5" /><span className="text-xs">报告</span>
           </button>
-          <button className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <button className="tool-btn flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
             <RefreshCw className="w-5 h-5" /><span className="text-xs">重测</span>
           </button>
         </div>

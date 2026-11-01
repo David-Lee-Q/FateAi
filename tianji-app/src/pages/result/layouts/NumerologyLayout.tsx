@@ -62,7 +62,7 @@ export default function NumerologyLayout({ data }: { data: Record<string, unknow
           background: 'linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
           border: '1px solid rgba(6, 182, 212, 0.2)'
         }}>
-          <div className="absolute inset-0 flex items-center justify-center opacity-5">
+          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none" aria-hidden="true">
             <div className="w-64 h-64 rounded-full border-2 border-cyan-400 animate-ping"></div>
           </div>
           <div className="relative z-10">

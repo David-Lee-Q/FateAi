@@ -86,7 +86,7 @@ export default function RuneResultPage() {
   return (
     <div style={{ background: 'linear-gradient(180deg, var(--color-primary-darker) 0%, #0a0f2e 100%)', color: '#e8ecf4', fontFamily: 'var(--font-body)', minHeight: '100vh' }}>
       {/* 顶部导航 */}
-      <header className="sticky top-0 z-50" style={{ background: 'rgba(10,15,46,0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(200,168,78,0.1)' }}>
+      <header className="sticky z-40" style={{ top: 'var(--navbar-height)', background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3" style={{ maxWidth: 'var(--max-width)' }}>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}>

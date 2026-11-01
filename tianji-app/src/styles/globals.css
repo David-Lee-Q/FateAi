@@ -35,8 +35,8 @@
   --color-text-light: #8b92a8;
 
   /* 边框 */
-  --color-border: #1e2740;
-  --color-border-light: #161e35;
+  --color-border: #2a3550;
+  --color-border-light: #1f2942;
 
   /* 金色强调 */
   --color-gold: #c8a84e;
@@ -92,6 +92,7 @@
   /* 布局 */
   --max-width: 1280px;
   --navbar-height: 64px;
+  --toolbar-height: 68px;
 }
 
 /* ---- 全局重置 ---- */
@@ -753,4 +754,26 @@ select option {
   font-variant-numeric: tabular-nums;
   color: var(--color-text-inverse);
   background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---- 可见边框的次级按钮（返回 / 底部工具栏） ---- */
+.nav-back-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+.nav-back-btn:hover {
+  border-color: var(--color-gold-dark);
+  background: var(--color-bg-card-hover);
+}
+.tool-btn {
+  border: 1px solid transparent;
+}
+.tool-btn:hover {
+  border-color: var(--color-border);
+  background: var(--color-bg-card-hover);
+}
+
+/* ---- 固定底部工具栏时，页脚避让 ---- */
+body:has(.result-toolbar) footer {
+  padding-bottom: calc(var(--toolbar-height) + 2rem);
 }

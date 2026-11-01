@@ -278,8 +278,8 @@ export default function HistoryPage() {
                   {/* 收藏 */}
                   <button onClick={() => toggleFavorite(record.id)} title={record.favorited ? '取消收藏' : '收藏'} style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: 36, height: 36, borderRadius: 8, border: 'none',
-                    background: 'transparent', cursor: 'pointer',
+                    width: 36, height: 36, borderRadius: 8, border: '1px solid var(--color-border)',
+                    background: 'var(--color-bg-elevated)', cursor: 'pointer',
                     color: record.favorited ? 'var(--color-gold)' : 'var(--color-text-tertiary)',
                   }}>
                     <Star size={16} fill={record.favorited ? 'currentColor' : 'none'} />
@@ -287,8 +287,8 @@ export default function HistoryPage() {
                   {/* 删除 */}
                   <button onClick={() => deleteRecord(record.id)} title="删除" style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: 36, height: 36, borderRadius: 8, border: 'none',
-                    background: 'transparent', cursor: 'pointer', color: 'var(--color-text-tertiary)',
+                    width: 36, height: 36, borderRadius: 8, border: '1px solid var(--color-border)',
+                    background: 'var(--color-bg-elevated)', cursor: 'pointer', color: 'var(--color-text-tertiary)',
                   }}>
                     <Trash2 size={16} />
                   </button>

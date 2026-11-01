@@ -1305,7 +1305,7 @@ export default function ReportPage() {
       {/* ========== 固定底部操作栏（空态下隐藏） ========== */}
       {!isEmpty && (
       <div
-        className="no-print"
+        className="result-toolbar no-print"
         style={{
           position: 'fixed',
           bottom: 0,

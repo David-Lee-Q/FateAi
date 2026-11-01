@@ -87,14 +87,14 @@ export default function MoonphaseLayout({ data }: { data: Record<string, unknown
                 background: 'linear-gradient(135deg, #f5f5f5, #e0e0e0)',
                 boxShadow: '0 0 60px rgba(167, 139, 250, 0.5), inset -20px -10px 40px rgba(0, 0, 0, 0.2)'
               }}>
-                <div className="absolute inset-0 rounded-full" style={{
+                <div className="absolute inset-0 rounded-full pointer-events-none" style={{
                   backgroundImage: 'radial-gradient(circle at 30% 35%, rgba(0,0,0,0.08) 0%, transparent 18%), radial-gradient(circle at 60% 50%, rgba(0,0,0,0.06) 0%, transparent 12%), radial-gradient(circle at 45% 70%, rgba(0,0,0,0.05) 0%, transparent 10%)'
                 }}></div>
                 {/* 月相阴影覆盖层 */}
                 {phase.includes('新月') || phase.includes('日食') ? (
-                  <div className="absolute inset-0 rounded-full" style={{ background: '#1a1a2e' }}></div>
+                  <div className="absolute inset-0 rounded-full pointer-events-none" style={{ background: '#1a1a2e' }}></div>
                 ) : phase.includes('满月') ? null : (
-                  <div className="absolute inset-0 rounded-full" style={{
+                  <div className="absolute inset-0 rounded-full pointer-events-none" style={{
                     background: `linear-gradient(to right, rgba(26, 26, 46, ${1 - illumination / 100}) 0%, transparent 50%)`
                   }}></div>
                 )}

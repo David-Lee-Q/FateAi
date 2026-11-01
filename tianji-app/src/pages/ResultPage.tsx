@@ -2071,7 +2071,7 @@ export default function ResultPage() {
 
       {/* ====== 5. 操作栏（固定底部） ====== */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-40"
+        className="result-toolbar fixed bottom-0 left-0 right-0 z-40"
         style={{
           background: 'var(--color-bg-elevated)',
           borderTop: '1px solid var(--color-border-light)',

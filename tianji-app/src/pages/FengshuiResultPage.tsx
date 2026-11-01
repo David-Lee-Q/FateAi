@@ -135,9 +135,9 @@ export default function FengshuiResultPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
       {/* 顶部导航区 */}
-      <header className="sticky top-0 z-50 w-full" style={{ background: 'rgba(10,14,26,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--color-border)' }}>
+      <header className="sticky z-40 w-full" style={{ top: 'var(--navbar-height)', background: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="mx-auto flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-width)' }}>
-          <button onClick={() => navigate('/fengshui')} className="inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors" style={{ color: 'var(--color-text-secondary)' }}>
+          <button onClick={() => navigate('/fengshui')} className="nav-back-btn inline-flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors" style={{ color: 'var(--color-text-secondary)' }}>
             <ChevronLeft size={16} />返回
           </button>
           <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
@@ -264,7 +264,7 @@ export default function FengshuiResultPage() {
       </div>
 
       {/* 底部工具栏 */}
-      <div className="fixed bottom-0 left-0 right-0 z-40" style={{ background: 'var(--color-bg-elevated)', borderTop: '1px solid var(--color-border)' }}>
+      <div className="result-toolbar fixed bottom-0 left-0 right-0 z-40" style={{ background: 'var(--color-bg-elevated)', borderTop: '1px solid var(--color-border)' }}>
         <div className="mx-auto flex items-center justify-center gap-4 md:gap-8 px-6 py-3" style={{ maxWidth: 'var(--max-width)' }}>
           <button
             onClick={() => setIsBookmarked(!isBookmarked)}
@@ -274,11 +274,11 @@ export default function FengshuiResultPage() {
             <Bookmark size={20} fill={isBookmarked ? 'currentColor' : 'none'} />
             <span className="text-xs">收藏</span>
           </button>
-          <button className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <button className="tool-btn flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
             <Share2 size={20} />
             <span className="text-xs">分享</span>
           </button>
-          <button onClick={() => navigate('/fengshui')} className="flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
+          <button onClick={() => navigate('/fengshui')} className="tool-btn flex flex-col items-center gap-1 px-3 py-1 rounded-lg" style={{ color: 'var(--color-text-secondary)' }}>
             <Heart size={20} />
             <span className="text-xs">重测</span>
           </button>

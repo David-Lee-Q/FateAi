@@ -101,7 +101,7 @@ export default function DatePicker({ label, value, onChange, placeholder = 'è¯·é
 
         {isOpen && (
           <div
-            className="absolute top-full left-0 mt-2 z-50 rounded-xl p-4 shadow-lg"
+            className="absolute top-full left-0 mt-2 z-30 rounded-xl p-4 shadow-lg"
             style={{
               background: 'var(--color-bg-elevated)',
               border: '1px solid rgba(255, 255, 255, 0.12)',

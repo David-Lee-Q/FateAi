@@ -129,7 +129,7 @@ export default function Navbar() {
         {/* 移动端菜单按钮 */}
         <button
           className="rounded-lg p-2 md:hidden"
-          style={{ color: 'var(--color-text)', background: 'none', border: 'none', cursor: 'pointer' }}
+          style={{ color: 'var(--color-text)', background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', cursor: 'pointer' }}
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="切换菜单"
         >
